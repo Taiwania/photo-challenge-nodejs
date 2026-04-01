@@ -1,0 +1,68 @@
+<section class="panel">
+  <h1>Job Result</h1>
+  <p class="lede">Job <code>{{job.id}}</code> finished with status <strong>{{job.status}}</strong>.</p>
+
+  <dl class="details">
+    <div><dt>Action</dt><dd>{{jobActionLabel}}</dd></div>
+    <div><dt>Challenge</dt><dd>{{job.challenge}}</dd></div>
+    <div><dt>Output</dt><dd><code>{{job.outputDir}}</code></dd></div>
+  </dl>
+
+  <h2>Core outputs</h2>
+  {{#if coreArtifacts.length}}
+    <div class="artifact-grid">
+      {{#each coreArtifacts}}
+        <article class="artifact-card artifact-card-{{type}}">
+          <p class="artifact-kicker">{{label}}</p>
+          <h3><code>{{name}}</code></h3>
+          <p class="artifact-copy">{{description}}</p>
+          <div class="artifact-actions">
+            <a href="{{previewUrl}}">Preview</a>
+            <a href="{{downloadUrl}}">Download</a>
+          </div>
+        </article>
+      {{/each}}
+    </div>
+  {{else}}
+    <p>No core output files are available for this job yet.</p>
+  {{/if}}
+
+  <h2>Other generated files</h2>
+  {{#if generatedFiles.length}}
+    <ul class="artifact-list">
+      {{#each generatedFiles}}
+        <li>
+          <code>{{name}}</code>
+          <span class="artifact-actions">
+            <a href="{{previewUrl}}">Preview</a>
+            <a href="{{downloadUrl}}">Download</a>
+          </span>
+        </li>
+      {{/each}}
+    </ul>
+  {{else}}
+    <p>No additional generated files yet.</p>
+  {{/if}}
+
+  <h2>Log files</h2>
+  {{#if logFiles.length}}
+    <ul class="artifact-list">
+      {{#each logFiles}}
+        <li>
+          <code>{{name}}</code>
+          <span class="artifact-actions">
+            <a href="{{previewUrl}}">Preview</a>
+            <a href="{{downloadUrl}}">Download</a>
+          </span>
+        </li>
+      {{/each}}
+    </ul>
+  {{else}}
+    <p>No log files yet.</p>
+  {{/if}}
+
+  <div class="actions">
+    <a href="/jobs/{{job.id}}">Back to progress</a>
+    <a href="/">Start another job</a>
+  </div>
+</section>

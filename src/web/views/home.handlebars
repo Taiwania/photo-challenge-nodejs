@@ -1,0 +1,139 @@
+<section class="panel">
+  <h1>Photo Challenge Runner</h1>
+  <p class="lede">Start a first-pass workflow with Wikimedia Commons bot credentials and store all artifacts in a fixed output directory.</p>
+
+  <section class="credential-card">
+    <div class="panel-header">
+      <div>
+        <h2>Saved Sign-in</h2>
+        <p class="lede">Bot passwords are stored in a cross-platform credential store when available, and fall back to this process only if the system keychain is unavailable.</p>
+      </div>
+    </div>
+
+    <dl class="details details-compact">
+      <div><dt>Storage</dt><dd>{{credentialStore.backendLabel}}</dd></div>
+      <div><dt>Persists</dt><dd>{{#if credentialStore.canPersistAcrossRestarts}}Yes{{else}}No, this session only{{/if}}</dd></div>
+      <div><dt>Saved name</dt><dd>{{#if savedCredential}}<code>{{savedCredential.name}}</code>{{else}}No saved sign-in{{/if}}</dd></div>
+    </dl>
+
+    {{#if savedCredential}}
+      <form method="post" action="/credentials/clear" class="inline-form-actions">
+        <input type="hidden" name="name" value="{{savedCredential.name}}" />
+        <button type="submit">Clear saved password</button>
+      </form>
+    {{/if}}
+  </section>
+
+  {{#if recentCompletedJob}}
+    <section class="recent-job-card">
+      <div class="panel-header">
+        <div>
+          <h2>Recent Completed Job</h2>
+          <p class="lede">Jump back into the latest finished run without hunting through the output folder.</p>
+        </div>
+        <div class="actions">
+          <a href="{{recentCompletedJob.resultUrl}}">Open result</a>
+          <a href="{{recentCompletedJob.progressUrl}}">Open progress</a>
+        </div>
+      </div>
+
+      <dl class="details details-compact">
+        <div><dt>Challenge</dt><dd>{{recentCompletedJob.challenge}}</dd></div>
+        <div><dt>Action</dt><dd>{{recentCompletedJob.action}}</dd></div>
+        <div><dt>Finished</dt><dd>{{recentCompletedJob.finishedAtLabel}}</dd></div>
+        <div><dt>Job ID</dt><dd><code>{{recentCompletedJob.id}}</code></dd></div>
+      </dl>
+    </section>
+  {{/if}}
+
+  {{#if recentJobs.length}}
+    <section class="recent-history-card">
+      <div class="panel-header">
+        <div>
+          <h2>Recent Jobs</h2>
+          <p class="lede">Quickly return to the latest runs, whether they completed, failed, or are still in progress.</p>
+        </div>
+      </div>
+
+      <ul class="job-history-list">
+        {{#each recentJobs}}
+          <li class="job-history-item">
+            <div class="job-history-copy">
+              <div class="job-history-heading">
+                <strong>{{challenge}}</strong>
+                <span class="status-pill {{statusClass}}">{{statusLabel}}</span>
+              </div>
+              <p class="job-history-meta">{{action}} · {{currentStep}}</p>
+              <p class="job-history-meta">{{timestampLabel}}</p>
+            </div>
+            <div class="artifact-actions">
+              <a href="{{progressUrl}}">Progress</a>
+              {{#if (eq statusLabel "completed")}}
+                <a href="{{resultUrl}}">Result</a>
+              {{/if}}
+            </div>
+          </li>
+        {{/each}}
+      </ul>
+    </section>
+  {{/if}}
+
+  {{#if success}}
+    <div class="notice">{{success}}</div>
+  {{/if}}
+
+  {{#if error}}
+    <div class="alert">{{error}}</div>
+  {{/if}}
+
+  <form method="post" action="/jobs" class="form-grid">
+    <label>
+      <span>Name</span>
+      <input name="name" type="text" value="{{defaults.name}}" required />
+      <small>Use the full BotPassword login name, for example <code>MainAccount@BotAppName</code>.</small>
+    </label>
+
+    <label>
+      <span>Bot Password</span>
+      <input name="botPassword" type="password" {{#unless savedCredential}}required{{/unless}} />
+      <small>{{#if savedCredential}}Leave blank to use the saved password for <code>{{savedCredential.name}}</code>.{{else}}Enter a BotPassword for Wikimedia Commons.{{/if}}</small>
+    </label>
+
+    <label class="checkbox-row">
+      <input name="rememberCredential" type="checkbox" value="true" {{#if credentialStore.canPersistAcrossRestarts}}checked{{/if}} />
+      <span>Remember this password on this machine</span>
+    </label>
+
+    <label>
+      <span>Challenge</span>
+      <input name="challenge" type="text" value="{{defaults.challenge}}" placeholder="2025 - January - Theme" required />
+    </label>
+
+    <fieldset class="action-picker">
+      <legend>What do you want to do?</legend>
+      <p class="action-picker-copy">Pick the workflow that matches where the challenge is right now.</p>
+
+      <label class="action-card">
+        <input name="action" type="radio" value="create-voting" {{#if (eq defaults.action "create-voting")}}checked{{/if}} />
+        <span class="action-card-body">
+          <span class="action-card-title">Prepare voting page</span>
+          <span class="action-card-text">Read submission pages and build the voting page that people will vote on.</span>
+          <span class="action-card-meta">Use this before voting starts.</span>
+        </span>
+      </label>
+
+      <label class="action-card">
+        <input name="action" type="radio" value="process-challenge" {{#if (eq defaults.action "process-challenge")}}checked{{/if}} />
+        <span class="action-card-body">
+          <span class="action-card-title">Count votes and publish results</span>
+          <span class="action-card-text">Check votes, score entries, and generate revised voting, result, and winners pages.</span>
+          <span class="action-card-meta">Use this after voting has happened.</span>
+        </span>
+      </label>
+    </fieldset>
+
+    <div class="form-actions">
+      <button type="submit">Start job</button>
+    </div>
+  </form>
+</section>

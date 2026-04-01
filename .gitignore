@@ -1,0 +1,14 @@
+# Original python assets and plans
+/upstreams
+nodejs-rewrite-plan.md
+
+# ENV
+.env
+
+# Node.js build artifacts
+/node_modules
+/dist
+
+# Generated outputs
+/output/jobs/*
+!/output/.gitkeep

@@ -1,0 +1,94 @@
+<section class="panel">
+  <h1>Job Progress</h1>
+  <p class="lede">Job <code>{{job.id}}</code> is currently <strong>{{job.status}}</strong>.</p>
+
+  <div class="progress-card">
+    <div class="progress-meta">
+      <span>Step: {{job.currentStep}}</span>
+      <span>{{job.percent}}%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: {{job.percent}}%;"></div>
+    </div>
+  </div>
+
+  <dl class="details">
+    <div><dt>Action</dt><dd>{{jobActionLabel}}</dd></div>
+    <div><dt>Challenge</dt><dd>{{job.challenge}}</dd></div>
+    <div><dt>Output</dt><dd><code>{{job.outputDir}}</code></dd></div>
+  </dl>
+
+  {{#if (eq job.status "completed")}}
+    <section class="progress-shortcuts">
+      <div class="panel-header">
+        <div>
+          <h2>Ready To Open</h2>
+          <p class="lede">The main generated pages are available right away from this progress screen.</p>
+        </div>
+        <div class="actions">
+          <a href="/jobs/{{job.id}}/result">View full result</a>
+        </div>
+      </div>
+
+      {{#if coreArtifacts.length}}
+        <div class="artifact-grid">
+          {{#each coreArtifacts}}
+            <article class="artifact-card artifact-card-{{type}}">
+              <p class="artifact-kicker">{{label}}</p>
+              <h3><code>{{name}}</code></h3>
+              <p class="artifact-copy">{{description}}</p>
+              <div class="artifact-actions">
+                <a href="{{previewUrl}}">Preview</a>
+                <a href="{{downloadUrl}}">Download</a>
+              </div>
+            </article>
+          {{/each}}
+        </div>
+      {{else}}
+        <p>No core output files are available yet.</p>
+      {{/if}}
+    </section>
+  {{/if}}
+
+  <h2>Messages</h2>
+  <ul class="messages">
+    {{#each job.messages}}
+      <li>{{this}}</li>
+    {{/each}}
+  </ul>
+
+  {{#if job.errorMessage}}
+    <div class="alert">{{job.errorMessage}}</div>
+  {{/if}}
+
+  <div class="actions">
+    {{#if (eq job.status "completed")}}
+      <a href="/jobs/{{job.id}}/result">View result</a>
+    {{/if}}
+    <a href="/">Start another job</a>
+  </div>
+</section>
+
+<script>
+  const jobId = "{{job.id}}";
+  const terminalStatuses = new Set(["completed", "failed"]);
+
+  async function refreshStatus() {
+    const response = await fetch(`/jobs/${jobId}/status`);
+    if (!response.ok) return;
+
+    const job = await response.json();
+    if (!terminalStatuses.has(job.status)) {
+      window.location.reload();
+      return;
+    }
+
+    if (terminalStatuses.has(job.status)) {
+      window.location.reload();
+    }
+  }
+
+  if (!terminalStatuses.has("{{job.status}}")) {
+    setTimeout(refreshStatus, 2000);
+  }
+</script>
