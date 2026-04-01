@@ -6,9 +6,12 @@
   "main": "dist/server.js",
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "build:test": "tsc -p tsconfig.test.json --outDir .test-dist --noEmit false",
     "dev": "tsx watch src/server.ts",
     "start": "node dist/server.js",
-    "check": "tsc --noEmit -p tsconfig.json"
+    "check": "tsc --noEmit -p tsconfig.json",
+    "check:test": "tsc --noEmit -p tsconfig.test.json",
+    "test": "npm run build:test && node .test-dist/tests/run.js"
   },
   "dependencies": {
     "dotenv": "^16.5.0",

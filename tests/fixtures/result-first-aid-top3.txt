@@ -1,0 +1,22 @@
+*Number of contributors: 3
+*Number of voters:       17
+*Number of images:       3
+
+The Score is the sum of the 3*/2*/1* votes. The Support is the count of 3*/2*/1* votes and 0* likes. In the event of a tie vote, the support decides the rank.
+
+{| class="sortable wikitable"
+|-
+! class="unsortable"| Image
+! Author
+! data-sort-type="number" | Rank
+! data-sort-type="number" | Score
+! data-sort-type="number" | Support
+|-
+| [[File:DSC09851 Search and Rescue Dog, Austrian Red Cross Perchtoldsdorf, 2024-10.jpg|120px]] || [[User:Aciarium|Aciarium]] ([[User talk:Aciarium|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) || 1 || 20 || 9
+|-
+| [[File:Portuguese Air Force Agusta-Westland EH-101 Merlin Mk.514 19606 Royal International Air Tattoo 2025 04.jpg|120px]] || [[User:Julian Herzog|Julian Herzog]] ([[User talk:Julian Herzog|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) || 2 || 12 || 5
+|-
+| [[File:CH.ZH.Hausen-am-Albis 2009-05-25 Tuerlersee Brand-Camping 138 16x9-R 4K.jpg|120px]] || [[User:Roy Egloff|Roy Egloff]] ([[User talk:Roy Egloff|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) || 3 || 9 || 6
+|}
+
+* no issues found

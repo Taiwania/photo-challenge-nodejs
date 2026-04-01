@@ -9,6 +9,7 @@ nodejs-rewrite-plan.md
 # Node.js dependencies and build output
 /node_modules
 /dist
+/.test-dist
 coverage/
 *.tsbuildinfo
 npm-debug.log*

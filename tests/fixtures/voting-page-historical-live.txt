@@ -1,0 +1,25 @@
+{{Discussion top}}
+__NOTOC__
+
+'''Voting ended at midnight UTC on 01 April 2026'''. The theme was '''Orange'''.
+
+{{Commons:Photo challenge/Voting header/{{SuperFallback|Commons:Photo challenge/Voting header}}}}
+{{Commons:Photo challenge/Voting example}}
+
+===<span class="anchor" id="1">1</span>. Dark Butterfly.jpg===
+[[File:Dark Butterfly.jpg|none|thumb|652px|A butterfly lives in silhouette [{{filepath:Dark Butterfly.jpg}}<br>''(Full size image)'']]]
+'''Creator:''' [[User:Saman Mokhtabad|Saman Mokhtabad]] '''Uploaded:''' 2026-02-18 13:01:28 '''Size''': 4000 × 2252 (9.008 MP) 
+<!-- Vote below this line -->
+*{{2/3*}} -- [[User:Fischer1961|Fischer1961]] ([[User talk:Fischer1961|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 17:02, 30 March 2026 (UTC)
+*{{0/3*}} -- [[User:Tn.kuvat|Tn.kuvat]] 
+*{{3/3*}} -- [[User:Maryam Yazdanisheldareh|Maryam Yazdanisheldareh]] ([[User talk:Maryam Yazdanisheldareh|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 02:23, 7 March 2026 (UTC)
+<!-- Vote above this line -->
+
+===<span class="anchor" id="4">4</span>. Asian Lady Beetle (Harmonia axyridis) - Hamblen County, Tennessee - April 14, 2024.jpg===
+[[File:Asian Lady Beetle (Harmonia axyridis) - Hamblen County, Tennessee - April 14, 2024.jpg|none|thumb|599px|Asian lady beetle (Harmonia axyridis) in Hamblen County, Tennessee. [{{filepath:Asian Lady Beetle (Harmonia axyridis) - Hamblen County, Tennessee - April 14, 2024.jpg}}<br>''(Full size image)'']]]
+'''Creator:''' [[User:David Ratledge|David Ratledge]] '''Uploaded:''' 2026-02-14 18:45:30 '''Size''': 3004 × 2003 (6.017012 MP) 
+<!-- Vote below this line -->
+{{0/3*}} -- [[User:Sindugab|Sindugab]] ([[User talk:Sindugab|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 14:34, 23 March 2026 (UTC)
+<!-- Vote above this line -->
+
+{{Discussion bottom}}

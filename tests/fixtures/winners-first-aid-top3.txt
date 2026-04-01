@@ -1,0 +1,24 @@
+{{Photo challenge winners table
+|page     = Photo challenge/2026 - February - First aid
+|theme    = First aid
+|height   = {{{height|240}}}
+|image_1  = DSC09851 Search and Rescue Dog, Austrian Red Cross Perchtoldsdorf, 2024-10.jpg
+|title_1  = A labrador retriever of the search and <br/>rescue dog unit of the Austrian Red <br/>Cross. Vienna 2025, Austria.
+|author_1 = Aciarium
+|score_1  = 20
+|rank_1   = 1
+|num_1    = 11
+|image_2  = Portuguese Air Force Agusta-Westland EH-101 Merlin Mk.514 19606 Royal International Air Tattoo 2025 04.jpg
+|title_2  = Lifting a person in a rescue basket.
+|author_2 = Julian Herzog
+|score_2  = 12
+|rank_2   = 2
+|num_2    = 33
+|image_3  = CH.ZH.Hausen-am-Albis 2009-05-25 Tuerlersee Brand-Camping 138 16x9-R 4K.jpg
+|title_3  = REGA rescue team
+|author_3 = Roy Egloff
+|score_3  = 9
+|rank_3   = 3
+|num_3    = 62
+}}
+

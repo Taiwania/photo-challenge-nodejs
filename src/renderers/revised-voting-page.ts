@@ -4,6 +4,11 @@ export function reviseVotingPage(wikiText: string): string {
 
   for (const rawLine of wikiText.split(/\r?\n/)) {
     let line = rawLine;
+
+    if (line.startsWith("{{Discussion top}}") || line.startsWith("{{Discussion bottom}}")) {
+      continue;
+    }
+
     if (line.startsWith("<!-- '''Creator")) {
       line = line.replace("<!-- ", "").replace(" -->", "").replace(collapseText, "");
     } else if (line.startsWith("{{Collapse bottom}}")) {
@@ -12,6 +17,10 @@ export function reviseVotingPage(wikiText: string): string {
       line = line.replace("Voting will end", "Voting ended");
     }
     lines.push(line);
+  }
+
+  while (lines.length > 0 && lines[lines.length - 1] === "") {
+    lines.pop();
   }
 
   lines.push("{{Discussion bottom}}");
