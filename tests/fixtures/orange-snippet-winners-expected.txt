@@ -1,0 +1,18 @@
+{{Photo challenge winners table
+|page     = Photo challenge/2026 - February - Orange
+|theme    = Orange
+|height   = {{{height|240}}}
+|image_1  = Dark Butterfly.jpg
+|title_1  = A butterfly lives in silhouette
+|author_1 = Saman Mokhtabad
+|score_1  = 5
+|rank_1   = 1
+|num_1    = 1
+|image_2  = Asian Lady Beetle (Harmonia axyridis) - Hamblen County, Tennessee - April 14, 2024.jpg
+|title_2  = Asian lady beetle (Harmonia axyridis) in <br/>Hamblen County, Tennessee.
+|author_2 = David Ratledge
+|score_2  = 0
+|rank_2   = 2
+|num_2    = 4
+}}
+

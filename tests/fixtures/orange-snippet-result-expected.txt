@@ -1,0 +1,21 @@
+*Number of contributors: 2
+*Number of voters:       4
+*Number of images:       2
+
+The Score is the sum of the 3*/2*/1* votes. The Support is the count of 3*/2*/1* votes and 0* likes. In the event of a tie vote, the support decides the rank.
+
+{| class="sortable wikitable"
+|-
+! class="unsortable"| Image
+! Author
+! data-sort-type="number" | Rank
+! data-sort-type="number" | Score
+! data-sort-type="number" | Support
+|-
+| [[File:Dark Butterfly.jpg|120px]] || [[User:Saman Mokhtabad|Saman Mokhtabad]] ([[User talk:Saman Mokhtabad|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) || 1 || 5 || 3
+|-
+| [[File:Asian Lady Beetle (Harmonia axyridis) - Hamblen County, Tennessee - April 14, 2024.jpg|120px]] || [[User:David Ratledge|David Ratledge]] ([[User talk:David Ratledge|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) || 2 || 0 || 1
+|}
+
+=== Issues corrected by the [[Commons:Photo challenge/code/Photo challenge library.py|software]] ===
+* no issues found
