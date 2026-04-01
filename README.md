@@ -1,0 +1,245 @@
+# Photo Challenge Node.js
+
+English | [繁體中文](README.zh-TW.md)
+
+A Node.js + TypeScript web app for running Wikimedia Commons Photo Challenge workflows.
+
+This project is a practical rewrite of the upstream Python tooling into a web-first workflow built with:
+- `express`
+- `express-handlebars`
+- `mwn`
+- `luxon`
+
+It currently supports two main flows:
+- Prepare a voting page from submission pages
+- Count votes and generate revised voting, result, and winners pages
+
+## Current Features
+
+- Wikimedia Commons login with `mwn`
+- Cross-platform credential storage via system keychain when available
+- Web UI for starting jobs and tracking progress
+- Fixed output directory under `output/jobs/<job-id>/`
+- Artifact preview and download in the browser
+- Core output shortcuts for voting, revised, result, and winners pages
+- Homepage history showing the latest 3 runs even after app restart
+- Parsing and processing of live Commons voting/submission pages
+- Vote validation for:
+  - voter eligibility
+  - duplicate votes
+  - unsigned votes
+  - self-votes
+  - multiple 1st/2nd/3rd-place awards by the same voter
+  - late votes after the voting deadline
+
+## Requirements
+
+- Node.js `24.14.1`
+- npm
+- A Wikimedia Commons BotPassword login
+
+## Installation
+
+```bash
+npm install
+```
+
+## Configuration
+
+Copy the example file and adjust the values for your environment:
+
+```bash
+cp .env.example .env
+```
+
+Important variables:
+
+- `NAME`: full BotPassword login name such as `MainAccount@BotAppName`
+- `BOT_PASSWORD`: BotPassword value
+- `PORT`: web server port, default `3000`
+- `COMMONS_API_URL`: default Commons API endpoint
+- `USER_AGENT`: custom user agent for Wikimedia requests
+- `CREDENTIAL_SERVICE_NAME`: keychain service name used by `keytar`
+
+Example:
+
+```env
+NAME=Example@ExampleBot
+BOT_PASSWORD=Generated from Commons
+PORT=3000
+COMMONS_API_URL=https://commons.wikimedia.org/w/api.php
+USER_AGENT=photo-challenge-nodejs/0.1.0 (local development; contact via Wikimedia Commons user page)
+CREDENTIAL_SERVICE_NAME=photo-challenge-nodejs/commons
+```
+
+## Running the App
+
+Development mode:
+
+```bash
+npm run dev
+```
+
+Production build:
+
+```bash
+npm run build
+npm start
+```
+
+The app will start at:
+
+```text
+http://localhost:3000
+```
+
+## Main Workflows
+
+### 1. Prepare voting page
+
+Use this before voting starts.
+
+What it does:
+- reads the challenge submission page
+- supports inline gallery pages and PrefixIndex-based subpages
+- fetches file metadata from Commons
+- validates basic submission constraints
+- generates a voting page draft
+
+Main outputs:
+- `*_voting.txt`
+- `*_summary.txt`
+- `*_files.json`
+- `*_sources.json`
+
+### 2. Count votes and publish results
+
+Use this after voting has happened.
+
+What it does:
+- reads the live voting page
+- parses files and votes
+- validates voters and vote rules
+- applies voting deadline checks
+- calculates score, support, and rank
+- renders revised voting, result, and winners pages
+
+Main outputs:
+- `*_revised.txt`
+- `*_result.txt`
+- `*_winners.txt`
+- `*_votes.json`
+- `*_summary.txt`
+
+## Output Structure
+
+All generated data is written to:
+
+```text
+output/jobs/<job-id>/
+```
+
+Each job directory contains:
+
+```text
+input/
+generated/
+logs/
+```
+
+Typical files:
+
+```text
+output/jobs/<job-id>/input/voting-page.txt
+output/jobs/<job-id>/generated/<challenge>_result.txt
+output/jobs/<job-id>/generated/<challenge>_winners.txt
+output/jobs/<job-id>/logs/job.log
+```
+
+## Credential Storage
+
+The app supports saved credentials for local use.
+
+Priority order:
+- system keychain via `keytar`
+- in-memory fallback for the current process if keychain is unavailable
+
+Platform backends typically are:
+- Windows: Credential Manager
+- macOS: Keychain
+- Linux: Secret Service / libsecret
+
+Notes:
+- `.env` is ignored by git and should not be committed
+- Bot passwords are safer than using a primary account password
+- The homepage can clear a saved password from the local machine
+
+## Persisted Job History
+
+Job history is rebuilt from files under `output/jobs/*/logs/job.log`.
+
+This means:
+- the homepage can show recent runs after app restart
+- completed and failed jobs can still be reopened later
+- result and artifact pages remain accessible if the job output is still on disk
+
+## Project Structure
+
+```text
+src/
+  core/
+  infra/
+  parsers/
+  renderers/
+  services/
+  web/
+  workflows/
+```
+
+High-level responsibilities:
+- `core/`: scoring and validation logic
+- `infra/`: config, job store, credential store, persisted job history
+- `parsers/`: Commons wikitext parsing
+- `renderers/`: output page generation
+- `services/`: Commons API / `mwn` integration
+- `web/`: Express app, routes, controllers, views, static assets
+- `workflows/`: end-to-end job orchestration
+
+## Validation and Build
+
+Type-check:
+
+```bash
+npm run check
+```
+
+Build:
+
+```bash
+npm run build
+```
+
+## Current Limitations
+
+- The CLI entrypoint is still a scaffold; the web app is the supported interface for now
+- The app is currently designed around a local single-user workflow
+- Job history depends on files stored under `output/jobs`
+- Some historical Commons page format variants may still require parser adjustments
+
+## Repository Notes
+
+Ignored from git:
+- `.env`
+- `node_modules/`
+- `dist/`
+- `output/jobs/`
+- `upstreams/`
+
+Tracked intentionally:
+- `.env.example`
+- `output/.gitkeep`
+- source code and configuration files
+
+## License / Source Context
+
+This repository is a Node.js rewrite project based on Wikimedia Commons Photo Challenge automation concepts and local upstream analysis.
