@@ -17,6 +17,7 @@ export class JobStore {
       outputDir,
       action: request.action,
       challenge: request.challenge,
+      publishMode: request.publishMode,
       errorMessage: null
     };
 

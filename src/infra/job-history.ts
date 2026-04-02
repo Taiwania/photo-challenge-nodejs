@@ -1,6 +1,6 @@
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
-import type { JobProgress } from "../core/models.js";
+import type { JobProgress, PublishMode } from "../core/models.js";
 import { config } from "./config.js";
 import { getJobOutputPaths } from "./output-paths.js";
 
@@ -28,6 +28,10 @@ function toPersistedJob(jobId: string, logValues: Record<string, string>): JobPr
   const finishedAt = finishedAtValue && !Number.isNaN(finishedAtValue.getTime()) ? finishedAtValue : null;
   const status = (logValues.status as JobProgress["status"]) ?? "completed";
 
+  const rawPublishMode = logValues.publishMode;
+  const publishMode: PublishMode =
+    rawPublishMode === "sandbox" || rawPublishMode === "live" ? rawPublishMode : "dry-run";
+
   return {
     id: jobId,
     status,
@@ -44,6 +48,7 @@ function toPersistedJob(jobId: string, logValues: Record<string, string>): JobPr
     outputDir: paths.jobRoot,
     action: logValues.action ?? "unknown",
     challenge: logValues.challenge ?? "Unknown challenge",
+    publishMode,
     errorMessage: logValues.errorMessage ?? null
   };
 }

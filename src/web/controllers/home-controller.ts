@@ -7,6 +7,7 @@ type HomeDefaults = {
   name: string;
   challenge: string;
   action: string;
+  publishMode: string;
 };
 
 type HomePageOptions = {
@@ -51,7 +52,8 @@ export async function buildHomePageViewModel(options: HomePageOptions = {}) {
     defaults: {
       name: options.defaults?.name ?? savedName ?? process.env.NAME ?? "",
       challenge: options.defaults?.challenge ?? "",
-      action: options.defaults?.action ?? "process-challenge"
+      action: options.defaults?.action ?? "process-challenge",
+      publishMode: options.defaults?.publishMode ?? "dry-run"
     },
     savedCredential: savedName
       ? {

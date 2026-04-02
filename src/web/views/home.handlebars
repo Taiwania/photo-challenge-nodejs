@@ -132,6 +132,38 @@
       </label>
     </fieldset>
 
+    <fieldset class="action-picker">
+      <legend>Publish mode</legend>
+      <p class="action-picker-copy">Controls whether generated pages are written back to Wikimedia Commons.</p>
+
+      <label class="action-card">
+        <input name="publishMode" type="radio" value="dry-run" {{#if (eq defaults.publishMode "dry-run")}}checked{{/if}} />
+        <span class="action-card-body">
+          <span class="action-card-title">Dry run</span>
+          <span class="action-card-text">Generate all output files locally. Nothing is written to the wiki.</span>
+          <span class="action-card-meta">Safe to use at any time.</span>
+        </span>
+      </label>
+
+      <label class="action-card">
+        <input name="publishMode" type="radio" value="sandbox" {{#if (eq defaults.publishMode "sandbox")}}checked{{/if}} />
+        <span class="action-card-body">
+          <span class="action-card-title">Sandbox</span>
+          <span class="action-card-text">Write pages to <code>User:Taiwania_Justo/Sandbox/&lt;challenge&gt;/…</code> for review before going live.</span>
+          <span class="action-card-meta">Use this to verify output without touching real challenge pages.</span>
+        </span>
+      </label>
+
+      <label class="action-card">
+        <input name="publishMode" type="radio" value="live" {{#if (eq defaults.publishMode "live")}}checked{{/if}} />
+        <span class="action-card-body">
+          <span class="action-card-title">Live</span>
+          <span class="action-card-text">Write directly to the real Commons challenge pages. Use only after verifying sandbox output.</span>
+          <span class="action-card-meta action-card-meta--warn">Irreversible. Double-check the challenge name before submitting.</span>
+        </span>
+      </label>
+    </fieldset>
+
     <div class="form-actions">
       <button type="submit">Start job</button>
     </div>

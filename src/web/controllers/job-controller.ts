@@ -1,7 +1,7 @@
 import path from "node:path";
 import { readdir, readFile } from "node:fs/promises";
 import type { Request, Response } from "express";
-import type { JobProgress, JobRequest } from "../../core/models.js";
+import type { JobProgress, JobRequest, PublishMode } from "../../core/models.js";
 import { getCredentialPassword, rememberCredential } from "../../infra/credential-store.js";
 import { loadPersistedJob } from "../../infra/job-history.js";
 import { jobStore } from "../../infra/job-store.js";
@@ -59,14 +59,22 @@ const coreArtifactDefinitions: Array<{
   }
 ];
 
+const VALID_PUBLISH_MODES = new Set<PublishMode>(["dry-run", "sandbox", "live"]);
+
 function buildJobRequest(body: Record<string, unknown>): JobRequest {
+  const rawPublishMode = String(body.publishMode ?? "dry-run");
+  const publishMode: PublishMode = VALID_PUBLISH_MODES.has(rawPublishMode as PublishMode)
+    ? (rawPublishMode as PublishMode)
+    : "dry-run";
+
   return {
     action: String(body.action ?? "process-challenge"),
     challenge: String(body.challenge ?? "").trim(),
     credentials: {
       name: String(body.name ?? "").trim(),
       botPassword: String(body.botPassword ?? "")
-    }
+    },
+    publishMode
   };
 }
 
@@ -124,7 +132,8 @@ export async function createJob(request: Request, response: Response) {
         defaults: {
           name: jobRequest.credentials.name,
           challenge: jobRequest.challenge,
-          action: jobRequest.action
+          action: jobRequest.action,
+          publishMode: jobRequest.publishMode
         }
       })
     );

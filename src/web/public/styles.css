@@ -199,6 +199,10 @@ button, .actions a, .artifact-actions a {
   color: #006d77;
 }
 
+.action-card-meta--warn {
+  color: #b5451b;
+}
+
 .progress-card {
   margin: 20px 0;
 }
