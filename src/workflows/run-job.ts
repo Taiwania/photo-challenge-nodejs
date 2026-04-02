@@ -1,7 +1,7 @@
 import path from "node:path";
 import { writeFile } from "node:fs/promises";
 import { DateTime } from "luxon";
-import type { JobRequest } from "../core/models.js";
+import type { JobRequest, PublishMode } from "../core/models.js";
 import { countVotes, type ScoredVotingFile } from "../core/scoring.js";
 import { listErrors, validateVotes, type VoteWithError, type VoterValidation } from "../core/validation.js";
 import { validateVoters } from "../core/voters.js";
@@ -16,6 +16,7 @@ import { renderResultPage } from "../renderers/result-page.js";
 import { reviseVotingPage } from "../renderers/revised-voting-page.js";
 import { renderVotingPage, type VotingSubmissionEntry } from "../renderers/voting-page.js";
 import { renderWinnersPage } from "../renderers/winners-page.js";
+import { extractChallengeCode, renderVotingIndexSection, type VotingIndexEntry } from "../renderers/voting-index.js";
 import { config } from "../infra/config.js";
 import { ensureJobOutputPaths, getJobOutputPaths } from "../infra/output-paths.js";
 import { jobStore } from "../infra/job-store.js";
@@ -79,6 +80,23 @@ export async function runJob(jobId: string, request: JobRequest): Promise<void> 
     const currentUser = await bot.getCurrentUser();
     jobStore.appendMessage(jobId, `Logged in as ${currentUser ?? "unknown user"}.`);
 
+    if (request.action === "archive-pages") {
+      await runArchivePages(bot, paths, jobId, request);
+      await finalizeJob(paths.logsDir, jobId, request, currentUser, timestamp, 2, 0, 0, 0);
+      jobStore.appendMessage(jobId, `Artifacts written to ${getJobOutputPaths(jobId).jobRoot}`);
+      jobStore.markCompleted(jobId);
+      return;
+    }
+
+    if (request.action === "build-voting-index") {
+      const section = await runBuildVotingIndex(bot, paths, jobId, request);
+      await writeFile(path.join(paths.generatedDir, "voting_index_section.txt"), section, "utf8");
+      await finalizeJob(paths.logsDir, jobId, request, currentUser, timestamp, 0, 0, 0, 0);
+      jobStore.appendMessage(jobId, `Voting index section written to ${getJobOutputPaths(jobId).jobRoot}`);
+      jobStore.markCompleted(jobId);
+      return;
+    }
+
     const sourceSpecs = getSourceSpecs(request);
     const sources: ReadPageResult[] = [];
 
@@ -104,6 +122,10 @@ export async function runJob(jobId: string, request: JobRequest): Promise<void> 
       const renderedVotingPage = renderVotingPage(request.challenge, submissionEntries);
       await writeFile(path.join(paths.generatedDir, `${challengeSlug}_voting.txt`), renderedVotingPage.text, "utf8");
       jobStore.appendMessage(jobId, `Rendered voting page with ${renderedVotingPage.includedCount} entries and ${renderedVotingPage.issueCount} issues.`);
+
+      updateProgress(jobId, { percent: 88, step: "Publishing pages", message: `Publish mode: ${request.publishMode}` });
+      await publishPage(bot, jobId, request.challenge, "voting", renderedVotingPage.text, "Photo Challenge bot: create voting page", request.publishMode);
+
       await finalizeJob(paths.logsDir, jobId, request, currentUser, timestamp, sources.length, parsed.challenges.length, parsed.files.length, parsed.votes.length);
       jobStore.appendMessage(jobId, `Artifacts written to ${getJobOutputPaths(jobId).jobRoot}`);
       jobStore.markCompleted(jobId);
@@ -115,6 +137,11 @@ export async function runJob(jobId: string, request: JobRequest): Promise<void> 
     await writeFile(path.join(paths.generatedDir, `${challengeSlug}_revised.txt`), processArtifacts.revisedText, "utf8");
     await writeFile(path.join(paths.generatedDir, `${challengeSlug}_result.txt`), processArtifacts.resultText, "utf8");
     await writeFile(path.join(paths.generatedDir, `${challengeSlug}_winners.txt`), processArtifacts.winnersText, "utf8");
+
+    updateProgress(jobId, { percent: 88, step: "Publishing pages", message: `Publish mode: ${request.publishMode}` });
+    await publishPage(bot, jobId, request.challenge, "voting", processArtifacts.revisedText, "Photo Challenge bot: revise voting page after validation", request.publishMode);
+    await publishPage(bot, jobId, request.challenge, "result", processArtifacts.resultText, "Photo Challenge bot: create result page", request.publishMode);
+    await publishPage(bot, jobId, request.challenge, "winners", processArtifacts.winnersText, "Photo Challenge bot: create winners page", request.publishMode);
 
     await finalizeJob(
       paths.logsDir,
@@ -271,6 +298,7 @@ async function finalizeJob(
       `status=completed`,
       `action=${request.action}`,
       `challenge=${request.challenge}`,
+      `publishMode=${request.publishMode}`,
       `name=${request.credentials.name}`,
       `loggedInAs=${currentUser ?? "unknown"}`,
       `sourceCount=${sourceCount}`,
@@ -456,7 +484,140 @@ function dedupeSubmissionFiles(files: SubmissionEntry[]): SubmissionEntry[] {
   return result;
 }
 
+const SANDBOX_USER = "User:Taiwania_Justo/Sandbox";
+
+type PublishPageType = "voting" | "result" | "winners";
+
+function resolvePublishTarget(challenge: string, pageType: PublishPageType, publishMode: "sandbox" | "live"): string {
+  if (publishMode === "live") {
+    if (pageType === "voting") return `Commons:Photo challenge/${challenge}/Voting`;
+    if (pageType === "result") return `Commons:Photo challenge/${challenge}/Voting/Result`;
+    return `Commons:Photo challenge/${challenge}/Winners`;
+  }
+
+  if (pageType === "voting") return `${SANDBOX_USER}/${challenge}/Voting`;
+  if (pageType === "result") return `${SANDBOX_USER}/${challenge}/Voting/Result`;
+  return `${SANDBOX_USER}/${challenge}/Winners`;
+}
+
+async function publishPage(
+  bot: CommonsBot,
+  jobId: string,
+  challenge: string,
+  pageType: PublishPageType,
+  text: string,
+  editSummary: string,
+  publishMode: PublishMode
+): Promise<void> {
+  if (publishMode === "dry-run") return;
+
+  const target = resolvePublishTarget(challenge, pageType, publishMode);
+  jobStore.appendMessage(jobId, `Publishing ${pageType} page to ${target}`);
+  const saveResult = await bot.savePage(target, text, editSummary);
+  const revNote = saveResult.newRevisionId ? ` (revision ${saveResult.newRevisionId})` : "";
+  jobStore.appendMessage(jobId, `Published ${pageType} page → ${saveResult.result}${revNote}`);
+}
+
 function updateProgress(jobId: string, step: ProgressStep): void {
   jobStore.markRunning(jobId, step.step, step.percent);
   jobStore.appendMessage(jobId, step.message);
+}
+
+async function publishRawPage(
+  bot: CommonsBot,
+  jobId: string,
+  label: string,
+  targetTitle: string,
+  text: string,
+  editSummary: string
+): Promise<void> {
+  jobStore.appendMessage(jobId, `Publishing ${label} to ${targetTitle}`);
+  const saveResult = await bot.savePage(targetTitle, text, editSummary);
+  const revNote = saveResult.newRevisionId ? ` (revision ${saveResult.newRevisionId})` : "";
+  jobStore.appendMessage(jobId, `Published ${label} → ${saveResult.result}${revNote}`);
+}
+
+async function runArchivePages(
+  bot: CommonsBot,
+  paths: Awaited<ReturnType<typeof ensureJobOutputPaths>>,
+  jobId: string,
+  request: JobRequest
+): Promise<void> {
+  const archivePairs = [
+    {
+      source: "Commons:Photo challenge/Submitting",
+      liveTarget: "Commons:Photo challenge/Submitting_old",
+      sandboxTarget: `${SANDBOX_USER}/Submitting_old`,
+      fileName: "submitting.txt"
+    },
+    {
+      source: "Commons:Photo challenge/Voting",
+      liveTarget: "Commons:Photo challenge/Voting_old",
+      sandboxTarget: `${SANDBOX_USER}/Voting_old`,
+      fileName: "voting.txt"
+    }
+  ];
+
+  for (let i = 0; i < archivePairs.length; i += 1) {
+    const pair = archivePairs[i];
+    updateProgress(jobId, {
+      percent: 20 + i * 30,
+      step: `Archiving ${pair.source}`,
+      message: `Reading ${pair.source}`
+    });
+    const page = await bot.readPage(pair.source);
+    await writeFile(path.join(paths.inputDir, pair.fileName), page.content, "utf8");
+    jobStore.appendMessage(jobId, `Read ${pair.source} (${page.content.length} chars)`);
+
+    if (request.publishMode !== "dry-run") {
+      const target = request.publishMode === "live" ? pair.liveTarget : pair.sandboxTarget;
+      await publishRawPage(bot, jobId, pair.source, target, page.content, `Photo Challenge bot: archive ${pair.source}`);
+    }
+  }
+
+  updateProgress(jobId, { percent: 88, step: "Publish mode", message: `Publish mode: ${request.publishMode}` });
+}
+
+async function runBuildVotingIndex(
+  bot: CommonsBot,
+  paths: Awaited<ReturnType<typeof ensureJobOutputPaths>>,
+  jobId: string,
+  request: JobRequest
+): Promise<string> {
+  const sourceTitle = (request.source ?? "old") === "old"
+    ? "Commons:Photo challenge/Submitting_old"
+    : "Commons:Photo challenge/Submitting";
+
+  updateProgress(jobId, { percent: 20, step: "Reading challenge list", message: `Fetching ${sourceTitle}` });
+  const sourcePage = await bot.readPage(sourceTitle);
+  await writeFile(path.join(paths.inputDir, "submitting-source.txt"), sourcePage.content, "utf8");
+
+  const challenges = parseSubmittedChallenges(sourcePage.content);
+  if (challenges.length === 0) {
+    jobStore.appendMessage(jobId, "No challenges found in source page.");
+    return "";
+  }
+  jobStore.appendMessage(jobId, `Found ${challenges.length} challenge(s): ${challenges.map((c) => c.raw).join(", ")}`);
+
+  const entries: VotingIndexEntry[] = [];
+  for (let i = 0; i < challenges.length; i += 1) {
+    const challenge = challenges[i];
+    updateProgress(jobId, {
+      percent: 35 + Math.round((i / challenges.length) * 40),
+      step: `Reading challenge page`,
+      message: `Fetching Commons:Photo challenge/${challenge.raw}`
+    });
+
+    const challengePage = await bot.readPage(`Commons:Photo challenge/${challenge.raw}`);
+    const challengeCode = extractChallengeCode(challengePage.content);
+    if (challengeCode) {
+      entries.push({ challenge: challenge.raw, challengeCode });
+    } else {
+      jobStore.appendMessage(jobId, `Warning: no === header === found in Commons:Photo challenge/${challenge.raw}`);
+    }
+  }
+
+  const section = renderVotingIndexSection(entries);
+  updateProgress(jobId, { percent: 88, step: "Rendering voting index section", message: `Generated ${entries.length} entries.` });
+  return section;
 }
