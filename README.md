@@ -19,6 +19,7 @@ It currently supports two main flows:
 - Wikimedia Commons login with `mwn`
 - Cross-platform credential storage via system keychain when available
 - Web UI for starting jobs and tracking progress
+- CLI for running the two main workflows directly
 - Fixed output directory under `output/jobs/<job-id>/`
 - Artifact preview and download in the browser
 - Core output shortcuts for voting, revised, result, and winners pages
@@ -31,6 +32,7 @@ It currently supports two main flows:
   - self-votes
   - multiple 1st/2nd/3rd-place awards by the same voter
   - late votes after the voting deadline
+- Automated regression tests for parser, renderer, and offline workflow fixtures
 
 ## Requirements
 
@@ -92,6 +94,23 @@ The app will start at:
 ```text
 http://localhost:3000
 ```
+
+## CLI Usage
+
+Run the workflows directly from the terminal:
+
+```bash
+npm run cli -- create-voting --challenge "2026 - March - Three-wheelers"
+npm run cli -- process-challenge --challenge "2026 - February - Orange"
+```
+
+Optional overrides:
+
+```bash
+npm run cli -- process-challenge --challenge "2026 - February - Orange" --name "Example@Bot" --bot-password "secret"
+```
+
+If `--name` or `--bot-password` are omitted, the CLI falls back to `NAME` and `BOT_PASSWORD` from `.env`.
 
 ## Main Workflows
 
@@ -211,6 +230,7 @@ Type-check:
 
 ```bash
 npm run check
+npm run check:test
 ```
 
 Build:
@@ -219,9 +239,14 @@ Build:
 npm run build
 ```
 
+Run tests:
+
+```bash
+npm test
+```
+
 ## Current Limitations
 
-- The CLI entrypoint is still a scaffold; the web app is the supported interface for now
 - The app is currently designed around a local single-user workflow
 - Job history depends on files stored under `output/jobs`
 - Some historical Commons page format variants may still require parser adjustments

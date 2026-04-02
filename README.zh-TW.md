@@ -2,9 +2,9 @@
 
 [English](README.md) | 繁體中文
 
-這是一個以 Node.js + TypeScript 建置的 Wikimedia Commons Photo Challenge Web 工具。
+這是一個以 Node.js + TypeScript 建置的 Wikimedia Commons Photo Challenge 工具，提供 Web 介面與 CLI 兩種使用方式。
 
-本專案將上游 Python 工具改寫為以 Web 介面為主的工作流程，主要技術包含：
+本專案將上游 Python 工具改寫為以 Node.js 為核心的工作流程，主要技術包含：
 - `express`
 - `express-handlebars`
 - `mwn`
@@ -19,6 +19,7 @@
 - 使用 `mwn` 登入 Wikimedia Commons
 - 支援跨平台系統 keychain 的本機憑證保存
 - 提供 Web UI 啟動工作與查看進度
+- 提供 CLI 直接執行兩條主要 workflow
 - 固定輸出目錄：`output/jobs/<job-id>/`
 - 可在瀏覽器中預覽與下載產物
 - 可快速切換核心輸出：voting、revised、result、winners
@@ -31,6 +32,7 @@
   - 自投
   - 同一投票者給多個 1st / 2nd / 3rd place
   - 超過投票截止時間的 late vote
+- 已建立 parser / renderer / offline workflow regression tests
 
 ## 環境需求
 
@@ -74,13 +76,13 @@ CREDENTIAL_SERVICE_NAME=photo-challenge-nodejs/commons
 
 ## 啟動方式
 
-開發模式：
+Web 開發模式：
 
 ```bash
 npm run dev
 ```
 
-正式模式：
+Web 正式模式：
 
 ```bash
 npm run build
@@ -91,6 +93,29 @@ npm start
 
 ```text
 http://localhost:3000
+```
+
+## CLI 使用方式
+
+可直接在終端機執行 workflow：
+
+```bash
+npm run cli -- create-voting --challenge "2026 - March - Three-wheelers"
+npm run cli -- process-challenge --challenge "2026 - February - Orange"
+```
+
+也可以手動覆寫登入資訊：
+
+```bash
+npm run cli -- process-challenge --challenge "2026 - February - Orange" --name "Example@Bot" --bot-password "secret"
+```
+
+如果沒有指定 `--name` 或 `--bot-password`，CLI 會自動回退使用 `.env` 裡的 `NAME` 與 `BOT_PASSWORD`。
+
+開發時若想直接跑 TypeScript 版本，也可以使用：
+
+```bash
+npm run cli:dev -- --help
 ```
 
 ## 主要流程
@@ -187,6 +212,7 @@ output/jobs/<job-id>/logs/job.log
 
 ```text
 src/
+  cli/
   core/
   infra/
   parsers/
@@ -197,6 +223,7 @@ src/
 ```
 
 各目錄用途：
+- `cli/`：命令列入口與參數解析
 - `core/`：計分與驗證邏輯
 - `infra/`：設定、job store、憑證保存、持久化工作紀錄
 - `parsers/`：Commons wikitext 解析
@@ -211,6 +238,7 @@ src/
 
 ```bash
 npm run check
+npm run check:test
 ```
 
 建置：
@@ -219,12 +247,18 @@ npm run check
 npm run build
 ```
 
+測試：
+
+```bash
+npm test
+```
+
 ## 目前限制
 
-- CLI 入口目前仍是 scaffold，現階段以 Web app 為主要使用方式
 - 專案目前以本機單人使用情境為主
 - 歷史紀錄依賴 `output/jobs` 內的檔案
 - 某些較少見的 Commons 歷史頁面格式，後續可能還需要補 parser 相容性
+- CLI 目前仍以本機批次使用為主，尚未做更完整的 publish / dry-run 指令切分
 
 ## 版控說明
 
