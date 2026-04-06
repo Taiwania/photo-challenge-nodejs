@@ -20,6 +20,7 @@ It currently supports two main flows:
 - Cross-platform credential storage via system keychain when available
 - Web UI for starting jobs and tracking progress
 - CLI for running the two main workflows directly
+- CLI support for list/archive/index maintenance commands
 - Fixed output directory under `output/jobs/<job-id>/`
 - Artifact preview and download in the browser
 - Core output shortcuts for voting, revised, result, and winners pages
@@ -33,6 +34,7 @@ It currently supports two main flows:
   - multiple 1st/2nd/3rd-place awards by the same voter
   - late votes after the voting deadline
 - Automated regression tests for parser, renderer, and offline workflow fixtures
+- Sandbox and live publish modes for the main page-writing workflows
 
 ## Requirements
 
@@ -111,6 +113,17 @@ npm run cli -- process-challenge --challenge "2026 - February - Orange" --name "
 ```
 
 If `--name` or `--bot-password` are omitted, the CLI falls back to `NAME` and `BOT_PASSWORD` from `.env`.
+
+## Publish Modes
+
+Supported publish behavior:
+- `create-voting`: `dry-run`, `sandbox`, `live`
+- `process-challenge`: `dry-run`, `sandbox`, `live`
+- `archive-pages`: `dry-run`, `live`
+- `build-voting-index`: `dry-run` only
+
+Sandbox targets are derived from the main account part before `@` in `NAME`.
+For example, `Example@BotApp` publishes to `User:Example/Sandbox/<challenge>/...`.
 
 ## Main Workflows
 
@@ -244,6 +257,21 @@ Run tests:
 ```bash
 npm test
 ```
+
+## Project Status
+
+Implemented and working today:
+- Web UI for running jobs, tracking progress, previewing outputs, and reopening recent runs
+- CLI for create-voting, process-challenge, list, archive, and voting-index helper commands
+- Commons publishing for the main generated pages, with dry-run, sandbox, and live safety boundaries
+- Persisted job history under output/jobs, including failed jobs
+- Offline regression coverage for parser, renderer, CLI, job history, and workflow fixtures
+
+Recommended next steps:
+- Implement winner notification and follow-up maintenance workflows from the upstream Python tool
+- Add a publish diff/review screen before writing to Commons from the Web UI
+- Expand regression fixtures for more historical page variants and edge-case signatures
+- Write deployment and operations docs for running this outside a local single-user setup
 
 ## Current Limitations
 

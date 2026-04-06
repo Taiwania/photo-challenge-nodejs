@@ -20,6 +20,7 @@
 - 支援跨平台系統 keychain 的本機憑證保存
 - 提供 Web UI 啟動工作與查看進度
 - 提供 CLI 直接執行兩條主要 workflow
+- 提供 list / archive / voting index 維運指令
 - 固定輸出目錄：`output/jobs/<job-id>/`
 - 可在瀏覽器中預覽與下載產物
 - 可快速切換核心輸出：voting、revised、result、winners
@@ -33,6 +34,7 @@
   - 同一投票者給多個 1st / 2nd / 3rd place
   - 超過投票截止時間的 late vote
 - 已建立 parser / renderer / offline workflow regression tests
+- 主要寫入流程已支援 dry-run、sandbox、live publish mode
 
 ## 環境需求
 
@@ -111,6 +113,17 @@ npm run cli -- process-challenge --challenge "2026 - February - Orange" --name "
 ```
 
 如果沒有指定 `--name` 或 `--bot-password`，CLI 會自動回退使用 `.env` 裡的 `NAME` 與 `BOT_PASSWORD`。
+
+## Publish Mode
+
+目前支援情況：
+- `create-voting`：支援 `dry-run`、`sandbox`、`live`
+- `process-challenge`：支援 `dry-run`、`sandbox`、`live`
+- `archive-pages`：支援 `dry-run`、`live`
+- `build-voting-index`：目前僅支援 `dry-run`
+
+`sandbox` 的寫入目標會依 `NAME` 中 `@` 前的主帳號名稱自動推導。
+例如 `Example@BotApp` 會寫到 `User:Example/Sandbox/<challenge>/...`。
 
 開發時若想直接跑 TypeScript 版本，也可以使用：
 
@@ -252,6 +265,21 @@ npm run build
 ```bash
 npm test
 ```
+
+## 目前完成進度
+
+目前已完成並可實際使用的部分：
+- Web UI 可建立 job、追蹤進度、預覽產物、重新開啟最近執行紀錄
+- CLI 已支援 create-voting、process-challenge、list、archive、build-voting-index 等指令
+- 主要生成頁面已可安全發佈到 Commons，並區分 dry-run、sandbox、live
+- `output/jobs` 的歷史紀錄可在重啟後重建，包含失敗 job
+- 已有 parser、renderer、CLI、job history、workflow fixtures 的離線 regression tests
+
+接下來最值得做的功能：
+- 補上 upstream Python 仍未搬完的 winners notification 與後續維護流程
+- 在 Web UI 加入發佈前 diff / review 畫面
+- 擴充更多歷史頁面格式與特殊簽名的 regression fixtures
+- 補齊多人/長期運行情境下的部署與維運文件
 
 ## 目前限制
 
