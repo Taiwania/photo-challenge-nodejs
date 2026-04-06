@@ -523,6 +523,94 @@ button, .actions a, .artifact-actions a {
   gap: 14px;
 }
 
+.diff-table-wrap {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: white;
+}
+
+.diff-table-head {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  background: #eef5f4;
+  border-bottom: 1px solid var(--border);
+}
+
+.diff-table-head span {
+  padding: 12px 14px;
+  font-weight: 700;
+}
+
+.diff-table {
+  display: grid;
+}
+
+.diff-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid #ece6dc;
+}
+
+.diff-row:last-child {
+  border-bottom: 0;
+}
+
+.diff-row-same {
+  background: #fbfaf7;
+}
+
+.diff-row-add {
+  background: #edf8ef;
+}
+
+.diff-row-remove {
+  background: #fbebeb;
+}
+
+.diff-row-change {
+  background: #fcf4df;
+}
+
+.diff-cell {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 10px;
+  padding: 10px 12px;
+  min-width: 0;
+}
+
+.diff-cell + .diff-cell {
+  border-left: 1px solid #ece6dc;
+}
+
+.diff-cell-skip {
+  grid-column: 1 / -1;
+  display: block;
+  padding: 10px 12px;
+  text-align: center;
+  color: #5b6872;
+  background: #f1eee7;
+  font-style: italic;
+}
+
+.diff-line-no {
+  display: inline-flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  color: #697783;
+  font-size: 0.88rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.diff-line-text {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: Consolas, "Courier New", monospace;
+  color: #20303a;
+}
 .diff-panel {
   display: grid;
   gap: 8px;

@@ -45,27 +45,30 @@
             <a href="{{downloadUrl}}">Download</a>
           </div>
 
-          <div class="diff-columns">
-            <section class="diff-panel">
-              <h4>Current target snippet</h4>
-              {{#if currentSnippet.length}}
-                <pre class="diff-snippet">{{#each currentSnippet}}{{this}}
-{{/each}}</pre>
-              {{else}}
-                <p class="artifact-copy">No current content was found for this target.</p>
-              {{/if}}
-            </section>
-
-            <section class="diff-panel">
-              <h4>Generated snippet{{#if firstDifferenceLine}} from line {{firstDifferenceLine}}{{/if}}</h4>
-              {{#if nextSnippet.length}}
-                <pre class="diff-snippet">{{#each nextSnippet}}{{this}}
-{{/each}}</pre>
-              {{else}}
-                <p class="artifact-copy">The generated file is empty.</p>
-              {{/if}}
-            </section>
-          </div>
+          <section class="diff-table-wrap">
+            <div class="diff-table-head">
+              <span>Current target</span>
+              <span>Generated output{{#if firstDifferenceLine}} from line {{firstDifferenceLine}}{{/if}}</span>
+            </div>
+            <div class="diff-table">
+              {{#each diffRows}}
+                <div class="diff-row diff-row-{{kind}}">
+                  {{#if isSkip}}
+                    <div class="diff-cell diff-cell-skip" colspan="2">{{nextText}}</div>
+                  {{else}}
+                    <div class="diff-cell diff-cell-current">
+                      <span class="diff-line-no">{{#if currentLineNumber}}{{currentLineNumber}}{{else}}&nbsp;{{/if}}</span>
+                      <pre class="diff-line-text">{{currentText}}</pre>
+                    </div>
+                    <div class="diff-cell diff-cell-next">
+                      <span class="diff-line-no">{{#if nextLineNumber}}{{nextLineNumber}}{{else}}&nbsp;{{/if}}</span>
+                      <pre class="diff-line-text">{{nextText}}</pre>
+                    </div>
+                  {{/if}}
+                </div>
+              {{/each}}
+            </div>
+          </section>
         </article>
       {{/each}}
     </div>
