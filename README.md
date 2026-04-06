@@ -2,46 +2,11 @@
 
 English | [繁體中文](README.zh-TW.md)
 
-A Node.js + TypeScript web app for running Wikimedia Commons Photo Challenge workflows.
-
-This project is a practical rewrite of the upstream Python tooling into a web-first workflow built with:
-- `express`
-- `express-handlebars`
-- `mwn`
-- `luxon`
-
-It currently supports three main flows:
-- Prepare a voting page from submission pages
-- Count votes and generate revised voting, result, and winners pages
-- Plan post-results maintenance from completed challenge outputs
-
-## Current Features
-
-- Wikimedia Commons login with `mwn`
-- Cross-platform credential storage via system keychain when available
-- Web UI for starting jobs, tracking progress, and reopening recent runs
-- Web entrypoint for the dry-run post-results maintenance planner
-- Dedicated Web maintenance review page for grouped follow-up planning artifacts
-- Selective maintenance publish flow for sandbox/live follow-up edits
-- Persisted maintenance publish history with target pages and revision IDs in Web review
-- CLI for running the three main workflows directly
-- CLI support for list/archive/index maintenance commands
-- Fixed output directory under `output/jobs/<job-id>/`
-- Artifact preview and download in the browser
-- Web publish review with target-page comparison before writing to Commons
-- Core output shortcuts for voting, revised, result, winners, and maintenance-plan artifacts
-- Homepage history showing the latest 3 runs even after app restart
-- Parsing and processing of live Commons voting/submission pages
-- Vote validation for:
-  - voter eligibility
-  - duplicate votes
-  - unsigned votes
-  - self-votes
-  - multiple 1st/2nd/3rd-place awards by the same voter
-  - late votes after the voting deadline
-- Automated regression tests for parser, renderer, and offline workflow fixtures
-- Sandbox and live publish modes for the main page-writing workflows
-- Line-by-line publish diff view with collapsed unchanged sections
+A Node.js + TypeScript application for Wikimedia Commons Photo Challenge operations.
+It provides a Web UI and CLI for three common workflows:
+- prepare voting pages from submission pages
+- process votes and generate revised/result/winners pages
+- plan and publish post-results maintenance tasks
 
 ## Requirements
 
@@ -49,43 +14,21 @@ It currently supports three main flows:
 - npm
 - A Wikimedia Commons BotPassword login
 
-## Installation
+Setup details:
+- copy `.env.example` to `.env`
+- set `NAME` to your full BotPassword login such as `MainAccount@BotAppName`
+- set `BOT_PASSWORD`
+- optional: set `USER_AGENT`, `PORT`, and `CREDENTIAL_SERVICE_NAME`
+
+## Install
 
 ```bash
 npm install
 ```
 
-## Configuration
+## Quick Start
 
-Copy the example file and adjust the values for your environment:
-
-```bash
-cp .env.example .env
-```
-
-Important variables:
-
-- `NAME`: full BotPassword login name such as `MainAccount@BotAppName`
-- `BOT_PASSWORD`: BotPassword value
-- `PORT`: web server port, default `3000`
-- `COMMONS_API_URL`: default Commons API endpoint
-- `USER_AGENT`: custom user agent for Wikimedia requests
-- `CREDENTIAL_SERVICE_NAME`: keychain service name used by `keytar`
-
-Example:
-
-```env
-NAME=Example@ExampleBot
-BOT_PASSWORD=Generated from Commons
-PORT=3000
-COMMONS_API_URL=https://commons.wikimedia.org/w/api.php
-USER_AGENT=photo-challenge-nodejs/0.1.0 (local development; contact via Wikimedia Commons user page)
-CREDENTIAL_SERVICE_NAME=photo-challenge-nodejs/commons
-```
-
-## Running the App
-
-Development mode:
+Web app:
 
 ```bash
 npm run dev
@@ -98,233 +41,71 @@ npm run build
 npm start
 ```
 
-The app will start at:
-
-```text
-http://localhost:3000
-```
-
-## CLI Usage
-
-Run the workflows directly from the terminal:
+CLI examples:
 
 ```bash
 npm run cli -- create-voting --challenge "2026 - March - Three-wheelers"
 npm run cli -- process-challenge --challenge "2026 - February - Orange"
+node dist/cli.js post-results-maintenance --challenge "2026 - February - Orange" --paired-challenge "2026 - February - First aid" --publish-mode dry-run
 ```
 
-Optional overrides:
-
-```bash
-npm run cli -- process-challenge --challenge "2026 - February - Orange" --name "Example@Bot" --bot-password "secret"
-```
-
-If `--name` or `--bot-password` are omitted, the CLI falls back to `NAME` and `BOT_PASSWORD` from `.env`.
-
-## Publish Modes
-
-Supported publish behavior:
-- `create-voting`: `dry-run`, `sandbox`, `live`
-- `process-challenge`: `dry-run`, `sandbox`, `live`
-- `archive-pages`: `dry-run`, `live`
-- `build-voting-index`: `dry-run` only
-- `post-results-maintenance`: dry-run job generation, plus Web review and selective publish to `sandbox` or `live`
-
-Sandbox targets are derived from the main account part before `@` in `NAME`.
-For example, `Example@BotApp` publishes to `User:Example/Sandbox/<challenge>/...`.
-
-## Main Workflows
+## Usage Overview
 
 ### 1. Prepare voting page
 
 Use this before voting starts.
-
-What it does:
-- reads the challenge submission page
-- supports inline gallery pages and PrefixIndex-based subpages
-- fetches file metadata from Commons
-- validates basic submission constraints
-- generates a voting page draft
-
-Main outputs:
-- `*_voting.txt`
-- `*_summary.txt`
-- `*_files.json`
-- `*_sources.json`
+Outputs are written under `output/jobs/<job-id>/generated/`, including `*_voting.txt`, `*_files.json`, and `*_summary.txt`.
 
 ### 2. Count votes and publish results
 
-Use this after voting has happened.
+Use this after voting ends.
+This workflow validates voters and votes, checks deadlines, and generates `*_revised.txt`, `*_result.txt`, and `*_winners.txt`.
 
-What it does:
-- reads the live voting page
-- parses files and votes
-- validates voters and vote rules
-- applies voting deadline checks
-- calculates score, support, and rank
-- renders revised voting, result, and winners pages
+### 3. Post-results maintenance
 
-Main outputs:
-- `*_revised.txt`
-- `*_result.txt`
-- `*_winners.txt`
-- `*_votes.json`
-- `*_summary.txt`
+Use this after winners are known.
+It creates winner notifications, challenge announcements, Previous-page updates, and file assessment plans. In the Web UI, these items can be reviewed and selectively published to `sandbox` or `live`.
 
-### 3. Plan post-results maintenance
+## Publish and Safety Notes
 
-Use this after winners are already known and you want to prepare the operational follow-up edits.
+- `create-voting` and `process-challenge` support `dry-run`, `sandbox`, and `live`
+- `post-results-maintenance` generates dry-run artifacts first, then uses Web review for selective publish
+- sandbox targets are derived from the main account part before `@` in `NAME`
+- saved credentials use the system keychain when available, with in-memory fallback for the current process
+- job history is rebuilt from `output/jobs/*/logs/job.log`
 
-What it does:
-- loads the latest completed `process-challenge` outputs from `output/jobs`
-- prepares winner talk-page notifications
-- prepares the central challenge-talk announcement for a challenge pair
-- prepares the `Commons:Photo challenge/Previous` page update
-- prepares top-three file assessment edit plans
+## Validation and Troubleshooting
 
-Main outputs:
-- `*_maintenance_plan.json`
-- `*_winner_notifications.txt`
-- `*_challenge_announcement.txt`
-- `*_previous_page_update.txt`
-- `*_file_assessments.json`
-
-## Output Structure
-
-All generated data is written to:
-
-```text
-output/jobs/<job-id>/
-```
-
-Each job directory contains:
-
-```text
-input/
-generated/
-logs/
-```
-
-Typical files:
-
-```text
-output/jobs/<job-id>/input/voting-page.txt
-output/jobs/<job-id>/generated/<challenge>_result.txt
-output/jobs/<job-id>/generated/<challenge>_winners.txt
-output/jobs/<job-id>/logs/job.log
-```
-
-## Credential Storage
-
-The app supports saved credentials for local use.
-
-Priority order:
-- system keychain via `keytar`
-- in-memory fallback for the current process if keychain is unavailable
-
-Platform backends typically are:
-- Windows: Credential Manager
-- macOS: Keychain
-- Linux: Secret Service / libsecret
-
-Notes:
-- `.env` is ignored by git and should not be committed
-- Bot passwords are safer than using a primary account password
-- The homepage can clear a saved password from the local machine
-
-## Persisted Job History
-
-Job history is rebuilt from files under `output/jobs/*/logs/job.log`.
-
-This means:
-- the homepage can show recent runs after app restart
-- completed and failed jobs can still be reopened later
-- result, publish-review, and artifact pages remain accessible if the job output is still on disk
-
-## Project Structure
-
-```text
-src/
-  cli/
-  core/
-  infra/
-  parsers/
-  renderers/
-  services/
-  web/
-  workflows/
-```
-
-High-level responsibilities:
-- `cli/`: command-line entrypoint and argument parsing
-- `core/`: scoring and validation logic
-- `infra/`: config, job store, credential store, persisted job history
-- `parsers/`: Commons wikitext parsing
-- `renderers/`: output page generation
-- `services/`: Commons API / `mwn` integration
-- `web/`: Express app, routes, controllers, views, static assets
-- `workflows/`: end-to-end job orchestration
-
-## Validation and Build
-
-Type-check:
+Useful commands:
 
 ```bash
 npm run check
 npm run check:test
-```
-
-Build:
-
-```bash
-npm run build
-```
-
-Run tests:
-
-```bash
 npm test
 ```
+
+Notes:
+- keep `.env` out of version control
+- preserve `output/jobs/` if you want to reopen past runs or review publish history
+- use `sandbox` before `live` when testing new workflow changes
 
 ## Project Status
 
 Implemented and working today:
-- Web UI for running jobs, tracking progress, previewing outputs, reopening recent runs, and reviewing publishes before write
-- CLI for create-voting, process-challenge, list, archive, and voting-index helper commands
-- Commons publishing for the main generated pages, with dry-run, sandbox, and live safety boundaries
-- Line-by-line publish review in the Web UI before submitting edits
-- Persisted job history under output/jobs, including failed jobs
-- Offline regression coverage for parser, renderer, CLI, job history, and workflow fixtures
+- Web UI for job creation, progress tracking, artifact preview, publish review, and maintenance review
+- CLI for main workflows plus list/archive/voting-index helper commands
+- Commons publishing for voting/result/winners pages
+- selective maintenance publish with persisted publish history
+- regression coverage for parsers, renderers, CLI, job history, and offline workflow fixtures
 
 Recommended next steps:
-- Implement winner notification and follow-up maintenance workflows from the upstream Python tool
-- Expand regression fixtures for more historical page variants and edge-case signatures
-- Write deployment and operations docs for running this outside a local single-user setup
-- Consider a finer-grained inline word diff inside changed lines on the publish-review screen
+- add deployment and operations documentation for non-local usage
+- expand fixtures for older Commons page variants and unusual signatures
+- add end-to-end Web flow coverage for create-voting, process-challenge, and maintenance publish
+- consider finer-grained inline word diff inside changed lines
 
-## Current Limitations
+## Useful Resources
 
-- The app is currently designed around a local single-user workflow
-- Job history depends on files stored under `output/jobs`
-- Some historical Commons page format variants may still require parser adjustments
-
-## Repository Notes
-
-Ignored from git:
-- `.env`
-- `node_modules/`
-- `dist/`
-- `output/jobs/`
-- `upstreams/`
-
-Tracked intentionally:
-- `.env.example`
-- `output/.gitkeep`
-- source code and configuration files
-
-## License / Source Context
-
-This repository is a Node.js rewrite project based on Wikimedia Commons Photo Challenge automation concepts and local upstream analysis.
-
-
-
+- Example environment file: [.env.example](.env.example)
+- Original upstream project: [Commons Photo Challenge](https://github.com/jarek-tuszynski/Commons_photo_challenge), by Jarek Tuszynski (public domain)
+- Traditional Chinese README: [README.zh-TW.md](README.zh-TW.md)
