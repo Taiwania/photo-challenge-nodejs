@@ -6,7 +6,7 @@ import { createCommonsBot } from "../services/commons-bot.js";
 import { parseSubmittedChallenges } from "../parsers/submitting-parser.js";
 import { parseVotingChallenges } from "../parsers/voting-parser.js";
 
-type JobCommand = "create-voting" | "process-challenge" | "archive-pages" | "build-voting-index";
+type JobCommand = "create-voting" | "process-challenge" | "archive-pages" | "build-voting-index" | "post-results-maintenance";
 type ListCommand = "list-submitted-challenges" | "list-voting-challenges";
 type CliCommand = JobCommand | ListCommand;
 
@@ -20,9 +20,9 @@ type ParsedCliArgs =
   | { kind: "list"; action: ListCommand; credentials: { name: string; botPassword: string }; source: "main" | "old" }
   | { kind: "run"; request: JobRequest };
 
-const jobCommands = new Set<JobCommand>(["create-voting", "process-challenge", "archive-pages", "build-voting-index"]);
+const jobCommands = new Set<JobCommand>(["create-voting", "process-challenge", "archive-pages", "build-voting-index", "post-results-maintenance"]);
 const listCommands = new Set<ListCommand>(["list-submitted-challenges", "list-voting-challenges"]);
-const challengeRequiredCommands = new Set<CliCommand>(["create-voting", "process-challenge"]);
+const challengeRequiredCommands = new Set<CliCommand>(["create-voting", "process-challenge", "post-results-maintenance"]);
 const VALID_PUBLISH_MODES = new Set<PublishMode>(["dry-run", "sandbox", "live"]);
 const VALID_SOURCES = new Set<string>(["main", "old"]);
 
@@ -37,22 +37,25 @@ export function buildCliUsage(): string {
     "  build-voting-index                 Generate the new voting index section from Submitting[_old]",
     "  create-voting                      Build the voting page for a challenge",
     "  process-challenge                  Validate votes and generate result/winners pages",
+    "  post-results-maintenance           Build dry-run maintenance plans after winners are known",
     "",
     "Options:",
-    "  --challenge       Challenge title (required for create-voting / process-challenge)",
-    "  --source          main|old — which page variant to read (default: old for build-voting-index, main for list-*)",
-    "  --name            BotPassword login name. Defaults to NAME from .env",
-    "  --bot-password    BotPassword value. Defaults to BOT_PASSWORD from .env",
-    "  --publish-mode    dry-run (default) | sandbox | live",
-    "  --help            Show this help text",
+    "  --challenge         Challenge title (required for create-voting / process-challenge / post-results-maintenance)",
+    "  --paired-challenge  Second challenge used for shared winner announcements and Previous-page updates",
+    "  --source            main|old — which page variant to read (default: old for build-voting-index, main for list-*)",
+    "  --name              BotPassword login name. Defaults to NAME from .env",
+    "  --bot-password      BotPassword value. Defaults to BOT_PASSWORD from .env",
+    "  --publish-mode      dry-run (default) | sandbox | live",
+    "  --help              Show this help text",
     "",
     "Examples:",
     "  npm run cli -- list-submitted-challenges",
     "  npm run cli -- list-voting-challenges --source old",
-    "  npm run cli -- archive-pages --publish-mode sandbox",
+    "  npm run cli -- archive-pages --publish-mode live",
     "  npm run cli -- build-voting-index --publish-mode dry-run",
     "  npm run cli -- create-voting --challenge \"2026 - March - Three-wheelers\" --publish-mode sandbox",
-    "  npm run cli -- process-challenge --challenge \"2026 - February - Orange\" --publish-mode sandbox"
+    "  npm run cli -- process-challenge --challenge \"2026 - February - Orange\" --publish-mode sandbox",
+    "  npm run cli -- post-results-maintenance --challenge \"2026 - February - Orange\" --paired-challenge \"2026 - February - First aid\" --publish-mode dry-run"
   ].join("\n");
 }
 
@@ -99,7 +102,7 @@ export function parseCliArgs(args: string[], env: NodeJS.ProcessEnv = process.en
   if (isListCmd) {
     const rawSource = options.get("source")?.trim() ?? "main";
     if (!VALID_SOURCES.has(rawSource)) {
-      throw new Error(`Invalid --source "${rawSource}". Must be main or old.`);
+      throw new Error(`Invalid --source \"${rawSource}\". Must be main or old.`);
     }
     return {
       kind: "list",
@@ -109,8 +112,8 @@ export function parseCliArgs(args: string[], env: NodeJS.ProcessEnv = process.en
     };
   }
 
-  // Job commands
   const challenge = options.get("challenge")?.trim() ?? "";
+  const pairedChallenge = options.get("paired-challenge")?.trim() ?? "";
   const rawPublishMode = options.get("publish-mode")?.trim() ?? "dry-run";
   const rawSource = options.get("source")?.trim() ?? "old";
 
@@ -118,10 +121,10 @@ export function parseCliArgs(args: string[], env: NodeJS.ProcessEnv = process.en
     throw new Error("Missing required --challenge value.");
   }
   if (!VALID_PUBLISH_MODES.has(rawPublishMode as PublishMode)) {
-    throw new Error(`Invalid --publish-mode "${rawPublishMode}". Must be dry-run, sandbox, or live.`);
+    throw new Error(`Invalid --publish-mode \"${rawPublishMode}\". Must be dry-run, sandbox, or live.`);
   }
   if (!VALID_SOURCES.has(rawSource)) {
-    throw new Error(`Invalid --source "${rawSource}". Must be main or old.`);
+    throw new Error(`Invalid --source \"${rawSource}\". Must be main or old.`);
   }
 
   return {
@@ -129,6 +132,7 @@ export function parseCliArgs(args: string[], env: NodeJS.ProcessEnv = process.en
     request: {
       action: command,
       challenge,
+      pairedChallenge: pairedChallenge || undefined,
       source: rawSource as "main" | "old",
       credentials: { name, botPassword },
       publishMode: rawPublishMode as PublishMode
@@ -185,6 +189,7 @@ export async function runCli(args: string[] = process.argv.slice(2), logger: Cli
     logger.log(`Started job ${job.id}`);
     logger.log(`Action:       ${parsed.request.action}`);
     if (parsed.request.challenge) logger.log(`Challenge:    ${parsed.request.challenge}`);
+    if (parsed.request.pairedChallenge) logger.log(`Paired:       ${parsed.request.pairedChallenge}`);
     logger.log(`Publish mode: ${parsed.request.publishMode}`);
     logger.log(`Output root:  ${job.outputDir}`);
 

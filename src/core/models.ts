@@ -10,6 +10,7 @@ export type BotCredentials = {
 export type JobRequest = {
   action: string;
   challenge: string;
+  pairedChallenge?: string;
   /** "main" reads the live page; "old" reads the *_old archived copy. Applies to list-* and build-voting-index. */
   source?: "main" | "old";
   credentials: BotCredentials;

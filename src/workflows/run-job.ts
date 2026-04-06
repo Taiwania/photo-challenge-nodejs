@@ -21,6 +21,7 @@ import { config } from "../infra/config.js";
 import { ensureJobOutputPaths, getJobOutputPaths } from "../infra/output-paths.js";
 import { jobStore } from "../infra/job-store.js";
 import { createCommonsBot, type CommonsBot, type FileInfoLookup, type ReadPageResult } from "../services/commons-bot.js";
+import { runPostResultsMaintenance } from "./run-post-results-maintenance.js";
 
 type ProgressStep = {
   percent: number;
@@ -67,6 +68,19 @@ export async function runJob(jobId: string, request: JobRequest): Promise<void> 
 
     enforcePublishModePolicy(request);
 
+    if (request.action === "post-results-maintenance") {
+      const maintenance = await runPostResultsMaintenance(
+        paths,
+        request,
+        (percent, step, message) => updateProgress(jobId, { percent, step, message }),
+        (message) => jobStore.appendMessage(jobId, message)
+      );
+      await finalizeJob(paths.logsDir, jobId, request, null, timestamp, maintenance.sourceCount, maintenance.challengeCount, maintenance.fileCount, maintenance.voteCount);
+      jobStore.appendMessage(jobId, `Artifacts written to ${getJobOutputPaths(jobId).jobRoot}`);
+      jobStore.markCompleted(jobId);
+      return;
+    }
+
     updateProgress(jobId, {
       percent: 10,
       step: "Initializing bot session",
@@ -98,6 +112,7 @@ export async function runJob(jobId: string, request: JobRequest): Promise<void> 
       jobStore.markCompleted(jobId);
       return;
     }
+
 
     const sourceSpecs = getSourceSpecs(request);
     const sources: ReadPageResult[] = [];
@@ -175,6 +190,10 @@ function enforcePublishModePolicy(request: JobRequest): void {
 
   if (request.action === "build-voting-index" && request.publishMode !== "dry-run") {
     throw new Error("build-voting-index currently supports only --publish-mode dry-run to avoid overwriting the shared voting index.");
+  }
+
+  if (request.action === "post-results-maintenance" && request.publishMode !== "dry-run") {
+    throw new Error("post-results-maintenance currently supports only --publish-mode dry-run while the follow-up publish flow is being built.");
   }
 }
 

@@ -1,6 +1,6 @@
 # Original python assets and plans
 /upstreams
-nodejs-rewrite-plan.md
+/docs
 
 # Environment and local secrets
 .env

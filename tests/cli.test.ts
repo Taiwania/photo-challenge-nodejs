@@ -8,6 +8,7 @@ test("buildCliUsage documents both supported commands", () => {
 
   assert.match(usage, /create-voting/);
   assert.match(usage, /process-challenge/);
+  assert.match(usage, /post-results-maintenance/);
   assert.match(usage, /--challenge/);
 });
 
@@ -30,6 +31,7 @@ test("parseCliArgs reads command line values directly", () => {
   assert.deepEqual(parsed.request, {
     action: "create-voting",
     challenge: "2026 - March - Three-wheelers",
+    pairedChallenge: undefined,
     source: "old",
     credentials: {
       name: "Example@Bot",
@@ -152,6 +154,20 @@ test("parseCliArgs parses build-voting-index as a run job with --source main", (
   assert.equal(parsed.request.source, "main");
 });
 
+test("parseCliArgs parses post-results-maintenance with a paired challenge", () => {
+  const parsed = parseCliArgs([
+    "post-results-maintenance",
+    "--challenge", "2026 - February - Orange",
+    "--paired-challenge", "2026 - February - First aid",
+    "--name", "Example@Bot",
+    "--bot-password", "secret"
+  ]);
+  assert.equal(parsed.kind, "run");
+  if (parsed.kind !== "run") throw new Error("Expected run");
+  assert.equal(parsed.request.action, "post-results-maintenance");
+  assert.equal(parsed.request.pairedChallenge, "2026 - February - First aid");
+});
+
 test("parseCliArgs rejects an invalid --source value", () => {
   assert.throws(
     () => parseCliArgs([
@@ -202,5 +218,21 @@ test("runCli rejects build-voting-index sandbox publish before any network work"
 
   assert.equal(exitCode, 1);
   assert.match(errors.join("\n"), /supports only --publish-mode dry-run/);
+  assert.match(logs.join("\n"), /Started job/);
+});
+
+test("runCli rejects post-results-maintenance live publish until follow-up publish exists", async () => {
+  const logs: string[] = [];
+  const errors: string[] = [];
+  const exitCode = await runCli(
+    ["post-results-maintenance", "--challenge", "2026 - February - Orange", "--name", "Example@Bot", "--bot-password", "secret", "--publish-mode", "live"],
+    {
+      log: (message: string) => logs.push(message),
+      error: (message: string) => errors.push(message)
+    }
+  );
+
+  assert.equal(exitCode, 1);
+  assert.match(errors.join("\n"), /currently supports only --publish-mode dry-run/);
   assert.match(logs.join("\n"), /Started job/);
 });
