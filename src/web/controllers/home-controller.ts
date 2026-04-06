@@ -6,6 +6,7 @@ import { jobStore } from "../../infra/job-store.js";
 type HomeDefaults = {
   name: string;
   challenge: string;
+  pairedChallenge: string;
   action: string;
   publishMode: string;
 };
@@ -52,6 +53,7 @@ export async function buildHomePageViewModel(options: HomePageOptions = {}) {
     defaults: {
       name: options.defaults?.name ?? savedName ?? process.env.NAME ?? "",
       challenge: options.defaults?.challenge ?? "",
+      pairedChallenge: options.defaults?.pairedChallenge ?? "",
       action: options.defaults?.action ?? "process-challenge",
       publishMode: options.defaults?.publishMode ?? "dry-run"
     },
@@ -113,6 +115,10 @@ function formatActionLabel(action: string): string {
 
   if (action === "process-challenge") {
     return "Count votes and publish results";
+  }
+
+  if (action === "post-results-maintenance") {
+    return "Plan post-results maintenance";
   }
 
   return action;

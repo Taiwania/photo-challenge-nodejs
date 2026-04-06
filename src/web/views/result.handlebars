@@ -12,15 +12,36 @@
     <div class="notice">{{publishNotice}}</div>
   {{/if}}
 
-  <section class="publish-review-cta">
-    <div>
-      <h2>Publish Review</h2>
-      <p class="lede">Open a final compare screen before writing generated pages to the selected Commons target.</p>
-    </div>
-    <div class="actions">
-      <a href="{{publishReviewUrl}}">Review before publishing to {{publishModeLabel}}</a>
-    </div>
-  </section>
+  {{#if canPublishReview}}
+    <section class="publish-review-cta">
+      <div>
+        <h2>Publish Review</h2>
+        <p class="lede">Open a final compare screen before writing generated pages to the selected Commons target.</p>
+      </div>
+      <div class="actions">
+        <a href="{{publishReviewUrl}}">Review before publishing to {{publishModeLabel}}</a>
+      </div>
+    </section>
+  {{else}}
+    {{#if hasMaintenanceReview}}
+      <section class="publish-review-cta">
+        <div>
+          <h2>Maintenance Review</h2>
+          <p class="lede">Open a grouped review screen for notifications, announcements, Previous-page updates, and assessment plans.</p>
+        </div>
+        <div class="actions">
+          <a href="{{maintenanceReviewUrl}}">Open maintenance review</a>
+        </div>
+      </section>
+    {{else}}
+      <section class="publish-review-cta">
+        <div>
+          <h2>Dry-run planning output</h2>
+          <p class="lede">This workflow currently generates follow-up maintenance plans only. Review the artifacts below before we add Web publishing for these edits.</p>
+        </div>
+      </section>
+    {{/if}}
+  {{/if}}
 
   <h2>Core outputs</h2>
   {{#if coreArtifacts.length}}

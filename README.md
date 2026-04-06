@@ -10,21 +10,25 @@ This project is a practical rewrite of the upstream Python tooling into a web-fi
 - `mwn`
 - `luxon`
 
-It currently supports two main flows:
+It currently supports three main flows:
 - Prepare a voting page from submission pages
 - Count votes and generate revised voting, result, and winners pages
+- Plan post-results maintenance from completed challenge outputs
 
 ## Current Features
 
 - Wikimedia Commons login with `mwn`
 - Cross-platform credential storage via system keychain when available
 - Web UI for starting jobs, tracking progress, and reopening recent runs
-- CLI for running the two main workflows directly
+- Web entrypoint for the dry-run post-results maintenance planner
+- Dedicated Web maintenance review page for grouped follow-up planning artifacts
+- Selective maintenance publish flow for sandbox/live follow-up edits
+- CLI for running the three main workflows directly
 - CLI support for list/archive/index maintenance commands
 - Fixed output directory under `output/jobs/<job-id>/`
 - Artifact preview and download in the browser
 - Web publish review with target-page comparison before writing to Commons
-- Core output shortcuts for voting, revised, result, and winners pages
+- Core output shortcuts for voting, revised, result, winners, and maintenance-plan artifacts
 - Homepage history showing the latest 3 runs even after app restart
 - Parsing and processing of live Commons voting/submission pages
 - Vote validation for:
@@ -123,6 +127,7 @@ Supported publish behavior:
 - `process-challenge`: `dry-run`, `sandbox`, `live`
 - `archive-pages`: `dry-run`, `live`
 - `build-voting-index`: `dry-run` only
+- `post-results-maintenance`: dry-run job generation, plus Web review and selective publish to `sandbox` or `live`
 
 Sandbox targets are derived from the main account part before `@` in `NAME`.
 For example, `Example@BotApp` publishes to `User:Example/Sandbox/<challenge>/...`.
@@ -164,6 +169,24 @@ Main outputs:
 - `*_winners.txt`
 - `*_votes.json`
 - `*_summary.txt`
+
+### 3. Plan post-results maintenance
+
+Use this after winners are already known and you want to prepare the operational follow-up edits.
+
+What it does:
+- loads the latest completed `process-challenge` outputs from `output/jobs`
+- prepares winner talk-page notifications
+- prepares the central challenge-talk announcement for a challenge pair
+- prepares the `Commons:Photo challenge/Previous` page update
+- prepares top-three file assessment edit plans
+
+Main outputs:
+- `*_maintenance_plan.json`
+- `*_winner_notifications.txt`
+- `*_challenge_announcement.txt`
+- `*_previous_page_update.txt`
+- `*_file_assessments.json`
 
 ## Output Structure
 
@@ -301,3 +324,5 @@ Tracked intentionally:
 ## License / Source Context
 
 This repository is a Node.js rewrite project based on Wikimedia Commons Photo Challenge automation concepts and local upstream analysis.
+
+

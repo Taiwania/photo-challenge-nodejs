@@ -367,6 +367,26 @@ button, .actions a, .artifact-actions a {
   border-color: #b4c7db;
 }
 
+.artifact-card-maintenance-plan {
+  border-color: #94c7c2;
+}
+
+.artifact-card-notifications {
+  border-color: #9bcab5;
+}
+
+.artifact-card-announcement {
+  border-color: #edc283;
+}
+
+.artifact-card-previous-page {
+  border-color: #b4c7db;
+}
+
+.artifact-card-file-assessments {
+  border-color: #d7b16a;
+}
+
 .preview-nav-item {
   min-height: 100%;
   align-content: start;
@@ -675,4 +695,80 @@ code {
   .preview-nav-current {
     width: 100%;
   }
+}
+
+.maintenance-overview {
+  margin: 24px 0 28px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(237, 248, 246, 0.96) 0%, rgba(255, 253, 249, 0.98) 100%);
+}
+
+.maintenance-review-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.maintenance-review-card {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 14px 28px rgba(29, 42, 51, 0.08);
+}
+
+.maintenance-review-card-notifications {
+  border-color: #94c7c2;
+}
+
+.maintenance-review-card-announcement {
+  border-color: #edc283;
+}
+
+.maintenance-review-card-previous-page {
+  border-color: #b4c7db;
+}
+
+.maintenance-review-card-file-assessments {
+  border-color: #d7b16a;
+}
+
+.maintenance-bullet-list {
+  margin: 0;
+  padding-left: 20px;
+  color: #485965;
+  display: grid;
+  gap: 6px;
+}
+
+
+.maintenance-publish-form {
+  display: grid;
+  gap: 18px;
+}
+
+.maintenance-checkbox-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+}
+
+.maintenance-checkbox-row input {
+  width: auto;
+}
+
+.maintenance-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.maintenance-form-actions {
+  margin-top: 4px;
 }

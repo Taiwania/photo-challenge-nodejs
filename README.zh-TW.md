@@ -10,21 +10,25 @@
 - `mwn`
 - `luxon`
 
-目前已支援兩條主要流程：
+目前已支援三條主要流程：
 - 從 submission pages 產生 voting page
 - 計算投票結果並產生 revised voting、result、winners 頁面
+- 從已完成的 challenge 輸出規劃 post-results maintenance
 
 ## 目前功能
 
 - 使用 `mwn` 登入 Wikimedia Commons
 - 支援跨平台系統 keychain 的本機憑證保存
 - 提供 Web UI 啟動工作、查看進度，並可重新開啟最近執行紀錄
-- 提供 CLI 直接執行兩條主要 workflow
+- 提供 Web 入口啟動 dry-run 的 post-results maintenance planner
+- 提供專用的 Web maintenance review 頁面，分組檢視後續維護產物
+- 提供可選擇項目的 maintenance publish flow，可發佈到 sandbox 或 live
+- 提供 CLI 直接執行三條主要 workflow
 - 提供 list / archive / voting index 維運指令
 - 固定輸出目錄：`output/jobs/<job-id>/`
 - 可在瀏覽器中預覽與下載產物
 - 提供 Web 發佈前審核畫面，可先比對目標頁再寫入 Commons
-- 可快速切換核心輸出：voting、revised、result、winners
+- 可快速切換核心輸出：voting、revised、result、winners，以及 maintenance planning artifacts
 - App 重啟後，首頁仍可顯示最近 3 次執行紀錄
 - 可解析 Commons 的 submission / voting 頁面並處理 live 資料
 - 目前已實作的投票驗證包括：
@@ -123,6 +127,7 @@ npm run cli -- process-challenge --challenge "2026 - February - Orange" --name "
 - `process-challenge`：支援 `dry-run`、`sandbox`、`live`
 - `archive-pages`：支援 `dry-run`、`live`
 - `build-voting-index`：目前僅支援 `dry-run`
+- `post-results-maintenance`：job 仍以 `dry-run` 生成產物，但可在 Web maintenance review 中選擇發佈到 `sandbox` 或 `live`
 
 `sandbox` 的寫入目標會依 `NAME` 中 `@` 前的主帳號名稱自動推導。
 例如 `Example@BotApp` 會寫到 `User:Example/Sandbox/<challenge>/...`。
@@ -170,6 +175,24 @@ npm run cli:dev -- --help
 - `*_winners.txt`
 - `*_votes.json`
 - `*_summary.txt`
+
+### 3. Plan post-results maintenance
+
+適用情境：winners 已經確定，接下來要規劃公告與後續維護時。
+
+會做的事情：
+- 從 `output/jobs` 讀取最新的 `process-challenge` 完成結果
+- 生成得獎者 talk page 通知計畫
+- 生成 challenge talk page 的雙 challenge 公告計畫
+- 生成 `Commons:Photo challenge/Previous` 更新計畫
+- 生成前三名檔案的 assessment edit plans
+
+主要輸出：
+- `*_maintenance_plan.json`
+- `*_winner_notifications.txt`
+- `*_challenge_announcement.txt`
+- `*_previous_page_update.txt`
+- `*_file_assessments.json`
 
 ## 輸出目錄結構
 
@@ -308,3 +331,5 @@ npm test
 ## 專案背景
 
 本 repository 是根據 Wikimedia Commons Photo Challenge 自動化流程概念與本地 upstream 分析，逐步改寫而成的 Node.js 版本。
+
+

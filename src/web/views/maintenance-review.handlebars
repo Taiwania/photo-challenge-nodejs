@@ -1,0 +1,89 @@
+<section class="panel panel-wide">
+  <div class="panel-header">
+    <div>
+      <h1>Maintenance Review</h1>
+      <p class="lede">Review the follow-up maintenance edits before publishing notifications, announcements, Previous-page updates, or file assessments.</p>
+    </div>
+    <div class="actions">
+      <a href="{{alternateModeUrl}}">Switch to {{alternateMode}}</a>
+      <a href="/jobs/{{job.id}}/result">Back to result</a>
+    </div>
+  </div>
+
+  <dl class="details">
+    <div><dt>Action</dt><dd>{{jobActionLabel}}</dd></div>
+    <div><dt>Challenge</dt><dd>{{job.challenge}}</dd></div>
+    <div><dt>Review mode</dt><dd><code>{{reviewMode}}</code></dd></div>
+  </dl>
+
+  {{#if reviewNotice}}
+    <div class="notice">{{reviewNotice}}</div>
+  {{/if}}
+
+  {{#if reviewWarning}}
+    <div class="alert">{{reviewWarning}}</div>
+  {{/if}}
+
+  {{#if overview}}
+    <section class="maintenance-overview">
+      <div>
+        <p class="artifact-kicker">{{overview.label}}</p>
+        <h2><code>{{overview.fileName}}</code></h2>
+        <p class="artifact-copy">{{overview.summary}}</p>
+      </div>
+      <div class="artifact-actions">
+        <a href="{{overview.previewUrl}}">Preview</a>
+        <a href="{{overview.downloadUrl}}">Download</a>
+      </div>
+      <ul class="maintenance-bullet-list">
+        {{#each overview.excerpt}}
+          <li>{{this}}</li>
+        {{/each}}
+      </ul>
+    </section>
+  {{/if}}
+
+  <h2>Publishable follow-up entries</h2>
+  {{#if reviewEntries.length}}
+    <form method="post" action="/jobs/{{job.id}}/maintenance-publish" class="maintenance-publish-form">
+      <input type="hidden" name="mode" value="{{reviewMode}}">
+      <div class="maintenance-review-grid">
+        {{#each reviewEntries}}
+          <article class="maintenance-review-card maintenance-review-card-{{type}}">
+            <label class="maintenance-checkbox-row">
+              <input type="checkbox" name="selected" value="{{id}}" {{#if selected}}checked{{/if}} {{#unless @root.canPublish}}disabled{{/unless}} />
+              <span>Select this item</span>
+            </label>
+            <div class="maintenance-card-header">
+              <div>
+                <p class="artifact-kicker">{{label}}</p>
+                <h3><code>{{targetTitle}}</code></h3>
+              </div>
+              <span class="status-pill publish-status-{{status}}">{{statusLabel}}</span>
+            </div>
+            <p class="artifact-copy">{{description}}</p>
+            <p class="publish-target"><strong>Source:</strong> <code>{{liveTargetTitle}}</code></p>
+            <p class="publish-target"><strong>Publish target:</strong> <code>{{targetTitle}}</code></p>
+            <p class="artifact-copy"><strong>Review:</strong> {{diffSummary}}</p>
+            <ul class="maintenance-bullet-list">
+              {{#each excerpt}}
+                <li>{{this}}</li>
+              {{/each}}
+            </ul>
+          </article>
+        {{/each}}
+      </div>
+
+      <div class="actions maintenance-form-actions">
+        {{#if canPublish}}
+          <button type="submit">Publish selected items to {{reviewMode}}</button>
+        {{else}}
+          <button type="submit" disabled>Publishing unavailable</button>
+        {{/if}}
+        <a href="/jobs/{{job.id}}/result">Cancel</a>
+      </div>
+    </form>
+  {{else}}
+    <p>No maintenance publish entries are available for this job yet.</p>
+  {{/if}}
+</section>

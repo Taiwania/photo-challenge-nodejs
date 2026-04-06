@@ -4,9 +4,11 @@ import {
   downloadArtifact,
   getJobStatus,
   publishJobOutputs,
+  publishMaintenanceOutputs,
   renderArtifactPreview,
   renderJobProgress,
   renderJobResult,
+  renderMaintenanceReview,
   renderPublishReview
 } from "../controllers/job-controller.js";
 
@@ -16,7 +18,9 @@ jobsRouter.post("/", createJob);
 jobsRouter.get("/:id", renderJobProgress);
 jobsRouter.get("/:id/status", getJobStatus);
 jobsRouter.get("/:id/result", renderJobResult);
+jobsRouter.get("/:id/maintenance-review", renderMaintenanceReview);
 jobsRouter.get("/:id/publish-review", renderPublishReview);
 jobsRouter.post("/:id/publish", publishJobOutputs);
 jobsRouter.get("/:id/artifacts/:kind/:fileName", renderArtifactPreview);
 jobsRouter.get("/:id/artifacts/:kind/:fileName/download", downloadArtifact);
+

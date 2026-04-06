@@ -109,6 +109,12 @@
       <input name="challenge" type="text" value="{{defaults.challenge}}" placeholder="2025 - January - Theme" required />
     </label>
 
+    <label>
+      <span>Paired challenge</span>
+      <input name="pairedChallenge" type="text" value="{{defaults.pairedChallenge}}" placeholder="Optional, used for shared results announcements" />
+      <small>Used by post-results maintenance when you want a single central announcement and Previous-page update for two challenges.</small>
+    </label>
+
     <fieldset class="action-picker">
       <legend>What do you want to do?</legend>
       <p class="action-picker-copy">Pick the workflow that matches where the challenge is right now.</p>
@@ -128,6 +134,15 @@
           <span class="action-card-title">Count votes and publish results</span>
           <span class="action-card-text">Check votes, score entries, and generate revised voting, result, and winners pages.</span>
           <span class="action-card-meta">Use this after voting has happened.</span>
+        </span>
+      </label>
+
+      <label class="action-card">
+        <input name="action" type="radio" value="post-results-maintenance" {{#if (eq defaults.action "post-results-maintenance")}}checked{{/if}} />
+        <span class="action-card-body">
+          <span class="action-card-title">Plan post-results maintenance</span>
+          <span class="action-card-text">Prepare winner notifications, shared announcements, Previous-page updates, and file assessment edits from completed results.</span>
+          <span class="action-card-meta">Use this after winners are already known.</span>
         </span>
       </label>
     </fieldset>
@@ -164,9 +179,12 @@
       </label>
     </fieldset>
 
+    <div class="notice inline-notice">
+      <strong>Note:</strong> Post-results maintenance is currently dry-run only. Sandbox/live choices do not apply to that workflow yet.
+    </div>
+
     <div class="form-actions">
       <button type="submit">Start job</button>
     </div>
   </form>
 </section>
-
