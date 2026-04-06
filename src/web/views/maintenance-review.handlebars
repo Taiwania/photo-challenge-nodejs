@@ -43,6 +43,23 @@
     </section>
   {{/if}}
 
+  {{#if publishHistory.length}}
+    <section class="maintenance-history">
+      <h2>Published history</h2>
+      <ul class="artifact-list">
+        {{#each publishHistory}}
+          <li>
+            <span class="maintenance-history-copy">
+              <strong>{{label}}</strong>
+              <span><code>{{mode}}</code> to <code>{{targetTitle}}</code></span>
+              <span>{{publishedAt}}{{#if revisionId}} · revision {{revisionId}}{{/if}}</span>
+            </span>
+          </li>
+        {{/each}}
+      </ul>
+    </section>
+  {{/if}}
+
   <h2>Publishable follow-up entries</h2>
   {{#if reviewEntries.length}}
     <form method="post" action="/jobs/{{job.id}}/maintenance-publish" class="maintenance-publish-form">

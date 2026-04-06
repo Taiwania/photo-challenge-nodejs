@@ -772,3 +772,12 @@ code {
 .maintenance-form-actions {
   margin-top: 4px;
 }
+
+.maintenance-history {
+  margin: 24px 0 28px;
+}
+
+.maintenance-history-copy {
+  display: grid;
+  gap: 4px;
+}

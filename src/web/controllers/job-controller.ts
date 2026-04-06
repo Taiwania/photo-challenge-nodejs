@@ -1,5 +1,5 @@
 import path from "node:path";
-import { readdir, readFile } from "node:fs/promises";
+import { appendFile, readdir, readFile, writeFile } from "node:fs/promises";
 import type { Request, Response } from "express";
 import type { JobProgress, JobRequest, PublishMode } from "../../core/models.js";
 import { getCredentialPassword, rememberCredential } from "../../infra/credential-store.js";
@@ -40,6 +40,18 @@ type MaintenancePublishReviewEntry = MaintenancePublishEntry & {
   selected: boolean;
 };
 
+type MaintenancePublishRecord = {
+  id: string;
+  type: MaintenancePublishEntry["type"];
+  label: string;
+  mode: MaintenancePublishMode;
+  targetTitle: string;
+  liveTargetTitle: string;
+  editSummary: string;
+  publishedAt: string;
+  revisionId: number | null;
+  result: string;
+};
 type PublishReviewEntry = {
   label: string;
   fileName: string;
@@ -421,9 +433,22 @@ export async function publishMaintenanceOutputs(request: Request, response: Resp
     }
 
     const nextContent = applyMaintenancePublishEntry(currentContent, entry);
-    await bot.savePage(entry.targetTitle, nextContent, entry.editSummary);
+    const saveResult = await bot.savePage(entry.targetTitle, nextContent, entry.editSummary);
+    await recordMaintenancePublish(job.id, {
+      id: entry.id,
+      type: entry.type,
+      label: entry.label,
+      mode,
+      targetTitle: entry.targetTitle,
+      liveTargetTitle: entry.liveTargetTitle,
+      editSummary: entry.editSummary,
+      publishedAt: new Date().toISOString(),
+      revisionId: saveResult.newRevisionId,
+      result: saveResult.result
+    });
     if (jobStore.get(job.id)) {
-      jobStore.appendMessage(job.id, `Published ${entry.label} to ${entry.targetTitle}`);
+      const revNote = saveResult.newRevisionId ? ` (revision ${saveResult.newRevisionId})` : "";
+      jobStore.appendMessage(job.id, `Published ${entry.label} to ${entry.targetTitle}${revNote}`);
     }
   }
 
@@ -541,6 +566,7 @@ async function loadMaintenancePublishReview(
 ): Promise<{
   overview: ({ previewUrl: string; downloadUrl: string } & ReturnType<typeof summarizeMaintenanceArtifact>) | null;
   entries: MaintenancePublishReviewEntry[];
+  publishHistory: MaintenancePublishRecord[];
   warning: string | null;
   canPublish: boolean;
 }> {
@@ -554,6 +580,7 @@ async function loadMaintenancePublishReview(
     return {
       overview: null,
       entries: [],
+      publishHistory: [],
       warning: "Maintenance plan JSON was not found for this job.",
       canPublish: false
     };
@@ -561,6 +588,7 @@ async function loadMaintenancePublishReview(
 
   const loginName = resolveLoginName(job);
   const entries = buildMaintenancePublishEntries(overviewFile.content, loginName, mode);
+  const publishHistory = await loadMaintenancePublishHistory(job.id);
   if (entries.length === 0) {
     return {
       overview: {
@@ -569,6 +597,7 @@ async function loadMaintenancePublishReview(
         downloadUrl: `/jobs/${job.id}/artifacts/generated/${encodeURIComponent(overviewFile.name)}/download`
       },
       entries: [],
+      publishHistory,
       warning: "No publishable maintenance entries were found in the maintenance plan.",
       canPublish: false
     };
@@ -590,6 +619,7 @@ async function loadMaintenancePublishReview(
         diffSummary: "Save a BotPassword on the home page to load live target content before publishing.",
         selected: selectedIds.length === 0 || selectedIds.includes(entry.id)
       })),
+      publishHistory,
       warning: "A saved BotPassword is required to load live target content for maintenance review and publishing.",
       canPublish: false
     };
@@ -632,9 +662,34 @@ async function loadMaintenancePublishReview(
       downloadUrl: `/jobs/${job.id}/artifacts/generated/${encodeURIComponent(overviewFile.name)}/download`
     },
     entries: reviewEntries,
+    publishHistory,
     warning: null,
     canPublish: true
   };
+}
+async function loadMaintenancePublishHistory(jobId: string): Promise<MaintenancePublishRecord[]> {
+  const filePath = path.join(getJobOutputPaths(jobId).generatedDir, "maintenance_publish_history.json");
+
+  try {
+    const content = await readFile(filePath, "utf8");
+    const parsed = JSON.parse(content) as MaintenancePublishRecord[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+async function recordMaintenancePublish(jobId: string, record: MaintenancePublishRecord): Promise<void> {
+  const paths = getJobOutputPaths(jobId);
+  const filePath = path.join(paths.generatedDir, "maintenance_publish_history.json");
+  const history = await loadMaintenancePublishHistory(jobId);
+  history.unshift(record);
+  await writeFile(filePath, JSON.stringify(history, null, 2), "utf8");
+  await appendFile(
+    path.join(paths.logsDir, "job.log"),
+    `maintenancePublish=${record.publishedAt} | ${record.mode} | ${record.type} | ${record.targetTitle} | ${record.revisionId ?? "n/a"}\n`,
+    "utf8"
+  );
 }
 
 async function loadPublishReview(job: JobProgress, mode: "sandbox" | "live"): Promise<{ entries: PublishReviewEntry[]; warning: string | null }> {
@@ -847,6 +902,19 @@ async function safeReadDir(targetPath: string): Promise<string[]> {
     return [];
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

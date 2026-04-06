@@ -23,6 +23,7 @@
 - 提供 Web 入口啟動 dry-run 的 post-results maintenance planner
 - 提供專用的 Web maintenance review 頁面，分組檢視後續維護產物
 - 提供可選擇項目的 maintenance publish flow，可發佈到 sandbox 或 live
+- maintenance review 會保留已發佈紀錄，並顯示目標頁與 revision id
 - 提供 CLI 直接執行三條主要 workflow
 - 提供 list / archive / voting index 維運指令
 - 固定輸出目錄：`output/jobs/<job-id>/`
@@ -331,5 +332,6 @@ npm test
 ## 專案背景
 
 本 repository 是根據 Wikimedia Commons Photo Challenge 自動化流程概念與本地 upstream 分析，逐步改寫而成的 Node.js 版本。
+
 
 

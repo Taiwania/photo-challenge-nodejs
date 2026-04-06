@@ -23,6 +23,7 @@ It currently supports three main flows:
 - Web entrypoint for the dry-run post-results maintenance planner
 - Dedicated Web maintenance review page for grouped follow-up planning artifacts
 - Selective maintenance publish flow for sandbox/live follow-up edits
+- Persisted maintenance publish history with target pages and revision IDs in Web review
 - CLI for running the three main workflows directly
 - CLI support for list/archive/index maintenance commands
 - Fixed output directory under `output/jobs/<job-id>/`
@@ -324,5 +325,6 @@ Tracked intentionally:
 ## License / Source Context
 
 This repository is a Node.js rewrite project based on Wikimedia Commons Photo Challenge automation concepts and local upstream analysis.
+
 
 
