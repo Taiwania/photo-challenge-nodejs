@@ -18,11 +18,12 @@
 
 - 使用 `mwn` 登入 Wikimedia Commons
 - 支援跨平台系統 keychain 的本機憑證保存
-- 提供 Web UI 啟動工作與查看進度
+- 提供 Web UI 啟動工作、查看進度，並可重新開啟最近執行紀錄
 - 提供 CLI 直接執行兩條主要 workflow
 - 提供 list / archive / voting index 維運指令
 - 固定輸出目錄：`output/jobs/<job-id>/`
 - 可在瀏覽器中預覽與下載產物
+- 提供 Web 發佈前審核畫面，可先比對目標頁再寫入 Commons
 - 可快速切換核心輸出：voting、revised、result、winners
 - App 重啟後，首頁仍可顯示最近 3 次執行紀錄
 - 可解析 Commons 的 submission / voting 頁面並處理 live 資料
@@ -35,6 +36,7 @@
   - 超過投票截止時間的 late vote
 - 已建立 parser / renderer / offline workflow regression tests
 - 主要寫入流程已支援 dry-run、sandbox、live publish mode
+- 發佈前審核畫面已支援逐行 diff，並折疊未變更區段
 
 ## 環境需求
 
@@ -219,7 +221,7 @@ output/jobs/<job-id>/logs/job.log
 這表示：
 - App 重啟後，首頁仍能顯示最近執行紀錄
 - 已完成與失敗的 job 之後都能重新打開
-- 只要磁碟上的 job 輸出還在，result / artifact 頁面就仍可存取
+- 只要磁碟上的 job 輸出還在，result / publish review / artifact 頁面就仍可存取
 
 ## 專案結構
 
@@ -269,17 +271,18 @@ npm test
 ## 目前完成進度
 
 目前已完成並可實際使用的部分：
-- Web UI 可建立 job、追蹤進度、預覽產物、重新開啟最近執行紀錄
+- Web UI 可建立 job、追蹤進度、預覽產物、重新開啟最近執行紀錄，並在寫入前做發佈審核
 - CLI 已支援 create-voting、process-challenge、list、archive、build-voting-index 等指令
 - 主要生成頁面已可安全發佈到 Commons，並區分 dry-run、sandbox、live
+- Web 發佈審核畫面已支援逐行 diff 檢視
 - `output/jobs` 的歷史紀錄可在重啟後重建，包含失敗 job
 - 已有 parser、renderer、CLI、job history、workflow fixtures 的離線 regression tests
 
 接下來最值得做的功能：
 - 補上 upstream Python 仍未搬完的 winners notification 與後續維護流程
-- 在 Web UI 加入發佈前 diff / review 畫面
 - 擴充更多歷史頁面格式與特殊簽名的 regression fixtures
 - 補齊多人/長期運行情境下的部署與維運文件
+- 視需要再加上 changed line 內的字詞級 diff 高亮
 
 ## 目前限制
 

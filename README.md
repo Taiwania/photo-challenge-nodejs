@@ -18,11 +18,12 @@ It currently supports two main flows:
 
 - Wikimedia Commons login with `mwn`
 - Cross-platform credential storage via system keychain when available
-- Web UI for starting jobs and tracking progress
+- Web UI for starting jobs, tracking progress, and reopening recent runs
 - CLI for running the two main workflows directly
 - CLI support for list/archive/index maintenance commands
 - Fixed output directory under `output/jobs/<job-id>/`
 - Artifact preview and download in the browser
+- Web publish review with target-page comparison before writing to Commons
 - Core output shortcuts for voting, revised, result, and winners pages
 - Homepage history showing the latest 3 runs even after app restart
 - Parsing and processing of live Commons voting/submission pages
@@ -35,6 +36,7 @@ It currently supports two main flows:
   - late votes after the voting deadline
 - Automated regression tests for parser, renderer, and offline workflow fixtures
 - Sandbox and live publish modes for the main page-writing workflows
+- Line-by-line publish diff view with collapsed unchanged sections
 
 ## Requirements
 
@@ -213,12 +215,13 @@ Job history is rebuilt from files under `output/jobs/*/logs/job.log`.
 This means:
 - the homepage can show recent runs after app restart
 - completed and failed jobs can still be reopened later
-- result and artifact pages remain accessible if the job output is still on disk
+- result, publish-review, and artifact pages remain accessible if the job output is still on disk
 
 ## Project Structure
 
 ```text
 src/
+  cli/
   core/
   infra/
   parsers/
@@ -229,6 +232,7 @@ src/
 ```
 
 High-level responsibilities:
+- `cli/`: command-line entrypoint and argument parsing
 - `core/`: scoring and validation logic
 - `infra/`: config, job store, credential store, persisted job history
 - `parsers/`: Commons wikitext parsing
@@ -261,17 +265,18 @@ npm test
 ## Project Status
 
 Implemented and working today:
-- Web UI for running jobs, tracking progress, previewing outputs, and reopening recent runs
+- Web UI for running jobs, tracking progress, previewing outputs, reopening recent runs, and reviewing publishes before write
 - CLI for create-voting, process-challenge, list, archive, and voting-index helper commands
 - Commons publishing for the main generated pages, with dry-run, sandbox, and live safety boundaries
+- Line-by-line publish review in the Web UI before submitting edits
 - Persisted job history under output/jobs, including failed jobs
 - Offline regression coverage for parser, renderer, CLI, job history, and workflow fixtures
 
 Recommended next steps:
 - Implement winner notification and follow-up maintenance workflows from the upstream Python tool
-- Add a publish diff/review screen before writing to Commons from the Web UI
 - Expand regression fixtures for more historical page variants and edge-case signatures
 - Write deployment and operations docs for running this outside a local single-user setup
+- Consider a finer-grained inline word diff inside changed lines on the publish-review screen
 
 ## Current Limitations
 
