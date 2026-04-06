@@ -456,6 +456,100 @@ button, .actions a, .artifact-actions a {
   flex-wrap: wrap;
 }
 
+.publish-review-cta {
+  margin: 24px 0 28px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(237, 248, 246, 0.96) 0%, rgba(255, 253, 249, 0.98) 100%);
+}
+
+.publish-review-list {
+  display: grid;
+  gap: 18px;
+}
+
+.publish-review-card {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.publish-review-card-new {
+  border-color: #8bbf8a;
+}
+
+.publish-review-card-same {
+  border-color: #9db7c8;
+}
+
+.publish-review-card-changed {
+  border-color: #e2b86d;
+}
+
+.publish-review-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.publish-target {
+  margin: 0;
+  color: #465661;
+}
+
+.publish-status-new {
+  background: #dff3e3;
+  color: #1f6a37;
+}
+
+.publish-status-same {
+  background: #d8edf7;
+  color: #1e5c7e;
+}
+
+.publish-status-changed {
+  background: #f7ead1;
+  color: #8d5d11;
+}
+
+.diff-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.diff-panel {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(249, 245, 238, 0.92) 0%, rgba(255, 255, 255, 0.98) 100%);
+}
+
+.diff-panel h4 {
+  margin: 0;
+}
+
+.diff-snippet {
+  margin: 0;
+  padding: 12px;
+  border-radius: 12px;
+  background: #1d2a33;
+  color: #f4efe7;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.publish-form {
+  margin-top: 22px;
+}
 .artifact-preview {
   margin: 24px 0 0;
   padding: 16px;

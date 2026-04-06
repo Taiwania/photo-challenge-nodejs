@@ -28,5 +28,6 @@ export type JobProgress = {
   action: string;
   challenge: string;
   publishMode: PublishMode;
+  loginName: string;
   errorMessage: string | null;
 };

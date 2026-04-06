@@ -3,10 +3,13 @@ import { readdir, readFile } from "node:fs/promises";
 import type { Request, Response } from "express";
 import type { JobProgress, JobRequest, PublishMode } from "../../core/models.js";
 import { getCredentialPassword, rememberCredential } from "../../infra/credential-store.js";
+import { config } from "../../infra/config.js";
 import { loadPersistedJob } from "../../infra/job-history.js";
 import { jobStore } from "../../infra/job-store.js";
 import { getJobOutputPaths } from "../../infra/output-paths.js";
+import { createCommonsBot } from "../../services/commons-bot.js";
 import { runJob } from "../../workflows/run-job.js";
+import { buildPublishableArtifacts, summarizePublishDiff, type PublishableArtifact } from "../publish-review.js";
 import { buildHomePageViewModel } from "./home-controller.js";
 
 type ArtifactKind = "generated" | "logs";
@@ -25,6 +28,20 @@ type CoreArtifactEntry = ArtifactEntry & {
   label: string;
   description: string;
   isActive?: boolean;
+};
+
+type PublishReviewEntry = {
+  label: string;
+  fileName: string;
+  targetTitle: string;
+  previewUrl: string;
+  downloadUrl: string;
+  status: "new" | "same" | "changed";
+  statusLabel: string;
+  summary: string;
+  firstDifferenceLine: number | null;
+  currentSnippet: string[];
+  nextSnippet: string[];
 };
 
 const coreArtifactDefinitions: Array<{
@@ -60,6 +77,7 @@ const coreArtifactDefinitions: Array<{
 ];
 
 const VALID_PUBLISH_MODES = new Set<PublishMode>(["dry-run", "sandbox", "live"]);
+const REVIEWABLE_PUBLISH_MODES = new Set<"sandbox" | "live">(["sandbox", "live"]);
 
 function buildJobRequest(body: Record<string, unknown>): JobRequest {
   const rawPublishMode = String(body.publishMode ?? "dry-run");
@@ -97,6 +115,15 @@ function getArtifactName(value: string | string[] | undefined): string {
 function getArtifactKind(value: string | string[] | undefined): ArtifactKind | null {
   const kind = Array.isArray(value) ? value[0] ?? "" : value ?? "";
   return kind === "generated" || kind === "logs" ? kind : null;
+}
+
+function getReviewMode(value: unknown, job: JobProgress): "sandbox" | "live" {
+  const raw = Array.isArray(value) ? value[0] : value;
+  if (raw === "live" || raw === "sandbox") {
+    return raw;
+  }
+
+  return job.publishMode === "live" ? "live" : "sandbox";
 }
 
 function formatActionLabel(action: string): string {
@@ -189,6 +216,8 @@ export async function renderJobResult(request: Request, response: Response) {
 
   const artifacts = await listArtifacts(job.id);
   const { coreArtifacts, otherGeneratedFiles } = classifyGeneratedArtifacts(artifacts.generated);
+  const reviewMode = getReviewMode(request.query.mode, job);
+  const notice = typeof request.query.notice === "string" ? request.query.notice : null;
 
   response.render("result", {
     title: `Result ${job.id}`,
@@ -196,8 +225,74 @@ export async function renderJobResult(request: Request, response: Response) {
     jobActionLabel: formatActionLabel(job.action),
     coreArtifacts,
     generatedFiles: otherGeneratedFiles,
-    logFiles: artifacts.logs
+    logFiles: artifacts.logs,
+    publishReviewUrl: `/jobs/${job.id}/publish-review?mode=${reviewMode}`,
+    publishNotice: notice,
+    publishModeLabel: reviewMode
   });
+}
+
+export async function renderPublishReview(request: Request, response: Response) {
+  const job = await getJobSnapshot(getRouteId(request.params.id));
+  if (!job) {
+    response.status(404).send("Job not found");
+    return;
+  }
+
+  const mode = getReviewMode(request.query.mode, job);
+  const review = await loadPublishReview(job, mode);
+
+  response.render("publish-review", {
+    title: `Publish review ${job.id}`,
+    job,
+    jobActionLabel: formatActionLabel(job.action),
+    reviewEntries: review.entries,
+    reviewMode: mode,
+    alternateMode: mode === "sandbox" ? "live" : "sandbox",
+    alternateModeUrl: `/jobs/${job.id}/publish-review?mode=${mode === "sandbox" ? "live" : "sandbox"}`,
+    reviewWarning: review.warning,
+    reviewNotice: typeof request.query.notice === "string" ? request.query.notice : null
+  });
+}
+
+export async function publishJobOutputs(request: Request, response: Response) {
+  const job = await getJobSnapshot(getRouteId(request.params.id));
+  if (!job) {
+    response.status(404).send("Job not found");
+    return;
+  }
+
+  const body = request.body as Record<string, unknown>;
+  const mode = getReviewMode(body.mode ?? request.query.mode, job);
+  const loginName = resolveLoginName(job);
+  const botPassword = await resolveBotPassword(loginName);
+
+  if (!loginName || !botPassword) {
+    response.redirect(`/jobs/${job.id}/publish-review?mode=${mode}&notice=${encodeURIComponent("A saved BotPassword is required before Web publish can proceed.")}`);
+    return;
+  }
+
+  const generatedFiles = await loadGeneratedFiles(job.id);
+  const artifacts = buildPublishableArtifacts({ ...job, loginName }, generatedFiles, mode);
+  if (artifacts.length === 0) {
+    response.redirect(`/jobs/${job.id}/publish-review?mode=${mode}&notice=${encodeURIComponent("No publishable generated files were found for this job.")}`);
+    return;
+  }
+
+  const bot = await createCommonsBot({
+    apiUrl: config.commonsApiUrl,
+    userAgent: config.userAgent,
+    credentials: { name: loginName, botPassword }
+  });
+
+  for (const artifact of artifacts) {
+    await bot.savePage(artifact.targetTitle, artifact.content, buildPublishSummary(job, artifact));
+    if (jobStore.get(job.id)) {
+      jobStore.appendMessage(job.id, `Published ${artifact.label} to ${artifact.targetTitle}`);
+    }
+  }
+
+  response.redirect(`/jobs/${job.id}/result?notice=${encodeURIComponent(`Published ${artifacts.length} page(s) to ${mode}.`)}`);
 }
 
 export async function renderArtifactPreview(request: Request, response: Response) {
@@ -257,6 +352,132 @@ export async function downloadArtifact(request: Request, response: Response) {
   }
 
   response.download(artifactPath, fileName);
+}
+
+async function loadPublishReview(job: JobProgress, mode: "sandbox" | "live"): Promise<{ entries: PublishReviewEntry[]; warning: string | null }> {
+  const loginName = resolveLoginName(job);
+  if (!loginName) {
+    return {
+      entries: [],
+      warning: "This job does not record a login name, so the publish target cannot be reconstructed. Re-run the job before using Web publish review."
+    };
+  }
+
+  const generatedFiles = await loadGeneratedFiles(job.id);
+  const artifacts = buildPublishableArtifacts({ ...job, loginName }, generatedFiles, mode);
+  if (artifacts.length === 0) {
+    return {
+      entries: [],
+      warning: "No publishable generated files were found for this job."
+    };
+  }
+
+  const botPassword = await resolveBotPassword(loginName);
+  if (!botPassword) {
+    return {
+      entries: toReviewEntries(job.id, artifacts, new Map()),
+      warning: "A saved BotPassword is required to load the current target pages for diff review. Save the password on the home page, then reopen this screen."
+    };
+  }
+
+  const bot = await createCommonsBot({
+    apiUrl: config.commonsApiUrl,
+    userAgent: config.userAgent,
+    credentials: { name: loginName, botPassword }
+  });
+
+  const currentContents = new Map<string, string | null>();
+  for (const artifact of artifacts) {
+    try {
+      const page = await bot.readPage(artifact.targetTitle);
+      currentContents.set(artifact.fileName, page.content);
+    } catch (error) {
+      if (error instanceof Error && error.message.startsWith("Page does not exist:")) {
+        currentContents.set(artifact.fileName, null);
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  return {
+    entries: toReviewEntries(job.id, artifacts, currentContents),
+    warning: null
+  };
+}
+
+function toReviewEntries(
+  jobId: string,
+  artifacts: PublishableArtifact[],
+  currentContents: Map<string, string | null>
+): PublishReviewEntry[] {
+  return artifacts.map((artifact) => {
+    const summary = summarizePublishDiff(currentContents.get(artifact.fileName) ?? null, artifact.content);
+    return {
+      label: artifact.label,
+      fileName: artifact.fileName,
+      targetTitle: artifact.targetTitle,
+      previewUrl: `/jobs/${jobId}/artifacts/generated/${encodeURIComponent(artifact.fileName)}`,
+      downloadUrl: `/jobs/${jobId}/artifacts/generated/${encodeURIComponent(artifact.fileName)}/download`,
+      status: summary.status,
+      statusLabel: summary.status === "new" ? "New page" : summary.status === "same" ? "No changes" : "Changes detected",
+      summary: buildDiffSummaryText(summary),
+      firstDifferenceLine: summary.firstDifferenceLine,
+      currentSnippet: summary.currentSnippet,
+      nextSnippet: summary.nextSnippet
+    };
+  });
+}
+
+function buildDiffSummaryText(summary: ReturnType<typeof summarizePublishDiff>): string {
+  if (summary.status === "new") {
+    return `This target page does not exist yet. ${summary.nextLineCount} line(s) will be created.`;
+  }
+
+  if (summary.status === "same") {
+    return `The target page already matches this generated artifact (${summary.nextLineCount} line(s)).`;
+  }
+
+  return `${summary.changedLineCount} differing line(s) detected. Current: ${summary.currentLineCount} line(s). Generated: ${summary.nextLineCount} line(s).`;
+}
+
+function buildPublishSummary(job: JobProgress, artifact: PublishableArtifact): string {
+  if (artifact.targetType === "voting") {
+    return job.action === "process-challenge"
+      ? "Photo Challenge bot: revise voting page after validation"
+      : "Photo Challenge bot: create voting page";
+  }
+
+  if (artifact.targetType === "result") {
+    return "Photo Challenge bot: create result page";
+  }
+
+  return "Photo Challenge bot: create winners page";
+}
+
+function resolveLoginName(job: JobProgress): string {
+  return job.loginName || process.env.NAME?.trim() || "";
+}
+
+async function resolveBotPassword(loginName: string): Promise<string> {
+  const saved = await getCredentialPassword(loginName);
+  if (saved) return saved;
+  if (process.env.NAME?.trim() === loginName) {
+    return process.env.BOT_PASSWORD?.trim() ?? "";
+  }
+  return "";
+}
+
+async function loadGeneratedFiles(jobId: string): Promise<Array<{ name: string; content: string }>> {
+  const paths = getJobOutputPaths(jobId);
+  const names = await safeReadDir(paths.generatedDir);
+  const files = await Promise.all(
+    names.map(async (name) => ({
+      name,
+      content: await readFile(path.join(paths.generatedDir, name), "utf8")
+    }))
+  );
+  return files;
 }
 
 async function loadCoreArtifacts(jobId: string, activeFileName?: string): Promise<CoreArtifactEntry[]> {

@@ -18,6 +18,7 @@ export class JobStore {
       action: request.action,
       challenge: request.challenge,
       publishMode: request.publishMode,
+      loginName: request.credentials.name,
       errorMessage: null
     };
 

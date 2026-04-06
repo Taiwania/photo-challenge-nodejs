@@ -8,6 +8,20 @@
     <div><dt>Output</dt><dd><code>{{job.outputDir}}</code></dd></div>
   </dl>
 
+  {{#if publishNotice}}
+    <div class="notice">{{publishNotice}}</div>
+  {{/if}}
+
+  <section class="publish-review-cta">
+    <div>
+      <h2>Publish Review</h2>
+      <p class="lede">Open a final compare screen before writing generated pages to the selected Commons target.</p>
+    </div>
+    <div class="actions">
+      <a href="{{publishReviewUrl}}">Review before publishing to {{publishModeLabel}}</a>
+    </div>
+  </section>
+
   <h2>Core outputs</h2>
   {{#if coreArtifacts.length}}
     <div class="artifact-grid">

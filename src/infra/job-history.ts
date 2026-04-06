@@ -49,6 +49,7 @@ function toPersistedJob(jobId: string, logValues: Record<string, string>): JobPr
     action: logValues.action ?? "unknown",
     challenge: logValues.challenge ?? "Unknown challenge",
     publishMode,
+    loginName: logValues.name ?? "",
     errorMessage: logValues.errorMessage ?? null
   };
 }

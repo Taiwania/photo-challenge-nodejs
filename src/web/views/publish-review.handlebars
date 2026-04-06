@@ -1,0 +1,83 @@
+<section class="panel panel-wide">
+  <div class="panel-header">
+    <div>
+      <h1>Publish Review</h1>
+      <p class="lede">Review the generated outputs before writing them to <strong>{{reviewMode}}</strong> targets.</p>
+    </div>
+    <div class="actions">
+      <a href="{{alternateModeUrl}}">Switch to {{alternateMode}}</a>
+      <a href="/jobs/{{job.id}}/result">Back to result</a>
+    </div>
+  </div>
+
+  <dl class="details">
+    <div><dt>Action</dt><dd>{{jobActionLabel}}</dd></div>
+    <div><dt>Challenge</dt><dd>{{job.challenge}}</dd></div>
+    <div><dt>Publish mode</dt><dd>{{reviewMode}}</dd></div>
+  </dl>
+
+  {{#if reviewNotice}}
+    <div class="notice">{{reviewNotice}}</div>
+  {{/if}}
+
+  {{#if reviewWarning}}
+    <div class="alert">{{reviewWarning}}</div>
+  {{/if}}
+
+  <h2>Targets</h2>
+  {{#if reviewEntries.length}}
+    <div class="publish-review-list">
+      {{#each reviewEntries}}
+        <article class="publish-review-card publish-review-card-{{status}}">
+          <div class="publish-review-header">
+            <div>
+              <p class="artifact-kicker">{{label}}</p>
+              <h3><code>{{fileName}}</code></h3>
+            </div>
+            <span class="status-pill publish-status-{{status}}">{{statusLabel}}</span>
+          </div>
+
+          <p class="publish-target"><strong>Target:</strong> <code>{{targetTitle}}</code></p>
+          <p class="artifact-copy">{{summary}}</p>
+
+          <div class="artifact-actions">
+            <a href="{{previewUrl}}">Preview generated file</a>
+            <a href="{{downloadUrl}}">Download</a>
+          </div>
+
+          <div class="diff-columns">
+            <section class="diff-panel">
+              <h4>Current target snippet</h4>
+              {{#if currentSnippet.length}}
+                <pre class="diff-snippet">{{#each currentSnippet}}{{this}}
+{{/each}}</pre>
+              {{else}}
+                <p class="artifact-copy">No current content was found for this target.</p>
+              {{/if}}
+            </section>
+
+            <section class="diff-panel">
+              <h4>Generated snippet{{#if firstDifferenceLine}} from line {{firstDifferenceLine}}{{/if}}</h4>
+              {{#if nextSnippet.length}}
+                <pre class="diff-snippet">{{#each nextSnippet}}{{this}}
+{{/each}}</pre>
+              {{else}}
+                <p class="artifact-copy">The generated file is empty.</p>
+              {{/if}}
+            </section>
+          </div>
+        </article>
+      {{/each}}
+    </div>
+
+    <form method="post" action="/jobs/{{job.id}}/publish" class="publish-form">
+      <input type="hidden" name="mode" value="{{reviewMode}}">
+      <div class="actions">
+        <button type="submit">Publish to {{reviewMode}}</button>
+        <a href="/jobs/{{job.id}}/result">Cancel</a>
+      </div>
+    </form>
+  {{else}}
+    <p>No publishable outputs are available for this job.</p>
+  {{/if}}
+</section>
