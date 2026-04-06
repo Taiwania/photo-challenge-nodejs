@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "./harness.js";
-import { buildCliUsage, parseCliArgs } from "../src/cli/index.js";
+import { buildCliUsage, parseCliArgs, runCli } from "../src/cli/index.js";
+import { getSandboxRootForName, resolvePublishTarget } from "../src/workflows/run-job.js";
 
 test("buildCliUsage documents both supported commands", () => {
   const usage = buildCliUsage();
@@ -161,4 +162,45 @@ test("parseCliArgs rejects an invalid --source value", () => {
     ]),
     /Invalid --source/
   );
+});
+
+test("sandbox publish targets are derived from the main account name", () => {
+  assert.equal(getSandboxRootForName("Example@PhotoChallenge"), "User:Example/Sandbox");
+  assert.equal(getSandboxRootForName("Example User@PhotoChallenge"), "User:Example_User/Sandbox");
+  assert.equal(
+    resolvePublishTarget("Example User@PhotoChallenge", "2026 - February - Orange", "result", "sandbox"),
+    "User:Example_User/Sandbox/2026 - February - Orange/Voting/Result"
+  );
+});
+
+test("runCli rejects archive-pages sandbox publish before any network work", async () => {
+  const logs: string[] = [];
+  const errors: string[] = [];
+  const exitCode = await runCli(
+    ["archive-pages", "--name", "Example@Bot", "--bot-password", "secret", "--publish-mode", "sandbox"],
+    {
+      log: (message: string) => logs.push(message),
+      error: (message: string) => errors.push(message)
+    }
+  );
+
+  assert.equal(exitCode, 1);
+  assert.match(errors.join("\n"), /does not support sandbox publishing/);
+  assert.match(logs.join("\n"), /Started job/);
+});
+
+test("runCli rejects build-voting-index sandbox publish before any network work", async () => {
+  const logs: string[] = [];
+  const errors: string[] = [];
+  const exitCode = await runCli(
+    ["build-voting-index", "--name", "Example@Bot", "--bot-password", "secret", "--publish-mode", "sandbox"],
+    {
+      log: (message: string) => logs.push(message),
+      error: (message: string) => errors.push(message)
+    }
+  );
+
+  assert.equal(exitCode, 1);
+  assert.match(errors.join("\n"), /supports only --publish-mode dry-run/);
+  assert.match(logs.join("\n"), /Started job/);
 });

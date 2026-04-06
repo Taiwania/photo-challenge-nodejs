@@ -65,6 +65,8 @@ export async function runJob(jobId: string, request: JobRequest): Promise<void> 
     const challengeSlug = slugify(request.challenge);
     const timestamp = DateTime.now().toUTC().toISO();
 
+    enforcePublishModePolicy(request);
+
     updateProgress(jobId, {
       percent: 10,
       step: "Initializing bot session",
@@ -91,7 +93,7 @@ export async function runJob(jobId: string, request: JobRequest): Promise<void> 
     if (request.action === "build-voting-index") {
       const section = await runBuildVotingIndex(bot, paths, jobId, request);
       await writeFile(path.join(paths.generatedDir, "voting_index_section.txt"), section, "utf8");
-      await finalizeJob(paths.logsDir, jobId, request, currentUser, timestamp, 0, 0, 0, 0);
+      await finalizeJob(paths.logsDir, jobId, request, currentUser, timestamp, 1, 0, 0, 0);
       jobStore.appendMessage(jobId, `Voting index section written to ${getJobOutputPaths(jobId).jobRoot}`);
       jobStore.markCompleted(jobId);
       return;
@@ -124,7 +126,7 @@ export async function runJob(jobId: string, request: JobRequest): Promise<void> 
       jobStore.appendMessage(jobId, `Rendered voting page with ${renderedVotingPage.includedCount} entries and ${renderedVotingPage.issueCount} issues.`);
 
       updateProgress(jobId, { percent: 88, step: "Publishing pages", message: `Publish mode: ${request.publishMode}` });
-      await publishPage(bot, jobId, request.challenge, "voting", renderedVotingPage.text, "Photo Challenge bot: create voting page", request.publishMode);
+      await publishPage(bot, jobId, request.credentials.name, request.challenge, "voting", renderedVotingPage.text, "Photo Challenge bot: create voting page", request.publishMode);
 
       await finalizeJob(paths.logsDir, jobId, request, currentUser, timestamp, sources.length, parsed.challenges.length, parsed.files.length, parsed.votes.length);
       jobStore.appendMessage(jobId, `Artifacts written to ${getJobOutputPaths(jobId).jobRoot}`);
@@ -139,9 +141,9 @@ export async function runJob(jobId: string, request: JobRequest): Promise<void> 
     await writeFile(path.join(paths.generatedDir, `${challengeSlug}_winners.txt`), processArtifacts.winnersText, "utf8");
 
     updateProgress(jobId, { percent: 88, step: "Publishing pages", message: `Publish mode: ${request.publishMode}` });
-    await publishPage(bot, jobId, request.challenge, "voting", processArtifacts.revisedText, "Photo Challenge bot: revise voting page after validation", request.publishMode);
-    await publishPage(bot, jobId, request.challenge, "result", processArtifacts.resultText, "Photo Challenge bot: create result page", request.publishMode);
-    await publishPage(bot, jobId, request.challenge, "winners", processArtifacts.winnersText, "Photo Challenge bot: create winners page", request.publishMode);
+    await publishPage(bot, jobId, request.credentials.name, request.challenge, "voting", processArtifacts.revisedText, "Photo Challenge bot: revise voting page after validation", request.publishMode);
+    await publishPage(bot, jobId, request.credentials.name, request.challenge, "result", processArtifacts.resultText, "Photo Challenge bot: create result page", request.publishMode);
+    await publishPage(bot, jobId, request.credentials.name, request.challenge, "winners", processArtifacts.winnersText, "Photo Challenge bot: create winners page", request.publishMode);
 
     await finalizeJob(
       paths.logsDir,
@@ -163,6 +165,16 @@ export async function runJob(jobId: string, request: JobRequest): Promise<void> 
       await persistFailedJob(paths.logsDir, jobId, request, message);
     }
     jobStore.markFailed(jobId, message);
+  }
+}
+
+function enforcePublishModePolicy(request: JobRequest): void {
+  if (request.action === "archive-pages" && request.publishMode === "sandbox") {
+    throw new Error("archive-pages does not support sandbox publishing. Use dry-run or live.");
+  }
+
+  if (request.action === "build-voting-index" && request.publishMode !== "dry-run") {
+    throw new Error("build-voting-index currently supports only --publish-mode dry-run to avoid overwriting the shared voting index.");
   }
 }
 
@@ -320,6 +332,7 @@ async function persistFailedJob(logsDir: string, jobId: string, request: JobRequ
       `status=failed`,
       `action=${request.action}`,
       `challenge=${request.challenge}`,
+      `publishMode=${request.publishMode}`,
       `name=${request.credentials.name}`,
       `errorMessage=${errorMessage.replace(/\r?\n/g, " ")}`,
       `completedAt=${timestamp}`
@@ -484,25 +497,36 @@ function dedupeSubmissionFiles(files: SubmissionEntry[]): SubmissionEntry[] {
   return result;
 }
 
-const SANDBOX_USER = "User:Taiwania_Justo/Sandbox";
-
 type PublishPageType = "voting" | "result" | "winners";
 
-function resolvePublishTarget(challenge: string, pageType: PublishPageType, publishMode: "sandbox" | "live"): string {
+export function getSandboxRootForName(loginName: string): string {
+  const mainAccount = loginName.trim().split("@")[0]?.trim() ?? "";
+  const normalized = mainAccount.replace(/^User:/i, "").replace(/\s+/g, "_");
+  return `User:${normalized}/Sandbox`;
+}
+
+export function resolvePublishTarget(
+  loginName: string,
+  challenge: string,
+  pageType: PublishPageType,
+  publishMode: "sandbox" | "live"
+): string {
   if (publishMode === "live") {
     if (pageType === "voting") return `Commons:Photo challenge/${challenge}/Voting`;
     if (pageType === "result") return `Commons:Photo challenge/${challenge}/Voting/Result`;
     return `Commons:Photo challenge/${challenge}/Winners`;
   }
 
-  if (pageType === "voting") return `${SANDBOX_USER}/${challenge}/Voting`;
-  if (pageType === "result") return `${SANDBOX_USER}/${challenge}/Voting/Result`;
-  return `${SANDBOX_USER}/${challenge}/Winners`;
+  const sandboxRoot = getSandboxRootForName(loginName);
+  if (pageType === "voting") return `${sandboxRoot}/${challenge}/Voting`;
+  if (pageType === "result") return `${sandboxRoot}/${challenge}/Voting/Result`;
+  return `${sandboxRoot}/${challenge}/Winners`;
 }
 
 async function publishPage(
   bot: CommonsBot,
   jobId: string,
+  loginName: string,
   challenge: string,
   pageType: PublishPageType,
   text: string,
@@ -511,7 +535,7 @@ async function publishPage(
 ): Promise<void> {
   if (publishMode === "dry-run") return;
 
-  const target = resolvePublishTarget(challenge, pageType, publishMode);
+  const target = resolvePublishTarget(loginName, challenge, pageType, publishMode);
   jobStore.appendMessage(jobId, `Publishing ${pageType} page to ${target}`);
   const saveResult = await bot.savePage(target, text, editSummary);
   const revNote = saveResult.newRevisionId ? ` (revision ${saveResult.newRevisionId})` : "";
@@ -547,13 +571,11 @@ async function runArchivePages(
     {
       source: "Commons:Photo challenge/Submitting",
       liveTarget: "Commons:Photo challenge/Submitting_old",
-      sandboxTarget: `${SANDBOX_USER}/Submitting_old`,
       fileName: "submitting.txt"
     },
     {
       source: "Commons:Photo challenge/Voting",
       liveTarget: "Commons:Photo challenge/Voting_old",
-      sandboxTarget: `${SANDBOX_USER}/Voting_old`,
       fileName: "voting.txt"
     }
   ];
@@ -569,9 +591,8 @@ async function runArchivePages(
     await writeFile(path.join(paths.inputDir, pair.fileName), page.content, "utf8");
     jobStore.appendMessage(jobId, `Read ${pair.source} (${page.content.length} chars)`);
 
-    if (request.publishMode !== "dry-run") {
-      const target = request.publishMode === "live" ? pair.liveTarget : pair.sandboxTarget;
-      await publishRawPage(bot, jobId, pair.source, target, page.content, `Photo Challenge bot: archive ${pair.source}`);
+    if (request.publishMode === "live") {
+      await publishRawPage(bot, jobId, pair.source, pair.liveTarget, page.content, `Photo Challenge bot: archive ${pair.source}`);
     }
   }
 
@@ -621,3 +642,5 @@ async function runBuildVotingIndex(
   updateProgress(jobId, { percent: 88, step: "Rendering voting index section", message: `Generated ${entries.length} entries.` });
   return section;
 }
+
+
