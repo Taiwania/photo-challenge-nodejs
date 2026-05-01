@@ -37,7 +37,7 @@ export function buildCliUsage(): string {
     "  build-voting-index                 Generate the new voting index section from Submitting[_old]",
     "  create-voting                      Build the voting page for a challenge",
     "  process-challenge                  Validate votes and generate result/winners pages",
-    "  post-results-maintenance           Build dry-run maintenance plans after winners are known",
+    "  post-results-maintenance           Plan maintenance and optionally publish winner notifications/file assessments",
     "",
     "Options:",
     "  --challenge         Challenge title (required for create-voting / process-challenge / post-results-maintenance)",
@@ -55,7 +55,8 @@ export function buildCliUsage(): string {
     "  npm run cli -- build-voting-index --publish-mode dry-run",
     "  npm run cli -- create-voting --challenge \"2026 - March - Three-wheelers\" --publish-mode sandbox",
     "  npm run cli -- process-challenge --challenge \"2026 - February - Orange\" --publish-mode sandbox",
-    "  npm run cli -- post-results-maintenance --challenge \"2026 - February - Orange\" --paired-challenge \"2026 - February - First aid\" --publish-mode dry-run"
+    "  npm run cli -- post-results-maintenance --challenge \"2026 - February - Orange\" --paired-challenge \"2026 - February - First aid\" --publish-mode dry-run",
+    "  npm run cli -- post-results-maintenance --challenge \"2026 - February - Orange\" --publish-mode live"
   ].join("\n");
 }
 

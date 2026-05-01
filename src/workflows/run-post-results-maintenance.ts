@@ -3,7 +3,10 @@ import { readdir, readFile, writeFile } from "node:fs/promises";
 import type { JobRequest } from "../core/models.js";
 import type { ScoredVotingFile } from "../core/scoring.js";
 import { config } from "../infra/config.js";
+import { recordMaintenancePublish } from "../infra/maintenance-publish-history.js";
 import type { JobOutputPaths } from "../infra/output-paths.js";
+import type { CommonsBot } from "../services/commons-bot.js";
+import { applyMaintenancePublishEntry, buildMaintenancePublishEntries, type MaintenancePublishMode } from "./maintenance-publish.js";
 import {
   buildChallengeAnnouncement,
   buildFileAssessmentPlans,
@@ -28,12 +31,18 @@ type MaintenanceSource = {
 
 type ProgressReporter = (percent: number, step: string, message: string) => void;
 type MessageReporter = (message: string) => void;
+type PublishRuntime = {
+  bot: CommonsBot;
+  jobId: string;
+  loginName: string;
+};
 
 export async function runPostResultsMaintenance(
   paths: JobOutputPaths,
   request: JobRequest,
   reportProgress: ProgressReporter,
-  reportMessage: MessageReporter
+  reportMessage: MessageReporter,
+  publishRuntime: PublishRuntime | null = null
 ): Promise<PostResultsMaintenanceSummary> {
   const challenges = [request.challenge, request.pairedChallenge].filter((value): value is string => Boolean(value?.trim()));
   if (challenges.length === 0) {
@@ -89,7 +98,26 @@ export async function runPostResultsMaintenance(
     previousPageUpdate,
     assessmentPlans
   };
-  await writeFile(path.join(paths.generatedDir, `${primarySlug}_maintenance_plan.json`), JSON.stringify(maintenancePlan, null, 2), "utf8");
+  const maintenancePlanContent = JSON.stringify(maintenancePlan, null, 2);
+  await writeFile(path.join(paths.generatedDir, `${primarySlug}_maintenance_plan.json`), maintenancePlanContent, "utf8");
+
+  let automaticPublish = {
+    notifications: 0,
+    fileAssessments: 0
+  };
+  if (request.publishMode !== "dry-run") {
+    if (!publishRuntime) {
+      throw new Error("post-results-maintenance publish mode requires an authenticated runtime bot.");
+    }
+
+    reportProgress(86, "Publishing supported maintenance outputs", `Writing winner notifications and file assessment templates to ${request.publishMode}.`);
+    automaticPublish = await publishSupportedMaintenanceEntries(
+      maintenancePlanContent,
+      request.publishMode,
+      publishRuntime,
+      reportMessage
+    );
+  }
 
   const summaryLines = [
     `Action: ${request.action}`,
@@ -98,14 +126,20 @@ export async function runPostResultsMaintenance(
     `Publish mode: ${request.publishMode}`,
     "",
     `Resolved source jobs: ${sources.map((source) => `${source.challenge} -> ${source.jobId}`).join("; ")}`,
-    `Winner notifications: ${notifications.length}`,
-    `File assessments: ${assessmentPlans.length}`,
-    `Challenge announcement: ${challengeAnnouncement ? "planned" : "skipped (requires exactly two challenges)"}`,
-    `Previous page update: ${previousPageUpdate ? "planned" : "skipped (requires exactly two challenges)"}`
+    `Winner notifications: ${notifications.length}${request.publishMode === "dry-run" ? " (planned only)" : ` (${automaticPublish.notifications} published to ${request.publishMode})`}`,
+    `File assessments: ${assessmentPlans.length}${request.publishMode === "dry-run" ? " (planned only)" : ` (${automaticPublish.fileAssessments} published to ${request.publishMode})`}`,
+    `Challenge announcement: ${challengeAnnouncement ? `planned only${request.publishMode === "dry-run" ? "" : " (use maintenance review to publish)"}` : "skipped (requires exactly two challenges)"}`,
+    `Previous page update: ${previousPageUpdate ? `planned only${request.publishMode === "dry-run" ? "" : " (use maintenance review to publish)"}` : "skipped (requires exactly two challenges)"}`
   ];
   await writeFile(path.join(paths.generatedDir, `${primarySlug}_summary.txt`), summaryLines.join("\n"), "utf8");
 
   reportMessage(`Planned ${notifications.length} winner notification(s), ${assessmentPlans.length} file assessment edit(s), and ${challengeAnnouncement ? 1 : 0} central announcement(s).`);
+  if (request.publishMode !== "dry-run") {
+    reportMessage(`Automatically published ${automaticPublish.notifications} winner notification target(s) and ${automaticPublish.fileAssessments} file assessment edit(s) to ${request.publishMode}.`);
+    if (challengeAnnouncement || previousPageUpdate) {
+      reportMessage("Central announcements and Previous-page updates remain review-based and can be published from the maintenance review screen.");
+    }
+  }
 
   return {
     sourceCount: sources.length,
@@ -209,4 +243,60 @@ function slugify(value: string): string {
     .replace(/[^\w\- ]+/g, "")
     .replace(/\s+/g, "_")
     .slice(0, 80) || "challenge";
+}
+
+async function publishSupportedMaintenanceEntries(
+  maintenancePlanContent: string,
+  mode: MaintenancePublishMode,
+  runtime: PublishRuntime,
+  reportMessage: MessageReporter
+): Promise<{ notifications: number; fileAssessments: number }> {
+  const entries = buildMaintenancePublishEntries(maintenancePlanContent, runtime.loginName, mode)
+    .filter((entry) => entry.type === "notifications" || entry.type === "file-assessment");
+
+  let notifications = 0;
+  let fileAssessments = 0;
+
+  for (const entry of entries) {
+    let currentContent: string | null = null;
+    try {
+      const page = await runtime.bot.readPage(entry.liveTargetTitle);
+      currentContent = page.content;
+    } catch (error) {
+      if (!(error instanceof Error) || !error.message.startsWith("Page does not exist:")) {
+        throw error;
+      }
+    }
+
+    const nextContent = applyMaintenancePublishEntry(currentContent, entry);
+    if (mode === "live" && currentContent !== null && nextContent === currentContent) {
+      reportMessage(`Skipped ${entry.label} for ${entry.liveTargetTitle} because the live page already matches the generated content.`);
+      continue;
+    }
+
+    const saveResult = await runtime.bot.savePage(entry.targetTitle, nextContent, entry.editSummary);
+    await recordMaintenancePublish(runtime.jobId, {
+      id: entry.id,
+      type: entry.type,
+      label: entry.label,
+      mode,
+      targetTitle: entry.targetTitle,
+      liveTargetTitle: entry.liveTargetTitle,
+      editSummary: entry.editSummary,
+      publishedAt: new Date().toISOString(),
+      revisionId: saveResult.newRevisionId,
+      result: saveResult.result
+    });
+
+    if (entry.type === "notifications") {
+      notifications += 1;
+    } else {
+      fileAssessments += 1;
+    }
+
+    const revNote = saveResult.newRevisionId ? ` (revision ${saveResult.newRevisionId})` : "";
+    reportMessage(`Published ${entry.label} to ${entry.targetTitle}${revNote}`);
+  }
+
+  return { notifications, fileAssessments };
 }

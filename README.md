@@ -47,6 +47,7 @@ CLI examples:
 npm run cli -- create-voting --challenge "2026 - March - Three-wheelers"
 npm run cli -- process-challenge --challenge "2026 - February - Orange"
 node dist/cli.js post-results-maintenance --challenge "2026 - February - Orange" --paired-challenge "2026 - February - First aid" --publish-mode dry-run
+node dist/cli.js post-results-maintenance --challenge "2026 - February - Orange" --publish-mode live
 ```
 
 ## Usage Overview
@@ -64,12 +65,13 @@ This workflow validates voters and votes, checks deadlines, and generates `*_rev
 ### 3. Post-results maintenance
 
 Use this after winners are known.
-It creates winner notifications, challenge announcements, Previous-page updates, and file assessment plans. In the Web UI, these items can be reviewed and selectively published to `sandbox` or `live`.
+It creates winner notifications, challenge announcements, Previous-page updates, and file assessment plans. `sandbox` and `live` now formally publish winner notifications and file assessment templates; central announcements and Previous-page updates remain review-based in the Web UI.
 
 ## Publish and Safety Notes
 
 - `create-voting` and `process-challenge` support `dry-run`, `sandbox`, and `live`
-- `post-results-maintenance` generates dry-run artifacts first, then uses Web review for selective publish
+- `post-results-maintenance` supports `dry-run`, `sandbox`, and `live` for winner notifications and file assessment templates
+- central announcements and Previous-page updates stay in maintenance review for explicit operator confirmation
 - sandbox targets are derived from the main account part before `@` in `NAME`
 - saved credentials use the system keychain when available, with in-memory fallback for the current process
 - job history is rebuilt from `output/jobs/*/logs/job.log`
@@ -95,7 +97,7 @@ Implemented and working today:
 - Web UI for job creation, progress tracking, artifact preview, publish review, and maintenance review
 - CLI for main workflows plus list/archive/voting-index helper commands
 - Commons publishing for voting/result/winners pages
-- selective maintenance publish with persisted publish history
+- formal maintenance publishing for winner notifications and file assessment templates, plus review-based publish for announcement/Previous-page updates
 - regression coverage for parsers, renderers, CLI, job history, and offline workflow fixtures
 
 Recommended next steps:

@@ -65,17 +65,42 @@ export async function runJob(jobId: string, request: JobRequest): Promise<void> 
     paths = await ensureJobOutputPaths(jobId);
     const challengeSlug = slugify(request.challenge);
     const timestamp = DateTime.now().toUTC().toISO();
+    let bot: CommonsBot | null = null;
+    let currentUser: string | null = null;
 
     enforcePublishModePolicy(request);
 
     if (request.action === "post-results-maintenance") {
+      if (request.publishMode !== "dry-run") {
+        updateProgress(jobId, {
+          percent: 10,
+          step: "Initializing bot session",
+          message: "Logging into Wikimedia Commons with mwn for post-results publishing."
+        });
+
+        bot = await createCommonsBot({
+          apiUrl: config.commonsApiUrl,
+          userAgent: config.userAgent,
+          credentials: request.credentials
+        });
+        currentUser = await bot.getCurrentUser();
+        jobStore.appendMessage(jobId, `Logged in as ${currentUser ?? "unknown user"}.`);
+      }
+
       const maintenance = await runPostResultsMaintenance(
         paths,
         request,
         (percent, step, message) => updateProgress(jobId, { percent, step, message }),
-        (message) => jobStore.appendMessage(jobId, message)
+        (message) => jobStore.appendMessage(jobId, message),
+        bot
+          ? {
+              bot,
+              jobId,
+              loginName: request.credentials.name
+            }
+          : null
       );
-      await finalizeJob(paths.logsDir, jobId, request, null, timestamp, maintenance.sourceCount, maintenance.challengeCount, maintenance.fileCount, maintenance.voteCount);
+      await finalizeJob(paths.logsDir, jobId, request, currentUser, timestamp, maintenance.sourceCount, maintenance.challengeCount, maintenance.fileCount, maintenance.voteCount);
       jobStore.appendMessage(jobId, `Artifacts written to ${getJobOutputPaths(jobId).jobRoot}`);
       jobStore.markCompleted(jobId);
       return;
@@ -87,13 +112,13 @@ export async function runJob(jobId: string, request: JobRequest): Promise<void> 
       message: "Logging into Wikimedia Commons with mwn."
     });
 
-    const bot = await createCommonsBot({
+    bot = await createCommonsBot({
       apiUrl: config.commonsApiUrl,
       userAgent: config.userAgent,
       credentials: request.credentials
     });
 
-    const currentUser = await bot.getCurrentUser();
+    currentUser = await bot.getCurrentUser();
     jobStore.appendMessage(jobId, `Logged in as ${currentUser ?? "unknown user"}.`);
 
     if (request.action === "archive-pages") {
@@ -192,9 +217,6 @@ function enforcePublishModePolicy(request: JobRequest): void {
     throw new Error("build-voting-index currently supports only --publish-mode dry-run to avoid overwriting the shared voting index.");
   }
 
-  if (request.action === "post-results-maintenance" && request.publishMode !== "dry-run") {
-    throw new Error("post-results-maintenance currently supports only --publish-mode dry-run while the follow-up publish flow is being built.");
-  }
 }
 
 async function handleCreateVoting(

@@ -47,6 +47,7 @@ CLI 範例：
 npm run cli -- create-voting --challenge "2026 - March - Three-wheelers"
 npm run cli -- process-challenge --challenge "2026 - February - Orange"
 node dist/cli.js post-results-maintenance --challenge "2026 - February - Orange" --paired-challenge "2026 - February - First aid" --publish-mode dry-run
+node dist/cli.js post-results-maintenance --challenge "2026 - February - Orange" --publish-mode live
 ```
 
 ## 使用概覽
@@ -64,12 +65,13 @@ node dist/cli.js post-results-maintenance --challenge "2026 - February - Orange"
 ### 3. Post-results maintenance
 
 適用於 winners 已經確定後。
-此流程會準備得獎通知、challenge announcement、Previous-page update 與 file assessment plans，並可在 Web UI 中選擇性發佈到 `sandbox` 或 `live`。
+此流程會準備得獎通知、challenge announcement、Previous-page update 與 file assessment plans。現在 `sandbox` 與 `live` 已正式支援得獎通知與檔案頁模板發佈；central announcement 與 Previous-page update 仍維持在 Web UI 中審核後再發佈。
 
 ## 發佈與安全說明
 
 - `create-voting` 與 `process-challenge` 支援 `dry-run`、`sandbox`、`live`
-- `post-results-maintenance` 會先生成 dry-run artifacts，再透過 Web review 做選擇性發佈
+- `post-results-maintenance` 已支援 `dry-run`、`sandbox`、`live`，但正式自動發佈範圍目前限於得獎通知與檔案頁模板
+- central announcement 與 Previous-page update 仍保留在 maintenance review 中，由操作者明確確認後發佈
 - `sandbox` 目標頁會依 `NAME` 中 `@` 前的主帳號名稱自動推導
 - 已保存的登入資訊優先走系統 keychain，若不可用則退回本次程式執行期間的記憶體保存
 - job history 會從 `output/jobs/*/logs/job.log` 重建
@@ -95,7 +97,7 @@ npm test
 - Web UI：job 建立、進度追蹤、artifact preview、publish review、maintenance review
 - CLI：主要 workflow 與 list/archive/voting-index helper commands
 - Commons 寫入：voting/result/winners 頁面發佈
-- maintenance selective publish 與 publish history
+- 後續維護：得獎通知與檔案頁模板可正式發佈，announcement / Previous-page update 保留 review-based publish，且 publish history 會持久化保存
 - parser、renderer、CLI、job history、offline workflow fixtures 的 regression tests
 
 建議下一步：

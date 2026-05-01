@@ -118,7 +118,7 @@ function formatActionLabel(action: string): string {
   }
 
   if (action === "post-results-maintenance") {
-    return "Plan post-results maintenance";
+    return "Run post-results maintenance";
   }
 
   return action;

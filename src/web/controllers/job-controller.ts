@@ -1,16 +1,17 @@
 import path from "node:path";
-import { appendFile, readdir, readFile, writeFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import type { Request, Response } from "express";
 import type { JobProgress, JobRequest, PublishMode } from "../../core/models.js";
 import { getCredentialPassword, rememberCredential } from "../../infra/credential-store.js";
 import { config } from "../../infra/config.js";
 import { loadPersistedJob } from "../../infra/job-history.js";
 import { jobStore } from "../../infra/job-store.js";
+import { loadMaintenancePublishHistory, recordMaintenancePublish, type MaintenancePublishRecord } from "../../infra/maintenance-publish-history.js";
 import { getJobOutputPaths } from "../../infra/output-paths.js";
 import { createCommonsBot } from "../../services/commons-bot.js";
 import { runJob } from "../../workflows/run-job.js";
+import { applyMaintenancePublishEntry, buildMaintenancePublishEntries, type MaintenancePublishEntry, type MaintenancePublishMode } from "../../workflows/maintenance-publish.js";
 import { summarizeMaintenanceArtifact } from "../maintenance-review.js";
-import { applyMaintenancePublishEntry, buildMaintenancePublishEntries, type MaintenancePublishEntry, type MaintenancePublishMode } from "../maintenance-publish.js";
 import { buildPublishableArtifacts, summarizePublishDiff, type PublishableArtifact } from "../publish-review.js";
 import { buildHomePageViewModel } from "./home-controller.js";
 
@@ -40,18 +41,6 @@ type MaintenancePublishReviewEntry = MaintenancePublishEntry & {
   selected: boolean;
 };
 
-type MaintenancePublishRecord = {
-  id: string;
-  type: MaintenancePublishEntry["type"];
-  label: string;
-  mode: MaintenancePublishMode;
-  targetTitle: string;
-  liveTargetTitle: string;
-  editSummary: string;
-  publishedAt: string;
-  revisionId: number | null;
-  result: string;
-};
 type PublishReviewEntry = {
   label: string;
   fileName: string;
@@ -214,7 +203,7 @@ function formatActionLabel(action: string): string {
   }
 
   if (action === "post-results-maintenance") {
-    return "Plan post-results maintenance";
+    return "Run post-results maintenance";
   }
 
   return action;
@@ -667,31 +656,6 @@ async function loadMaintenancePublishReview(
     canPublish: true
   };
 }
-async function loadMaintenancePublishHistory(jobId: string): Promise<MaintenancePublishRecord[]> {
-  const filePath = path.join(getJobOutputPaths(jobId).generatedDir, "maintenance_publish_history.json");
-
-  try {
-    const content = await readFile(filePath, "utf8");
-    const parsed = JSON.parse(content) as MaintenancePublishRecord[];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-async function recordMaintenancePublish(jobId: string, record: MaintenancePublishRecord): Promise<void> {
-  const paths = getJobOutputPaths(jobId);
-  const filePath = path.join(paths.generatedDir, "maintenance_publish_history.json");
-  const history = await loadMaintenancePublishHistory(jobId);
-  history.unshift(record);
-  await writeFile(filePath, JSON.stringify(history, null, 2), "utf8");
-  await appendFile(
-    path.join(paths.logsDir, "job.log"),
-    `maintenancePublish=${record.publishedAt} | ${record.mode} | ${record.type} | ${record.targetTitle} | ${record.revisionId ?? "n/a"}\n`,
-    "utf8"
-  );
-}
-
 async function loadPublishReview(job: JobProgress, mode: "sandbox" | "live"): Promise<{ entries: PublishReviewEntry[]; warning: string | null }> {
   if (job.action !== "create-voting" && job.action !== "process-challenge") {
     return {

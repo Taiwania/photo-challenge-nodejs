@@ -221,18 +221,9 @@ test("runCli rejects build-voting-index sandbox publish before any network work"
   assert.match(logs.join("\n"), /Started job/);
 });
 
-test("runCli rejects post-results-maintenance live publish until follow-up publish exists", async () => {
-  const logs: string[] = [];
-  const errors: string[] = [];
-  const exitCode = await runCli(
-    ["post-results-maintenance", "--challenge", "2026 - February - Orange", "--name", "Example@Bot", "--bot-password", "secret", "--publish-mode", "live"],
-    {
-      log: (message: string) => logs.push(message),
-      error: (message: string) => errors.push(message)
-    }
-  );
+test("buildCliUsage documents post-results-maintenance live publish support", () => {
+  const usage = buildCliUsage();
 
-  assert.equal(exitCode, 1);
-  assert.match(errors.join("\n"), /currently supports only --publish-mode dry-run/);
-  assert.match(logs.join("\n"), /Started job/);
+  assert.match(usage, /optionally publish winner notifications\/file assessments/);
+  assert.match(usage, /post-results-maintenance --challenge .* --publish-mode live/);
 });

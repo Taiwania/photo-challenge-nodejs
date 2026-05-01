@@ -140,8 +140,8 @@
       <label class="action-card">
         <input name="action" type="radio" value="post-results-maintenance" {{#if (eq defaults.action "post-results-maintenance")}}checked{{/if}} />
         <span class="action-card-body">
-          <span class="action-card-title">Plan post-results maintenance</span>
-          <span class="action-card-text">Prepare winner notifications, shared announcements, Previous-page updates, and file assessment edits from completed results.</span>
+          <span class="action-card-title">Run post-results maintenance</span>
+          <span class="action-card-text">Prepare follow-up edits from completed results and optionally publish winner notifications and file assessment templates.</span>
           <span class="action-card-meta">Use this after winners are already known.</span>
         </span>
       </label>
@@ -180,7 +180,7 @@
     </fieldset>
 
     <div class="notice inline-notice">
-      <strong>Note:</strong> Post-results maintenance is currently dry-run only. Sandbox/live choices do not apply to that workflow yet.
+      <strong>Note:</strong> Post-results maintenance now supports <code>sandbox</code> and <code>live</code> for winner notifications and file assessment templates. Central announcements and Previous-page updates still go through maintenance review.
     </div>
 
     <div class="form-actions">
