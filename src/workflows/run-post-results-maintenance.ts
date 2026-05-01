@@ -103,15 +103,17 @@ export async function runPostResultsMaintenance(
 
   let automaticPublish = {
     notifications: 0,
-    fileAssessments: 0
+    fileAssessments: 0,
+    announcements: 0,
+    previousPages: 0
   };
   if (request.publishMode !== "dry-run") {
     if (!publishRuntime) {
       throw new Error("post-results-maintenance publish mode requires an authenticated runtime bot.");
     }
 
-    reportProgress(86, "Publishing supported maintenance outputs", `Writing winner notifications and file assessment templates to ${request.publishMode}.`);
-    automaticPublish = await publishSupportedMaintenanceEntries(
+    reportProgress(86, "Publishing maintenance outputs", `Writing planned maintenance edits to ${request.publishMode}.`);
+    automaticPublish = await publishMaintenanceEntries(
       maintenancePlanContent,
       request.publishMode,
       publishRuntime,
@@ -128,17 +130,14 @@ export async function runPostResultsMaintenance(
     `Resolved source jobs: ${sources.map((source) => `${source.challenge} -> ${source.jobId}`).join("; ")}`,
     `Winner notifications: ${notifications.length}${request.publishMode === "dry-run" ? " (planned only)" : ` (${automaticPublish.notifications} published to ${request.publishMode})`}`,
     `File assessments: ${assessmentPlans.length}${request.publishMode === "dry-run" ? " (planned only)" : ` (${automaticPublish.fileAssessments} published to ${request.publishMode})`}`,
-    `Challenge announcement: ${challengeAnnouncement ? `planned only${request.publishMode === "dry-run" ? "" : " (use maintenance review to publish)"}` : "skipped (requires exactly two challenges)"}`,
-    `Previous page update: ${previousPageUpdate ? `planned only${request.publishMode === "dry-run" ? "" : " (use maintenance review to publish)"}` : "skipped (requires exactly two challenges)"}`
+    `Challenge announcement: ${challengeAnnouncement ? (request.publishMode === "dry-run" ? "planned only" : `${automaticPublish.announcements} published to ${request.publishMode}`) : "skipped (requires exactly two challenges)"}`,
+    `Previous page update: ${previousPageUpdate ? (request.publishMode === "dry-run" ? "planned only" : `${automaticPublish.previousPages} published to ${request.publishMode}`) : "skipped (requires exactly two challenges)"}`
   ];
   await writeFile(path.join(paths.generatedDir, `${primarySlug}_summary.txt`), summaryLines.join("\n"), "utf8");
 
   reportMessage(`Planned ${notifications.length} winner notification(s), ${assessmentPlans.length} file assessment edit(s), and ${challengeAnnouncement ? 1 : 0} central announcement(s).`);
   if (request.publishMode !== "dry-run") {
-    reportMessage(`Automatically published ${automaticPublish.notifications} winner notification target(s) and ${automaticPublish.fileAssessments} file assessment edit(s) to ${request.publishMode}.`);
-    if (challengeAnnouncement || previousPageUpdate) {
-      reportMessage("Central announcements and Previous-page updates remain review-based and can be published from the maintenance review screen.");
-    }
+    reportMessage(`Published ${automaticPublish.notifications} winner notification target(s), ${automaticPublish.fileAssessments} file assessment edit(s), ${automaticPublish.announcements} central announcement(s), and ${automaticPublish.previousPages} Previous-page update(s) to ${request.publishMode}.`);
   }
 
   return {
@@ -245,17 +244,18 @@ function slugify(value: string): string {
     .slice(0, 80) || "challenge";
 }
 
-async function publishSupportedMaintenanceEntries(
+async function publishMaintenanceEntries(
   maintenancePlanContent: string,
   mode: MaintenancePublishMode,
   runtime: PublishRuntime,
   reportMessage: MessageReporter
-): Promise<{ notifications: number; fileAssessments: number }> {
-  const entries = buildMaintenancePublishEntries(maintenancePlanContent, runtime.loginName, mode)
-    .filter((entry) => entry.type === "notifications" || entry.type === "file-assessment");
+): Promise<{ notifications: number; fileAssessments: number; announcements: number; previousPages: number }> {
+  const entries = buildMaintenancePublishEntries(maintenancePlanContent, runtime.loginName, mode);
 
   let notifications = 0;
   let fileAssessments = 0;
+  let announcements = 0;
+  let previousPages = 0;
 
   for (const entry of entries) {
     let currentContent: string | null = null;
@@ -288,15 +288,14 @@ async function publishSupportedMaintenanceEntries(
       result: saveResult.result
     });
 
-    if (entry.type === "notifications") {
-      notifications += 1;
-    } else {
-      fileAssessments += 1;
-    }
+    if (entry.type === "notifications") notifications += 1;
+    if (entry.type === "file-assessment") fileAssessments += 1;
+    if (entry.type === "announcement") announcements += 1;
+    if (entry.type === "previous-page") previousPages += 1;
 
     const revNote = saveResult.newRevisionId ? ` (revision ${saveResult.newRevisionId})` : "";
     reportMessage(`Published ${entry.label} to ${entry.targetTitle}${revNote}`);
   }
 
-  return { notifications, fileAssessments };
+  return { notifications, fileAssessments, announcements, previousPages };
 }

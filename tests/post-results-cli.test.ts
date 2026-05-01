@@ -83,7 +83,7 @@ test("runCli executes post-results-maintenance in dry-run mode from local scored
   await removeJob("seed-first-aid");
 });
 
-test("runPostResultsMaintenance live mode auto-publishes winner notifications and file assessments only", async () => {
+test("runPostResultsMaintenance live mode auto-publishes notifications, announcement, previous page, and file assessments", async () => {
   await seedProcessChallengeJob("seed-orange", "2026 - February - Orange", [
     { num: 1, fileName: "Orange winner 1.jpg", title: "Orange winner 1", creator: "Amitash", score: 10, support: 4, rank: 1 },
     { num: 2, fileName: "Orange winner 2.jpg", title: "Orange winner 2", creator: "Poco a poco", score: 8, support: 3, rank: 2 },
@@ -105,6 +105,8 @@ test("runPostResultsMaintenance live mode auto-publishes winner notifications an
     ["User talk:Amitash", { title: "User talk:Amitash", content: "== Existing ==\nWelcome", revisionTimestamp: null, revisionId: 1 }],
     ["User talk:Poco a poco", { title: "User talk:Poco a poco", content: "", revisionTimestamp: null, revisionId: 2 }],
     ["User talk:VulpesVulpes42", { title: "User talk:VulpesVulpes42", content: "", revisionTimestamp: null, revisionId: 3 }],
+    ["Commons talk:Photo challenge", { title: "Commons talk:Photo challenge", content: "== Older section ==\nArchive", revisionTimestamp: null, revisionId: 10 }],
+    ["Commons:Photo challenge/Previous", { title: "Commons:Photo challenge/Previous", content: "== Old month ==\n{{Old winners}}", revisionTimestamp: null, revisionId: 11 }],
     ["File:Orange winner 1.jpg", { title: "File:Orange winner 1.jpg", content: "Intro\n=={{int:license-header}}==\nLicense", revisionTimestamp: null, revisionId: 4 }],
     ["File:Orange winner 2.jpg", { title: "File:Orange winner 2.jpg", content: "Intro\n[[Category:Example]]", revisionTimestamp: null, revisionId: 5 }],
     ["File:Orange winner 3.jpg", { title: "File:Orange winner 3.jpg", content: "Intro\n=={{Other versions}}==\nOther", revisionTimestamp: null, revisionId: 6 }],
@@ -151,19 +153,22 @@ test("runPostResultsMaintenance live mode auto-publishes winner notifications an
     { bot: fakeBot, jobId: "maintenance-live", loginName: "Example@Bot" }
   );
 
-  assert.equal(saves.length, 9);
-  assert.equal(saves.some((entry) => entry.title === "Commons talk:Photo challenge"), false);
-  assert.equal(saves.some((entry) => entry.title === "Commons:Photo challenge/Previous"), false);
+  assert.equal(saves.length, 11);
+  assert.equal(saves.some((entry) => entry.title === "Commons talk:Photo challenge"), true);
+  assert.equal(saves.some((entry) => entry.title === "Commons:Photo challenge/Previous"), true);
   assert.equal(saves.filter((entry) => entry.title.startsWith("User talk:")).length, 3);
   assert.equal(saves.filter((entry) => entry.title.startsWith("File:")).length, 6);
+  assert.equal(saves.filter((entry) => entry.title === "Commons talk:Photo challenge").length, 1);
+  assert.equal(saves.filter((entry) => entry.title === "Commons:Photo challenge/Previous").length, 1);
 
   const summary = await readFile(path.join(paths.generatedDir, "2026_-_February_-_Orange_summary.txt"), "utf8");
   const publishHistory = JSON.parse(await readFile(path.join(paths.generatedDir, "maintenance_publish_history.json"), "utf8")) as Array<{ targetTitle: string }>;
   assert.match(summary, /Winner notifications: 3 \(3 published to live\)/);
   assert.match(summary, /File assessments: 6 \(6 published to live\)/);
-  assert.match(summary, /Challenge announcement: planned only \(use maintenance review to publish\)/);
-  assert.equal(publishHistory.length, 9);
-  assert.match(messages.join("\n"), /Automatically published 3 winner notification target\(s\) and 6 file assessment edit\(s\) to live\./);
+  assert.match(summary, /Challenge announcement: 1 published to live/);
+  assert.match(summary, /Previous page update: 1 published to live/);
+  assert.equal(publishHistory.length, 11);
+  assert.match(messages.join("\n"), /Published 3 winner notification target\(s\), 6 file assessment edit\(s\), 1 central announcement\(s\), and 1 Previous-page update\(s\) to live\./);
 
   await removeJob("maintenance-live");
   await removeJob("seed-orange");
