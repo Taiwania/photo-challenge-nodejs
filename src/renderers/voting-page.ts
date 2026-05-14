@@ -1,5 +1,6 @@
 import path from "node:path";
 import { DateTime } from "luxon";
+import { getVoteDeadlineBannerDate, getVoteDeadlineZoneLabel } from "../core/challenge-date.js";
 
 export type VotingSubmissionEntry = {
   fileName: string;
@@ -28,8 +29,6 @@ export function renderVotingPage(challenge: string, files: VotingSubmissionEntry
   const theme = themeParts.join(" - ");
   const minUploadDate = DateTime.fromFormat(`1 ${monthName} ${year}`, "d MMMM yyyy", { zone: "utc" });
   const maxUploadDate = minUploadDate.plus({ days: 31, hours: 12 }).set({ day: 1 });
-  const voteCloseTime = maxUploadDate.plus({ days: 31 }).set({ day: 1 });
-
   const minUploadStr = minUploadDate.toFormat("yyyy-LL-dd HH:mm:ss");
   const maxUploadStr = maxUploadDate.toFormat("yyyy-LL-dd HH:mm:ss");
 
@@ -38,7 +37,7 @@ export function renderVotingPage(challenge: string, files: VotingSubmissionEntry
   const lines: string[] = [
     "__NOTOC__",
     "",
-    `'''Voting will end at midnight UTC on ${voteCloseTime.toFormat("dd MMMM yyyy")}'''. The theme was '''${theme}'''.`,
+    `'''Voting will end at midnight ${getVoteDeadlineZoneLabel()} on ${getVoteDeadlineBannerDate(challenge)}'''. The theme was '''${theme}'''.`,
     "",
     "{{Commons:Photo challenge/Voting header/{{SuperFallback|Commons:Photo challenge/Voting header}}}}",
     "{{Commons:Photo challenge/Voting example}}",

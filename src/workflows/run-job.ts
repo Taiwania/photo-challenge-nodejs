@@ -2,6 +2,7 @@ import path from "node:path";
 import { writeFile } from "node:fs/promises";
 import { DateTime } from "luxon";
 import type { JobRequest, PublishMode } from "../core/models.js";
+import { formatVoteDeadlineUtc, getVoteDeadlineUtc, getVoteDeadlineZoneLabel } from "../core/challenge-date.js";
 import { countVotes, type ScoredVotingFile } from "../core/scoring.js";
 import { listErrors, validateVotes, type VoteWithError, type VoterValidation } from "../core/validation.js";
 import { validateVoters } from "../core/voters.js";
@@ -50,12 +51,6 @@ function slugify(value: string): string {
     .replace(/[^\w\- ]+/g, "")
     .replace(/\s+/g, "_")
     .slice(0, 80) || "challenge";
-}
-
-function getVoteDeadline(challenge: string): DateTime {
-  const [year, monthName] = challenge.split(" - ");
-  const challengeStart = DateTime.fromFormat(`1 ${monthName} ${year}`, "d MMMM yyyy", { zone: "utc" });
-  return challengeStart.plus({ months: 2 }).startOf("month");
 }
 
 export async function runJob(jobId: string, request: JobRequest): Promise<void> {
@@ -295,7 +290,7 @@ async function handleProcessChallenge(
   const parsed = parseProcessChallengeArtifacts(request, challenges, parsedVoting.files, votes, voters, scoredFiles);
   const lateVotes = votes.filter((vote) => vote.error === 9).length;
   if (lateVotes > 0) {
-    jobStore.appendMessage(jobId, `Detected ${lateVotes} late vote(s) after the deadline of ${getVoteDeadline(request.challenge).toFormat("yyyy-MM-dd HH:mm")} UTC.`);
+    jobStore.appendMessage(jobId, `Detected ${lateVotes} late vote(s) after the deadline of ${formatVoteDeadlineUtc(request.challenge)} ${getVoteDeadlineZoneLabel()}.`);
   }
   return { parsed, revisedText, resultText, winnersText };
 }
@@ -501,13 +496,14 @@ function parseProcessChallengeArtifacts(
   voters: VoterValidation[],
   scoredFiles: ScoredVotingFile[]
 ): ParsedArtifacts {
-  const deadline = getVoteDeadline(request.challenge);
+  const deadlineUtc = getVoteDeadlineUtc(request.challenge);
   return {
     summaryLines: [
       `Action: ${request.action}`,
       `Challenge: ${request.challenge}`,
       `Configured login name: ${request.credentials.name}`,
-      `Vote deadline (UTC): ${deadline.toFormat("yyyy-MM-dd HH:mm")}`,
+      `Vote deadline (${getVoteDeadlineZoneLabel()}): ${formatVoteDeadlineUtc(request.challenge)}`,
+      `Vote deadline (UTC): ${deadlineUtc.toFormat("yyyy-MM-dd HH:mm")}`,
       "",
       `Voting index challenges found: ${challenges.length}`,
       `Voting page files parsed: ${files.length}`,

@@ -13,8 +13,9 @@ export function reviseVotingPage(wikiText: string): string {
       line = line.replace("<!-- ", "").replace(" -->", "").replace(collapseText, "");
     } else if (line.startsWith("{{Collapse bottom}}")) {
       continue;
-    } else if (line.startsWith("'''Voting will end")) {
+    } else if (line.startsWith("'''Voting will end") || line.startsWith("'''Voting ended")) {
       line = line.replace("Voting will end", "Voting ended");
+      line = line.replace("midnight UTC-12 on", "midnight UTC on");
     }
     lines.push(line);
   }

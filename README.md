@@ -61,6 +61,7 @@ Outputs are written under `output/jobs/<job-id>/generated/`, including `*_voting
 
 Use this after voting ends.
 This workflow validates voters and votes, checks deadlines, and generates `*_revised.txt`, `*_result.txt`, and `*_winners.txt`.
+Late-vote checks use the default Photo Challenge closing time in `UTC`, and the generated outputs reflect that same cutoff.
 
 ### 3. Post-results maintenance
 

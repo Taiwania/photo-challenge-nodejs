@@ -1,4 +1,5 @@
 import { DateTime } from "luxon";
+import { formatVoteDeadlineUtc, getVoteDeadlineUtc, getVoteDeadlineZoneLabel } from "./challenge-date.js";
 
 export type VoterValidation = {
   voter: string;
@@ -20,12 +21,6 @@ export type VoteWithError = {
   error: number;
 };
 
-function getVoteDeadline(challenge: string): DateTime {
-  const [year, monthName] = challenge.split(" - ");
-  const challengeStart = DateTime.fromFormat(`1 ${monthName} ${year}`, "d MMMM yyyy", { zone: "utc" });
-  return challengeStart.plus({ months: 2 }).startOf("month");
-}
-
 function isVoteAfterDeadline(timestamp: string | null, deadline: DateTime): boolean {
   if (!timestamp) {
     return false;
@@ -45,7 +40,7 @@ export function validateVotes(
   challenge: string
 ): VoteWithError[] {
   const voterErrors = new Map(voters.map((voter) => [voter.voter, voter.error]));
-  const deadline = getVoteDeadline(challenge);
+  const deadline = getVoteDeadlineUtc(challenge);
   const withErrors: VoteWithError[] = votes.map((vote) => ({
     ...vote,
     error: voterErrors.get(vote.voter) ?? 0
@@ -108,8 +103,7 @@ export function listErrors(
   challenge: string
 ): string[] {
   const errors = ["=== Issues corrected by the [[Commons:Photo challenge/code/Photo challenge library.py|software]] ==="];
-  const deadline = getVoteDeadline(challenge);
-  const deadlineText = deadline.toFormat("yyyy-MM-dd HH:mm") + " UTC";
+  const deadlineText = `${formatVoteDeadlineUtc(challenge)} ${getVoteDeadlineZoneLabel()}`;
 
   for (const voter of voters.filter((row) => row.error > 0)) {
     let prefix = `* [[User:${voter.voter}]] `;
