@@ -83,6 +83,62 @@ test("runCli executes post-results-maintenance in dry-run mode from local scored
   await removeJob("seed-first-aid");
 });
 
+test("runPostResultsMaintenance can recover scored winners from a published Winners page", async () => {
+  const paths = getJobOutputPaths("maintenance-published-winners");
+  await rm(paths.jobRoot, { recursive: true, force: true });
+  await mkdir(paths.inputDir, { recursive: true });
+  await mkdir(paths.generatedDir, { recursive: true });
+  await mkdir(paths.logsDir, { recursive: true });
+
+  const winnersText = await readFile(path.join("tests", "fixtures", "winners-first-aid-top3.txt"), "utf8");
+  const fakeBot: CommonsBot = {
+    async readPage(title: string): Promise<ReadPageResult> {
+      assert.equal(title, "Commons:Photo challenge/2026 - February - First aid/Winners");
+      return {
+        title,
+        content: winnersText,
+        revisionTimestamp: "2026-03-01T00:00:00Z",
+        revisionId: 123
+      };
+    },
+    async savePage(): Promise<SavePageResult> {
+      throw new Error("dry-run fallback should not publish");
+    },
+    async getCurrentUser() { return "Example"; },
+    async listPagesByPrefix() { return []; },
+    async listFileInfo() { return []; },
+    async getUserInfo() { return null; },
+    async userHasPhotoChallengeParticipation() { return false; }
+  };
+
+  const messages: string[] = [];
+  await runPostResultsMaintenance(
+    paths,
+    {
+      action: "post-results-maintenance",
+      challenge: "2026 - February - First aid",
+      credentials: { name: "Example@Bot", botPassword: "secret" },
+      publishMode: "dry-run"
+    },
+    () => {},
+    (message) => messages.push(message),
+    { bot: fakeBot, jobId: "maintenance-published-winners", loginName: "Example@Bot" }
+  );
+
+  const summary = await readFile(path.join(paths.generatedDir, "2026_-_February_-_First_aid_summary.txt"), "utf8");
+  const notifications = await readFile(path.join(paths.generatedDir, "2026_-_February_-_First_aid_winner_notifications.json"), "utf8");
+  const sourceFiles = JSON.parse(await readFile(path.join(paths.inputDir, "2026_-_February_-_First_aid_source_files.json"), "utf8")) as Array<{ creator: string; title: string }>;
+
+  assert.match(summary, /Winner notifications: 3/);
+  assert.match(summary, /published page Commons:Photo challenge\/2026 - February - First aid\/Winners/);
+  assert.match(notifications, /User talk:Aciarium/);
+  assert.equal(sourceFiles[0].creator, "Aciarium");
+  assert.equal(sourceFiles[0].title.includes("<br"), false);
+  assert.match(messages.join("\n"), /Loaded scored files for 2026 - February - First aid from published page/);
+
+  await removeJob("maintenance-published-winners");
+});
+
 test("runPostResultsMaintenance live mode auto-publishes notifications, announcement, previous page, and file assessments", async () => {
   await seedProcessChallengeJob("seed-orange", "2026 - February - Orange", [
     { num: 1, fileName: "Orange winner 1.jpg", title: "Orange winner 1", creator: "Amitash", score: 10, support: 4, rank: 1 },

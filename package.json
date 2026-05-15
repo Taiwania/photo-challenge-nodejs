@@ -8,6 +8,7 @@
     "build": "tsc -p tsconfig.json",
     "build:test": "tsc -p tsconfig.test.json --outDir .test-dist --noEmit false",
     "dev": "tsx watch src/server.ts",
+    "dev:nodemon": "nodemon --watch src --ext ts,handlebars,css --exec tsx src/server.ts",
     "start": "node dist/server.js",
     "cli": "npm run build --silent && node dist/cli.js",
     "cli:dev": "tsx src/cli.ts",

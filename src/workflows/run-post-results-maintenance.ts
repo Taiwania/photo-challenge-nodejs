@@ -5,7 +5,7 @@ import type { ScoredVotingFile } from "../core/scoring.js";
 import { config } from "../infra/config.js";
 import { recordMaintenancePublish } from "../infra/maintenance-publish-history.js";
 import type { JobOutputPaths } from "../infra/output-paths.js";
-import type { CommonsBot } from "../services/commons-bot.js";
+import type { CommonsBot, ReadPageResult } from "../services/commons-bot.js";
 import { applyMaintenancePublishEntry, buildMaintenancePublishEntries, type MaintenancePublishMode } from "./maintenance-publish.js";
 import {
   buildChallengeAnnouncement,
@@ -54,10 +54,10 @@ export async function runPostResultsMaintenance(
   const sources: MaintenanceSource[] = [];
   for (let index = 0; index < challenges.length; index += 1) {
     const challenge = challenges[index];
-    const source = await loadLatestScoredFiles(challenge);
+    const source = await loadLatestScoredFiles(challenge, publishRuntime?.bot ?? null);
     sources.push(source);
     await writeFile(path.join(paths.inputDir, `${slugify(challenge)}_source_files.json`), source.rawContent, "utf8");
-    reportMessage(`Loaded scored files for ${challenge} from job ${source.jobId}.`);
+    reportMessage(`Loaded scored files for ${challenge} from ${source.jobId}.`);
     reportProgress(18 + Math.round(((index + 1) / challenges.length) * 24), "Loading scored results", `Resolved latest files for ${challenge}`);
   }
 
@@ -148,7 +148,20 @@ export async function runPostResultsMaintenance(
   };
 }
 
-async function loadLatestScoredFiles(challenge: string): Promise<MaintenanceSource> {
+async function loadLatestScoredFiles(challenge: string, bot: CommonsBot | null): Promise<MaintenanceSource> {
+  const localSource = await loadLatestLocalScoredFiles(challenge);
+  if (localSource) {
+    return localSource;
+  }
+
+  if (bot) {
+    return loadPublishedWinnerFiles(challenge, bot);
+  }
+
+  throw new Error(`No completed process-challenge outputs were found for ${challenge}. Run process-challenge first, or run post-results-maintenance in sandbox/live mode after the Winners page has been published.`);
+}
+
+async function loadLatestLocalScoredFiles(challenge: string): Promise<MaintenanceSource | null> {
   const entries = await readdir(config.outputRoot, { withFileTypes: true });
   const candidates: Array<{ jobId: string; completedAt: string; filePath: string }> = [];
   const challengeSlug = slugify(challenge);
@@ -185,7 +198,7 @@ async function loadLatestScoredFiles(challenge: string): Promise<MaintenanceSour
   }
 
   if (candidates.length === 0) {
-    throw new Error(`No completed process-challenge outputs were found for ${challenge}. Run process-challenge first.`);
+    return null;
   }
 
   candidates.sort((left, right) => Date.parse(right.completedAt) - Date.parse(left.completedAt));
@@ -195,10 +208,65 @@ async function loadLatestScoredFiles(challenge: string): Promise<MaintenanceSour
 
   return {
     challenge,
-    jobId: selected.jobId,
+    jobId: `job ${selected.jobId}`,
     files: parsed,
     rawContent
   };
+}
+
+async function loadPublishedWinnerFiles(challenge: string, bot: CommonsBot): Promise<MaintenanceSource> {
+  const pageTitle = `Commons:Photo challenge/${challenge}/Winners`;
+  const page = await bot.readPage(pageTitle);
+  const files = parsePublishedWinnersPage(page);
+
+  if (files.length === 0) {
+    throw new Error(`No local process-challenge outputs were found for ${challenge}, and ${pageTitle} does not contain parseable winner data.`);
+  }
+
+  return {
+    challenge,
+    jobId: `published page ${page.title}`,
+    files,
+    rawContent: JSON.stringify(files, null, 2)
+  };
+}
+
+function parsePublishedWinnersPage(page: ReadPageResult): ScoredVotingFile[] {
+  const values = parseTemplateParameters(page.content);
+  const files: ScoredVotingFile[] = [];
+
+  for (let index = 1; index <= 3; index += 1) {
+    const fileName = values.get(`image_${index}`);
+    const creator = values.get(`author_${index}`);
+    if (!fileName || !creator) continue;
+
+    files.push({
+      num: Number.parseInt(values.get(`num_${index}`) ?? `${index}`, 10),
+      fileName,
+      title: normalizeWinnerTitle(values.get(`title_${index}`) ?? fileName),
+      creator,
+      score: Number.parseInt(values.get(`score_${index}`) ?? "0", 10),
+      support: 0,
+      rank: Number.parseInt(values.get(`rank_${index}`) ?? `${index}`, 10)
+    });
+  }
+
+  return files;
+}
+
+function parseTemplateParameters(content: string): Map<string, string> {
+  const values = new Map<string, string>();
+  const matches = content.matchAll(/^\|\s*([^=\n]+?)\s*=\s*(.*?)\s*$/gm);
+
+  for (const match of matches) {
+    values.set(match[1].trim(), match[2].trim());
+  }
+
+  return values;
+}
+
+function normalizeWinnerTitle(title: string): string {
+  return title.replace(/\s*<br\s*\/?>\s*/gi, " ").replace(/\s+/g, " ").trim();
 }
 
 function parseLogFile(content: string): Record<string, string> {
