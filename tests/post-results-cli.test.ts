@@ -161,6 +161,8 @@ test("runPostResultsMaintenance live mode auto-publishes notifications, announce
     ["User talk:Amitash", { title: "User talk:Amitash", content: "== Existing ==\nWelcome", revisionTimestamp: null, revisionId: 1 }],
     ["User talk:Poco a poco", { title: "User talk:Poco a poco", content: "", revisionTimestamp: null, revisionId: 2 }],
     ["User talk:VulpesVulpes42", { title: "User talk:VulpesVulpes42", content: "", revisionTimestamp: null, revisionId: 3 }],
+    ["Commons:Photo challenge/2026 - February - Orange/Winners", { title: "Commons:Photo challenge/2026 - February - Orange/Winners", content: "{{Photo challenge winners table}}", revisionTimestamp: null, revisionId: 12 }],
+    ["Commons:Photo challenge/2026 - February - First aid/Winners", { title: "Commons:Photo challenge/2026 - February - First aid/Winners", content: "{{Photo challenge winners table}}", revisionTimestamp: null, revisionId: 13 }],
     ["Commons talk:Photo challenge", { title: "Commons talk:Photo challenge", content: "== Older section ==\nArchive", revisionTimestamp: null, revisionId: 10 }],
     ["Commons:Photo challenge/Previous", { title: "Commons:Photo challenge/Previous", content: "== Old month ==\n{{Old winners}}", revisionTimestamp: null, revisionId: 11 }],
     ["File:Orange winner 1.jpg", { title: "File:Orange winner 1.jpg", content: "Intro\n=={{int:license-header}}==\nLicense", revisionTimestamp: null, revisionId: 4 }],
@@ -227,6 +229,80 @@ test("runPostResultsMaintenance live mode auto-publishes notifications, announce
   assert.match(messages.join("\n"), /Published 3 winner notification target\(s\), 6 file assessment edit\(s\), 1 central announcement\(s\), and 1 Previous-page update\(s\) to live\./);
 
   await removeJob("maintenance-live");
+  await removeJob("seed-orange");
+  await removeJob("seed-first-aid");
+});
+
+test("runPostResultsMaintenance skips central announcement when a winners page is missing", async () => {
+  await seedProcessChallengeJob("seed-orange", "2026 - February - Orange", [
+    { num: 1, fileName: "Orange winner 1.jpg", title: "Orange winner 1", creator: "Amitash", score: 10, support: 4, rank: 1 },
+    { num: 2, fileName: "Orange winner 2.jpg", title: "Orange winner 2", creator: "Poco a poco", score: 8, support: 3, rank: 2 },
+    { num: 3, fileName: "Orange winner 3.jpg", title: "Orange winner 3", creator: "VulpesVulpes42", score: 6, support: 2, rank: 3 }
+  ]);
+  await seedProcessChallengeJob("seed-first-aid", "2026 - February - First aid", [
+    { num: 1, fileName: "First aid winner 1.jpg", title: "First aid winner 1", creator: "MedicOne", score: 10, support: 4, rank: 1 },
+    { num: 2, fileName: "First aid winner 2.jpg", title: "First aid winner 2", creator: "BlueSunrise", score: 8, support: 3, rank: 2 },
+    { num: 3, fileName: "First aid winner 3.jpg", title: "First aid winner 3", creator: "Quickresponse", score: 6, support: 2, rank: 3 }
+  ]);
+
+  const paths = getJobOutputPaths("maintenance-missing-winners");
+  await rm(paths.jobRoot, { recursive: true, force: true });
+  await mkdir(paths.inputDir, { recursive: true });
+  await mkdir(paths.generatedDir, { recursive: true });
+  await mkdir(paths.logsDir, { recursive: true });
+
+  const readPages = new Map<string, ReadPageResult>([
+    ["User talk:Amitash", { title: "User talk:Amitash", content: "", revisionTimestamp: null, revisionId: 1 }],
+    ["User talk:Poco a poco", { title: "User talk:Poco a poco", content: "", revisionTimestamp: null, revisionId: 2 }],
+    ["User talk:VulpesVulpes42", { title: "User talk:VulpesVulpes42", content: "", revisionTimestamp: null, revisionId: 3 }],
+    ["Commons:Photo challenge/2026 - February - Orange/Winners", { title: "Commons:Photo challenge/2026 - February - Orange/Winners", content: "{{Photo challenge winners table}}", revisionTimestamp: null, revisionId: 12 }],
+    ["Commons:Photo challenge/Previous", { title: "Commons:Photo challenge/Previous", content: "", revisionTimestamp: null, revisionId: 11 }],
+    ["File:Orange winner 1.jpg", { title: "File:Orange winner 1.jpg", content: "", revisionTimestamp: null, revisionId: 4 }],
+    ["File:Orange winner 2.jpg", { title: "File:Orange winner 2.jpg", content: "", revisionTimestamp: null, revisionId: 5 }],
+    ["File:Orange winner 3.jpg", { title: "File:Orange winner 3.jpg", content: "", revisionTimestamp: null, revisionId: 6 }],
+    ["File:First aid winner 1.jpg", { title: "File:First aid winner 1.jpg", content: "", revisionTimestamp: null, revisionId: 7 }],
+    ["File:First aid winner 2.jpg", { title: "File:First aid winner 2.jpg", content: "", revisionTimestamp: null, revisionId: 8 }],
+    ["File:First aid winner 3.jpg", { title: "File:First aid winner 3.jpg", content: "", revisionTimestamp: null, revisionId: 9 }]
+  ]);
+  const saves: Array<{ title: string }> = [];
+  const fakeBot: CommonsBot = {
+    async readPage(title: string): Promise<ReadPageResult> {
+      const page = readPages.get(title);
+      if (!page) throw new Error(`Page does not exist: ${title}`);
+      return page;
+    },
+    async savePage(title: string): Promise<SavePageResult> {
+      saves.push({ title });
+      return { title, newRevisionId: saves.length, result: "Success" };
+    },
+    async getCurrentUser() { return "Example"; },
+    async listPagesByPrefix() { return []; },
+    async listFileInfo() { return []; },
+    async getUserInfo() { return null; },
+    async userHasPhotoChallengeParticipation() { return false; }
+  };
+
+  const messages: string[] = [];
+  await runPostResultsMaintenance(
+    paths,
+    {
+      action: "post-results-maintenance",
+      challenge: "2026 - February - Orange",
+      pairedChallenge: "2026 - February - First aid",
+      credentials: { name: "Example@Bot", botPassword: "secret" },
+      publishMode: "sandbox"
+    },
+    () => {},
+    (message) => messages.push(message),
+    { bot: fakeBot, jobId: "maintenance-missing-winners", loginName: "Example@Bot" }
+  );
+
+  const summary = await readFile(path.join(paths.generatedDir, "2026_-_February_-_Orange_summary.txt"), "utf8");
+  assert.match(summary, /Challenge announcement: skipped/);
+  assert.equal(saves.some((entry) => entry.title.includes("Photo Challenge talk page Annoucement")), false);
+  assert.match(messages.join("\n"), /Skipping central announcement because winner page\(s\) are not published yet/);
+
+  await removeJob("maintenance-missing-winners");
   await removeJob("seed-orange");
   await removeJob("seed-first-aid");
 });

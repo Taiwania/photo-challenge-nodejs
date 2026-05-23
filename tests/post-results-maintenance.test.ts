@@ -42,6 +42,21 @@ test("buildChallengeAnnouncement combines two winners pages and congratulates th
   assert.match(announcement.bodyText, /Congratulations to \[\[User:Amitash\|\]\], \[\[User:Poco a poco\|\]\], \[\[User:VulpesVulpes42\|\]\], \[\[User:MedicOne\|\]\], \[\[User:BlueSunrise\|\]\] and \[\[User:Quickresponse\|\]\]--~~~~/);
 });
 
+test("buildChallengeAnnouncement mentions duplicate podium authors once", () => {
+  const announcement = buildChallengeAnnouncement([
+    { challenge: "2026 - February - Orange", files: orangeTopThree },
+    { challenge: "2026 - February - First aid", files: [
+      { ...firstAidTopThree[0], creator: "Amitash" },
+      firstAidTopThree[1],
+      firstAidTopThree[2]
+    ] }
+  ]);
+
+  const body = announcement.bodyText;
+  assert.equal((body.match(/\[\[User:Amitash\|\]\]/g) ?? []).length, 1);
+  assert.match(body, /Congratulations to \[\[User:Amitash\|\]\], \[\[User:Poco a poco\|\]\], \[\[User:VulpesVulpes42\|\]\], \[\[User:BlueSunrise\|\]\] and \[\[User:Quickresponse\|\]\]--~~~~/);
+});
+
 test("buildPreviousPageUpdate prepends the monthly winners section", () => {
   const update = buildPreviousPageUpdate([
     "2026 - February - Orange",

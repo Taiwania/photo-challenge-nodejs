@@ -189,7 +189,7 @@ function resolveMaintenanceTarget(
 
   const root = `${getSandboxRootForName(loginName)}/${challenge}/Maintenance`;
   if (type === "notifications") return `${root}/Notifications/${toPageSegment(key)}`;
-  if (type === "announcement") return `${root}/Announcement`;
+  if (type === "announcement") return `${getSandboxRootForName(loginName)}/Photo Challenge talk page Annoucement`;
   if (type === "previous-page") return `${root}/Previous`;
   return `${root}/File_assessments/${toPageSegment(key)}`;
 }

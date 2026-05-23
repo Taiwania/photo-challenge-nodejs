@@ -65,7 +65,10 @@ export function buildChallengeAnnouncement(challenges: ChallengeAnnouncementInpu
 
   const [first, second] = challenges;
   const { month } = parseChallenge(first.challenge);
-  const winners = challenges.flatMap((challenge) => challenge.files.slice(0, 3).map((file) => file.creator));
+  const winners = uniqueBy(
+    challenges.flatMap((challenge) => challenge.files.slice(0, 3).map((file) => file.creator)),
+    (winner) => winner.trim().toLocaleLowerCase()
+  );
   const linkedUsers = winners.map((user) => `[[User:${user}|]]`);
   const congratulations = linkedUsers.length > 1
     ? `Congratulations to ${linkedUsers.slice(0, -1).join(", ")} and ${linkedUsers.at(-1)}`
@@ -148,6 +151,20 @@ function splitOnce(text: string, marker: string): [string, string] {
     return [text, ""];
   }
   return [text.slice(0, index), text.slice(index + marker.length)];
+}
+
+function uniqueBy<T>(values: T[], getKey: (value: T) => string): T[] {
+  const seen = new Set<string>();
+  const unique: T[] = [];
+
+  for (const value of values) {
+    const key = getKey(value);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    unique.push(value);
+  }
+
+  return unique;
 }
 
 function parseChallenge(challenge: string): { year: string; month: string; monthNumber: string; theme: string } {

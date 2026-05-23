@@ -70,7 +70,12 @@ export async function runPostResultsMaintenance(
 
   const notifications = buildWinnerNotifications(request.challenge, sources[0].files);
   const assessmentPlans = buildFileAssessmentPlans(challengeInputs);
-  const challengeAnnouncement = challengeInputs.length === 2 ? buildChallengeAnnouncement(challengeInputs) : null;
+  const shouldBuildAnnouncement = await shouldBuildChallengeAnnouncement(
+    challenges,
+    publishRuntime?.bot ?? null,
+    reportMessage
+  );
+  const challengeAnnouncement = shouldBuildAnnouncement ? buildChallengeAnnouncement(challengeInputs) : null;
   const previousPageUpdate = challengeInputs.length === 2 ? buildPreviousPageUpdate(challenges) : null;
 
   reportProgress(78, "Writing plan artifacts", "Saving dry-run maintenance plans to the job output folder.");
@@ -146,6 +151,37 @@ export async function runPostResultsMaintenance(
     fileCount: sources.reduce((sum, source) => sum + source.files.length, 0),
     voteCount: 0
   };
+}
+
+async function shouldBuildChallengeAnnouncement(
+  challenges: string[],
+  bot: CommonsBot | null,
+  reportMessage: MessageReporter
+): Promise<boolean> {
+  if (challenges.length !== 2) {
+    return false;
+  }
+
+  if (!bot) {
+    return true;
+  }
+
+  const missingPages: string[] = [];
+  for (const challenge of challenges) {
+    const pageTitle = `Commons:Photo challenge/${challenge}/Winners`;
+    try {
+      await bot.readPage(pageTitle);
+    } catch {
+      missingPages.push(pageTitle);
+    }
+  }
+
+  if (missingPages.length > 0) {
+    reportMessage(`Skipping central announcement because winner page(s) are not published yet: ${missingPages.join(", ")}.`);
+    return false;
+  }
+
+  return true;
 }
 
 async function loadLatestScoredFiles(challenge: string, bot: CommonsBot | null): Promise<MaintenanceSource> {

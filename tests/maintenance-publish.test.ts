@@ -39,7 +39,7 @@ test("buildMaintenancePublishEntries maps live targets into sandbox pages", () =
   const entries = buildMaintenancePublishEntries(maintenancePlanJson, "Example User@BotApp", "sandbox");
 
   assert.equal(entries.find((entry) => entry.type === "notifications")?.targetTitle, "User:Example_User/Sandbox/2026 - February - Orange/Maintenance/Notifications/Example_Winner");
-  assert.equal(entries.find((entry) => entry.type === "announcement")?.targetTitle, "User:Example_User/Sandbox/2026 - February - Orange/Maintenance/Announcement");
+  assert.equal(entries.find((entry) => entry.type === "announcement")?.targetTitle, "User:Example_User/Sandbox/Photo Challenge talk page Annoucement");
   assert.equal(entries.find((entry) => entry.type === "previous-page")?.targetTitle, "User:Example_User/Sandbox/2026 - February - Orange/Maintenance/Previous");
   assert.equal(entries.find((entry) => entry.type === "file-assessment")?.targetTitle, "User:Example_User/Sandbox/2026 - February - Orange/Maintenance/File_assessments/Orange_One.jpg");
 });
