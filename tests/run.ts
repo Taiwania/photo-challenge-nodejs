@@ -1,3 +1,4 @@
+import "./commons-bot.test.js";
 import "./cli.test.js";
 import "./job-history.test.js";
 import "./maintenance-publish.test.js";

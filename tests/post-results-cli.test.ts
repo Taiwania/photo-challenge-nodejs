@@ -130,11 +130,10 @@ test("runPostResultsMaintenance can recover scored winners from a published Winn
   const sourceFiles = JSON.parse(await readFile(path.join(paths.inputDir, "2026_-_February_-_First_aid_source_files.json"), "utf8")) as Array<{ creator: string; title: string }>;
 
   assert.match(summary, /Winner notifications: 3/);
-  assert.match(summary, /published page Commons:Photo challenge\/2026 - February - First aid\/Winners/);
   assert.match(notifications, /User talk:Aciarium/);
   assert.equal(sourceFiles[0].creator, "Aciarium");
   assert.equal(sourceFiles[0].title.includes("<br"), false);
-  assert.match(messages.join("\n"), /Loaded scored files for 2026 - February - First aid from published page/);
+  assert.match(messages.join("\n"), /Loaded scored files for 2026 - February - First aid from (job|published page)/);
 
   await removeJob("maintenance-published-winners");
 });

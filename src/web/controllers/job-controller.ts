@@ -8,7 +8,7 @@ import { loadPersistedJob } from "../../infra/job-history.js";
 import { jobStore } from "../../infra/job-store.js";
 import { loadMaintenancePublishHistory, recordMaintenancePublish, type MaintenancePublishRecord } from "../../infra/maintenance-publish-history.js";
 import { getJobOutputPaths } from "../../infra/output-paths.js";
-import { createCommonsBot } from "../../services/commons-bot.js";
+import { createCommonsBot, isCommonsLoginError, toUserFacingCommonsErrorMessage } from "../../services/commons-bot.js";
 import { runJob } from "../../workflows/run-job.js";
 import { applyMaintenancePublishEntry, buildMaintenancePublishEntries, type MaintenancePublishEntry, type MaintenancePublishMode } from "../../workflows/maintenance-publish.js";
 import { summarizeMaintenanceArtifact } from "../maintenance-review.js";
@@ -310,57 +310,79 @@ export async function renderJobResult(request: Request, response: Response) {
 }
 
 export async function renderPublishReview(request: Request, response: Response) {
-  const job = await getJobSnapshot(getRouteId(request.params.id));
-  if (!job) {
-    response.status(404).send("Job not found");
-    return;
+  try {
+    const job = await getJobSnapshot(getRouteId(request.params.id));
+    if (!job) {
+      response.status(404).send("Job not found");
+      return;
+    }
+
+    const mode = getReviewMode(request.query.mode, job);
+    const review = await loadPublishReview(job, mode);
+
+    response.render("publish-review", {
+      title: `Publish review ${job.id}`,
+      job,
+      jobActionLabel: formatActionLabel(job.action),
+      reviewEntries: review.entries,
+      reviewMode: mode,
+      alternateMode: mode === "sandbox" ? "live" : "sandbox",
+      alternateModeUrl: `/jobs/${job.id}/publish-review?mode=${mode === "sandbox" ? "live" : "sandbox"}`,
+      reviewWarning: review.warning,
+      reviewNotice: typeof request.query.notice === "string" ? request.query.notice : null
+    });
+  } catch (error) {
+    if (isCommonsLoginError(error)) {
+      const jobId = getRouteId(request.params.id);
+      const mode = typeof request.query.mode === "string" ? request.query.mode : "sandbox";
+      response.redirect(`/jobs/${jobId}/result?notice=${encodeURIComponent(toUserFacingCommonsErrorMessage(error))}&mode=${encodeURIComponent(mode)}`);
+      return;
+    }
+
+    throw error;
   }
-
-  const mode = getReviewMode(request.query.mode, job);
-  const review = await loadPublishReview(job, mode);
-
-  response.render("publish-review", {
-    title: `Publish review ${job.id}`,
-    job,
-    jobActionLabel: formatActionLabel(job.action),
-    reviewEntries: review.entries,
-    reviewMode: mode,
-    alternateMode: mode === "sandbox" ? "live" : "sandbox",
-    alternateModeUrl: `/jobs/${job.id}/publish-review?mode=${mode === "sandbox" ? "live" : "sandbox"}`,
-    reviewWarning: review.warning,
-    reviewNotice: typeof request.query.notice === "string" ? request.query.notice : null
-  });
 }
 
 export async function renderMaintenanceReview(request: Request, response: Response) {
-  const job = await getJobSnapshot(getRouteId(request.params.id));
-  if (!job) {
-    response.status(404).send("Job not found");
-    return;
+  try {
+    const job = await getJobSnapshot(getRouteId(request.params.id));
+    if (!job) {
+      response.status(404).send("Job not found");
+      return;
+    }
+
+    if (job.action !== "post-results-maintenance") {
+      response.redirect(`/jobs/${job.id}/result?notice=${encodeURIComponent("This job uses the standard result view instead of maintenance review.")}`);
+      return;
+    }
+
+    const mode = getReviewMode(request.query.mode, job) as MaintenancePublishMode;
+    const selectedIds = normalizeSelectedValues(request.query.selected);
+    const review = await loadMaintenancePublishReview(job, mode, selectedIds);
+
+    response.render("maintenance-review", {
+      title: `Maintenance review ${job.id}`,
+      job,
+      jobActionLabel: formatActionLabel(job.action),
+      overview: review.overview,
+      reviewEntries: review.entries,
+      reviewMode: mode,
+      alternateMode: mode === "sandbox" ? "live" : "sandbox",
+      alternateModeUrl: `/jobs/${job.id}/maintenance-review?mode=${mode === "sandbox" ? "live" : "sandbox"}`,
+      reviewWarning: review.warning,
+      reviewNotice: typeof request.query.notice === "string" ? request.query.notice : null,
+      canPublish: review.canPublish
+    });
+  } catch (error) {
+    if (isCommonsLoginError(error)) {
+      const jobId = getRouteId(request.params.id);
+      const mode = typeof request.query.mode === "string" ? request.query.mode : "sandbox";
+      response.redirect(`/jobs/${jobId}/result?notice=${encodeURIComponent(toUserFacingCommonsErrorMessage(error))}&mode=${encodeURIComponent(mode)}`);
+      return;
+    }
+
+    throw error;
   }
-
-  if (job.action !== "post-results-maintenance") {
-    response.redirect(`/jobs/${job.id}/result?notice=${encodeURIComponent("This job uses the standard result view instead of maintenance review.")}`);
-    return;
-  }
-
-  const mode = getReviewMode(request.query.mode, job) as MaintenancePublishMode;
-  const selectedIds = normalizeSelectedValues(request.query.selected);
-  const review = await loadMaintenancePublishReview(job, mode, selectedIds);
-
-  response.render("maintenance-review", {
-    title: `Maintenance review ${job.id}`,
-    job,
-    jobActionLabel: formatActionLabel(job.action),
-    overview: review.overview,
-    reviewEntries: review.entries,
-    reviewMode: mode,
-    alternateMode: mode === "sandbox" ? "live" : "sandbox",
-    alternateModeUrl: `/jobs/${job.id}/maintenance-review?mode=${mode === "sandbox" ? "live" : "sandbox"}`,
-    reviewWarning: review.warning,
-    reviewNotice: typeof request.query.notice === "string" ? request.query.notice : null,
-    canPublish: review.canPublish
-  });
 }
 
 export async function publishMaintenanceOutputs(request: Request, response: Response) {
@@ -404,11 +426,17 @@ export async function publishMaintenanceOutputs(request: Request, response: Resp
     return;
   }
 
-  const bot = await createCommonsBot({
-    apiUrl: config.commonsApiUrl,
-    userAgent: config.userAgent,
-    credentials: { name: loginName, botPassword }
-  });
+  let bot;
+  try {
+    bot = await createCommonsBot({
+      apiUrl: config.commonsApiUrl,
+      userAgent: config.userAgent,
+      credentials: { name: loginName, botPassword }
+    });
+  } catch (error) {
+    response.redirect(`/jobs/${job.id}/maintenance-review?mode=${mode}&notice=${encodeURIComponent(toUserFacingCommonsErrorMessage(error))}`);
+    return;
+  }
 
   for (const entry of selectedEntries) {
     let currentContent: string | null = null;
@@ -473,11 +501,17 @@ export async function publishJobOutputs(request: Request, response: Response) {
     return;
   }
 
-  const bot = await createCommonsBot({
-    apiUrl: config.commonsApiUrl,
-    userAgent: config.userAgent,
-    credentials: { name: loginName, botPassword }
-  });
+  let bot;
+  try {
+    bot = await createCommonsBot({
+      apiUrl: config.commonsApiUrl,
+      userAgent: config.userAgent,
+      credentials: { name: loginName, botPassword }
+    });
+  } catch (error) {
+    response.redirect(`/jobs/${job.id}/publish-review?mode=${mode}&notice=${encodeURIComponent(toUserFacingCommonsErrorMessage(error))}`);
+    return;
+  }
 
   for (const artifact of artifacts) {
     await bot.savePage(artifact.targetTitle, artifact.content, buildPublishSummary(job, artifact));

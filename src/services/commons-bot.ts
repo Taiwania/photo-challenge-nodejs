@@ -50,6 +50,23 @@ export type CommonsBot = {
   userHasPhotoChallengeParticipation(userName: string): Promise<boolean>;
 };
 
+export function isCommonsLoginError(error: unknown): boolean {
+  return error instanceof Error
+    && error.message.startsWith("Unable to log in to Wikimedia Commons with the provided credentials.");
+}
+
+export function toUserFacingCommonsErrorMessage(error: unknown): string {
+  if (isCommonsLoginError(error)) {
+    return "Incorrect username or bot password. Update the saved sign-in and try again.";
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return "Unknown error";
+}
+
 export async function createCommonsBot(config: CommonsBotConfig): Promise<CommonsBot> {
   const bot = await loginWithCandidates(config);
 

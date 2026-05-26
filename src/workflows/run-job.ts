@@ -21,7 +21,7 @@ import { extractChallengeCode, renderVotingIndexSection, type VotingIndexEntry }
 import { config } from "../infra/config.js";
 import { ensureJobOutputPaths, getJobOutputPaths } from "../infra/output-paths.js";
 import { jobStore } from "../infra/job-store.js";
-import { createCommonsBot, type CommonsBot, type FileInfoLookup, type ReadPageResult } from "../services/commons-bot.js";
+import { createCommonsBot, toUserFacingCommonsErrorMessage, type CommonsBot, type FileInfoLookup, type ReadPageResult } from "../services/commons-bot.js";
 import { runPostResultsMaintenance } from "./run-post-results-maintenance.js";
 
 type ProgressStep = {
@@ -194,7 +194,7 @@ export async function runJob(jobId: string, request: JobRequest): Promise<void> 
     jobStore.appendMessage(jobId, `Artifacts written to ${getJobOutputPaths(jobId).jobRoot}`);
     jobStore.markCompleted(jobId);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
+    const message = toUserFacingCommonsErrorMessage(error);
     jobStore.appendMessage(jobId, `Job failed: ${message}`);
     if (paths) {
       await persistFailedJob(paths.logsDir, jobId, request, message);
