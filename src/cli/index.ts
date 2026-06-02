@@ -1,6 +1,7 @@
 import { config } from "../infra/config.js";
 import { jobStore } from "../infra/job-store.js";
-import type { JobRequest, PublishMode } from "../core/models.js";
+import { DateTime } from "luxon";
+import type { EntryMode, JobRequest, PublishMode, SubmissionWindow } from "../core/models.js";
 import { runJob } from "../workflows/run-job.js";
 import { createCommonsBot } from "../services/commons-bot.js";
 import { parseSubmittedChallenges } from "../parsers/submitting-parser.js";
@@ -25,6 +26,7 @@ const listCommands = new Set<ListCommand>(["list-submitted-challenges", "list-vo
 const challengeRequiredCommands = new Set<CliCommand>(["create-voting", "process-challenge", "post-results-maintenance"]);
 const VALID_PUBLISH_MODES = new Set<PublishMode>(["dry-run", "sandbox", "live"]);
 const VALID_SOURCES = new Set<string>(["main", "old"]);
+const VALID_ENTRY_MODES = new Set<EntryMode>(["single", "duo-coequal", "duo-reference"]);
 
 export function buildCliUsage(): string {
   return [
@@ -42,6 +44,9 @@ export function buildCliUsage(): string {
     "Options:",
     "  --challenge         Challenge title (required for create-voting / process-challenge / post-results-maintenance)",
     "  --paired-challenge  Second challenge used for shared winner announcements and Previous-page updates",
+    "  --entry-mode        single (default) | duo-coequal | duo-reference",
+    "  --submission-start  Exceptional duration override: ISO date/time, inclusive. Use with --submission-end",
+    "  --submission-end    Exceptional duration override: ISO date/time, exclusive. Use with --submission-start",
     "  --source            main|old — which page variant to read (default: old for build-voting-index, main for list-*)",
     "  --name              BotPassword login name. Defaults to NAME from .env",
     "  --bot-password      BotPassword value. Defaults to BOT_PASSWORD from .env",
@@ -78,6 +83,22 @@ function parseOptions(rest: string[]): Map<string, string> {
     index += 1;
   }
   return options;
+}
+
+function parseSubmissionWindow(options: Map<string, string>): SubmissionWindow | undefined {
+  const startsAt = options.get("submission-start")?.trim() ?? "";
+  const endsAt = options.get("submission-end")?.trim() ?? "";
+  if (!startsAt && !endsAt) return undefined;
+  if (!startsAt || !endsAt) {
+    throw new Error("--submission-start and --submission-end must be provided together.");
+  }
+
+  const start = DateTime.fromISO(startsAt, { setZone: true });
+  const end = DateTime.fromISO(endsAt, { setZone: true });
+  if (!start.isValid || !end.isValid || start >= end) {
+    throw new Error("Invalid submission window. Use ISO date/times with --submission-start earlier than --submission-end.");
+  }
+  return { startsAt, endsAt };
 }
 
 export function parseCliArgs(args: string[], env: NodeJS.ProcessEnv = process.env): ParsedCliArgs {
@@ -117,6 +138,8 @@ export function parseCliArgs(args: string[], env: NodeJS.ProcessEnv = process.en
   const pairedChallenge = options.get("paired-challenge")?.trim() ?? "";
   const rawPublishMode = options.get("publish-mode")?.trim() ?? "dry-run";
   const rawSource = options.get("source")?.trim() ?? "old";
+  const rawEntryMode = options.get("entry-mode")?.trim() ?? "single";
+  const submissionWindow = parseSubmissionWindow(options);
 
   if (challengeRequiredCommands.has(command as CliCommand) && !challenge) {
     throw new Error("Missing required --challenge value.");
@@ -127,6 +150,9 @@ export function parseCliArgs(args: string[], env: NodeJS.ProcessEnv = process.en
   if (!VALID_SOURCES.has(rawSource)) {
     throw new Error(`Invalid --source \"${rawSource}\". Must be main or old.`);
   }
+  if (!VALID_ENTRY_MODES.has(rawEntryMode as EntryMode)) {
+    throw new Error(`Invalid --entry-mode \"${rawEntryMode}\". Must be single, duo-coequal, or duo-reference.`);
+  }
 
   return {
     kind: "run",
@@ -134,6 +160,8 @@ export function parseCliArgs(args: string[], env: NodeJS.ProcessEnv = process.en
       action: command,
       challenge,
       pairedChallenge: pairedChallenge || undefined,
+      entryMode: rawEntryMode as EntryMode,
+      submissionWindow,
       source: rawSource as "main" | "old",
       credentials: { name, botPassword },
       publishMode: rawPublishMode as PublishMode

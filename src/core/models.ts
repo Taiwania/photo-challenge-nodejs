@@ -4,6 +4,11 @@ export type PublishMode = "dry-run" | "sandbox" | "live";
 
 export type EntryMode = "single" | "duo-coequal" | "duo-reference";
 
+export type SubmissionWindow = {
+  startsAt: string;
+  endsAt: string;
+};
+
 export type VotingEntryMemberRole = "submission" | "reference";
 
 export type VotingEntryMember = {
@@ -52,6 +57,8 @@ export type JobRequest = {
   action: string;
   challenge: string;
   pairedChallenge?: string;
+  entryMode?: EntryMode;
+  submissionWindow?: SubmissionWindow;
   /** "main" reads the live page; "old" reads the *_old archived copy. Applies to list-* and build-voting-index. */
   source?: "main" | "old";
   credentials: BotCredentials;

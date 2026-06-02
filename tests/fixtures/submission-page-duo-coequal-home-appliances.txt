@@ -1,0 +1,113 @@
+=== 2016 – {{ucfirst:{{I18n month|12}}}}/{{ucfirst:{{I18n month|1}}}} – {{LangSwitch|en=Home appliances|pl=Artykuły Gospodarstwa Domowego|ru=Бытовая техника|uk=Побутова техніка}} ===
+
+{{LangSwitch
+<!-- |af=Die nuwe uitdaging van vertoon ''''''.-->
+<!-- |de=In diesem neuen Wettbewerb werden Fotografien von '....gesucht, die.... -->
+
+|en=The new challenge features '''{{w|Home appliances}}''': submit two informative and educational photographs, one showing the exterior and one showing the interior of the same device to educate viewers on how they work. Please follow safety procedures while disassembling appliances: gas or electricity coming from outlets, batteries  or capacitors can be dangerous.
+
+<!-- |es=El nuevo desafío está dedicado a '''''' .-->
+<!-- |fr=Le nouveau défi met en scène les '''''' .-->
+<!-- |hu=A kihívás témái --> 
+<!-- |it=La sfida tratta dell -->
+<!-- |pl=Tematem nowego konkursu jest --> 
+<!-- |pt=O desafio de janeiro destaca ''''''.-->
+ |ru=Тема нового конкурса — '''[[:ru:Бытовая техника|бытовая техника]]''': принимаются по две информативные и образовательные фотографии одного и того же прибора, одна из которых демонстрирует его внешний вид, а другая — его устройство и принцип работы. Пожалуйста, соблюдайте меры безопасности при разборке приборов: отключайте от источников электроэнергии и газа, с осторожностью обращайтесь с электрическими батареями и конденсаторами.
+ |sv=Den nya utmaningen handlar om '''[[:sv:Hushållsapparater|hushållsapparater]]''': Skicka in två informativa och pedagogiska fotografier, en som visar utsidan och en som visar insidan av samma enhet för att visa tittarna hur de fungerar. Följ säkerhetsriktlinjerna när du plockar isär föremålen; gas eller elektricitet som kommer ut från uttag, batterier eller kondensatorer kan vara farligt.
+ |uk=Тема нового конкурсу — '''[[:uk:Побутова техніка|побутова техніка]]''': приймаються по дві інформативні та освітні фотографії одного й того ж пристрою, одна з яких демонструє його зовнішній вигляд, а інша — його будову та принцип дії. Будь ласка, дотримуйтесь заходів безпеки при розбиранні приладів: вимикайте від джерел електроенергії та газу, з обережністю поводьтесь з електричними батареями та конденсаторами.
+ }}
+
+{{trim|
+{{Photo challenge rules|December|2016}}
+}}
+{{LangSwitch
+ |de= * <span style="color:#800000">'''Beschränkung: Es dürfen maximal 4 Bilder-Paare pro Fotograf eingereicht werden.'''</span> 
+ |en = * <span style="color:#800000">'''Restriction: a maximum of four pairs of photographs'''</span> can be submitted per photographer.
+ |es = * <span style="color:#800000">'''Restricción: Solo se puede subir un máximo de cuatro pares de fotos'''</span> por fotógrafo.
+ |fr=*<span style="color:#800000">'''Restriction : un maximum de 4 paires de photos'''</span> est autorisé par participant.
+ |ru = * <span style="color:#800000">'''Ограничение: не более 4 пар фотографий'''</span> от одного фотографа.
+ |sv= * <span style="color:#800000">'''Begränsning: Varje fotograf får skicka in maximalt fyra par fotografier'''</span>.
+ |uk= * <span style="color:#800000">'''Слід обмежитись не більш як чотирма парами фотографій'''</span> від одного фотографа.
+ |vi = * <span style="color:#800000">'''Hạn chế: Nộp dự thi tối đa bốn cặp ảnh'''</span> với mỗi nhiếp ảnh gia.
+}}
+
+{{countdown
+|year= 2017 |month= 02|day= 01 |hour= 00 |minute= 00
+|event= {{LangSwitch |af=hierdie uitdaging eindig |cs=tato soutěž končí |de=dieser Wettbewerb endet |en=this challenge ends |es=este desafío termine |fr=de ce défi|hu=kihívás végé |it=della fine della sfida |pl=ten konkurs kończy się|sv=denna utmaning slutar |ru=окончания этого конкурса|uk=закінчення цього конкурсу}}
+|eventend= {{LangSwitch |af=Hierdie uitdaging het alreeds geëindig. |cs=Tato soutěž již skončila. |de=Dieser Wettbewerb ist bereits beendet. |en=This challenge has already ended. |es=Este reto ya ha terminado.|hu=Ez a kihívás már befejeződött. |it=Questa sfida è già terminata. |pl=Ten konkurs już się skończył |sv=Denna utmatning har redan slutat. |ru=Этот конкурс уже закончился.|uk=Цей конкурс вже закінчився.}}
+}}
+
+
+
+===={{Examples tag}}====
+<gallery mode="packed" heights="200px">
+Mattel-Aquarius-Computer-FL.jpg|Mattel-Aquarius-Computer Exterior
+Mattel-Aquarius-Computer-Top-Removed-FL.jpg|Mattel-Aquarius-Computer Interior
+Nintendo-Color-TV-Game-Blockbreaker-FL.jpg| Nintendo-Color-TV-Game-Blockbreaker Exterior
+Nintendo-Color-TV-Game-Blockbreaker-Opened.jpg|Nintendo-Color-TV-Game-Blockbreaker Interior
+Nokia-NGage-L.jpg|Nokia-NGage Exterior
+Nokia-NGage-Disassembled.jpg|Nokia-NGage Disassembled
+Vintage Zenith Trans-Oceanic Multi-Band Tube Radio, Model Y600, Heavy-Duty High-Quality Construction, 5 Vacuum Tubes, Circa 1956-1957 (13787252955).jpg|Zenith Trans-Oceanic Multi-Band Tube Radio Exterior
+Vintage Zenith Trans-Oceanic Multi-Band Tube Radio, Model Y600, Heavy-Duty High-Quality Construction, 5 Vacuum Tubes, Circa 1956-1957 (13787307703).jpg|Zenith Trans-Oceanic Multi-Band Tube Radio Interior
+Philips Rasierer 015 wp 1 uf.jpg
+Philips Rasierer 005 wp open 1.jpg
+LGwashingmachine.jpg
+IFA 2010 Internationale Funkausstellung Berlin 111.JPG
+</gallery>
+
+<gallery mode="packed-hover" heights=100px>
+Example rotated 90 left.jpg|description 1
+Beispiel.jpg|Beschreibung 2
+Example es.svg|descripción 3
+</gallery>
+
+===={{Entries tag}}====
+
+<!---ATTENTION.!  Please paste the File names of your entries at the top of the gallery. / ATENCIÓN! Por favor pega los nombres de los archivos de tus entradas en la parte superior de la galería. / Bitte neue Bilder am Anfang der Gallerie einfügen. / Copiez le nom de fichier de votre image en haut de la liste, sous la balise "gallery". / ATTENZIONE!  Aggiungi il nome del file della tua candidata in cima alla lista della galleria. Grazie. / برای اضافه کردن تصویر ، پیوند [ویرایش] را در بالای بخش فشار دهید و عکستان را در بالای فهرست وارد کنید. / Внимание! Новый порядок добавления фотографий: пожалуйста, помещайте ваши новые фотографии в начале (в верху) галереи! Спасибо. -->
+<gallery vaddya.jpg mode="nolines" widths=250px heights=250px perrow=2>
+
+File:RK 1701 1353 Zweitwecker.jpg|Very simple, but hundreds of thousands in use: An auxiliary ringer bell for a telephone
+File:RK 1701 1346 Zweitwecker.jpg|Very simple, but hundreds of thousands in use: An auxiliary ringer bell for a telephone
+File:Wandtelefon mit Wählscheibe.jpg|Wandtelefon. Automatische Wandstation Modell PTT 1950. Schweiz.
+File:Wandtelefon mit Wählscheibe. Innenansicht.jpg|Wandtelefon. Automatische Wandstation Modell PTT 1950. Schweiz. Innenansicht.
+File:Energy-saving electric bulb.jpg|Energy-saving electric bulb Exterior view
+File:Energy-saving electric bulb 1.jpg|Energy-saving electric bulb Interior view
+Toaster outside.jpg|Toaster outside
+Toaster inside.jpg|Toaster inside
+Assembled compact camera.jpg|Assembled compact camera
+Disassembled compact camera.jpg|Disassembled compact camera
+Stereo Radio Kuba Imperial Adria Chassis 669.jpg|Radio Kuba Imperial Adria - Exterior view
+Stereo Radio Kuba Imperial Adria Chassis 669 - Interior view.jpg|Radio Kuba Imperial Adria - Interior view
+Assembled laptop.jpg|Assembled laptop computer
+Disassembled laptop.jpg|Disassembled laptop computer
+Western Digital Hard Disk - 2.jpg|Western Digital Hard Disk outside
+Western Digital Hard Disk - 1.jpg|Western Digital Hard Disk inside
+Blackberry RIM 957 - 01.jpg|Blackberry RIM 957 outside
+Blackberry RIM 957 - 03.jpg|Blackberry RIM 957 inside
+Compact camera external view.jpg|Compact camera - external view
+Compact camera internal view.jpg|Compact camera - internal view
+Palm Tungsten E2 powered on, front.jpg|Palm Tungsten E2, a 2005 personal digital assistant
+Palm Tungsten E2 disassembled, back.jpg|Palm Tungsten E2, a 2005 personal digital assistant
+Telefon W48 Schwarz.jpg|Telephone W48 from West Germany 1948
+Telefon W48 Grundplatte.jpg|Telephone W48 Interior view
+File:Electric heater control panel 1.jpg|electric heater control panel  Exterior view
+File:Electric heater control panel 2.jpg|electric heater control panel  Interior view
+Wires in AC power socket1.jpg|Euro AC power sockets
+Wires in AC power socket2.jpg|Euro AC power sockets - interior
+Philips 12 V Plug-in AC Adapter.JPG|Old AC power adapter - closed
+Philips 12 V Plug-in AC Adapter opened.JPG|Old AC power adapter - opened
+Samsung Galaxy S3 ( Exterior view).jpg|Mobile phone - Exterior view
+Samsung Galaxy S3 ( Interior view).jpg|Mobile phone - Interior view
+Zeitschaltuhr - Außenansicht.jpg|Switch clock - Exterior view
+Zeitschaltuhr - Innenansicht.jpg|Switch clock - Interior view
+Radio Gnomo esterno.jpg|Radio Gnomo exterior
+radio Gnomo interno.jpg|Radio Gnomo interior
+Macchina caffè elettrica esterno.jpg|Old electric coffee machine exterior   
+Macchina caffè elettrica smontata.jpg|Old electric coffee machine disassembled
+Silicon Graphics 02 - front.jpg|[[:en:SGI O2|Silicon Graphics 02]] front
+Silicon Graphics 02 - back.jpg|[[:en:SGI O2|Silicon Graphics 02]] inside
+<!--Please insert images at the top of the gallery. Do not delete this. / Por favor colour las imágenes en la parte superior de la galería. No borres esto. /Bitte Bilder am Anfang der Galerie einfügen. / S'il vous plaît, ajoutez vos images au début de cette liste sans supprimer ces avertissements. / Inserisci le immagini in cima alla lista della galleria. Grazie. -->
+W2321-ToInsertYourPicToChallengeClickBelow.svg|[https://commons.wikimedia.org/w/index.php?title=Commons:Photo_challenge/2016_-_December_-_Home_appliances&action=edit&section=3 To submit pictures please follow this link]|link=Commons:Photo_challenge/2016_-_December_-_Home_appliances
+</gallery>
+
+[[Category:Photo challenge/2016 - December - Home appliances]]

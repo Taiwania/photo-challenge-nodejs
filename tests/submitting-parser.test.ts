@@ -56,3 +56,30 @@ test("extractPrefixIndexPrefix finds the submission subpage prefix", () => {
   const prefix = extractPrefixIndexPrefix("{{Special:PrefixIndex/Commons:Photo challenge/2026 - March - Three-wheelers/}}");
   assert.equal(prefix, "Commons:Photo challenge/2026 - March - Three-wheelers/");
 });
+
+test("parseSubmissionPage finds the real Home appliances Entries gallery and removes the submit helper", () => {
+  const wikiText = readFileSync(path.join(fixturesDir, "submission-page-duo-coequal-home-appliances.txt"), "utf8");
+
+  const entries = parseSubmissionPage(wikiText);
+
+  assert.equal(entries.length, 40);
+  assert.deepEqual(entries.slice(0, 2), [
+    { fileName: "RK 1701 1353 Zweitwecker.jpg", title: "Very simple, but hundreds of thousands in use: An auxiliary ringer bell for a telephone" },
+    { fileName: "RK 1701 1346 Zweitwecker.jpg", title: "Very simple, but hundreds of thousands in use: An auxiliary ringer bell for a telephone" }
+  ]);
+  assert.equal(entries.some((entry) => entry.fileName === "W2321-ToInsertYourPicToChallengeClickBelow.svg"), false);
+  assert.equal(
+    entries.find((entry) => entry.fileName === "Silicon Graphics 02 - front.jpg")?.title,
+    "[[:en:SGI O2|Silicon Graphics 02]] front"
+  );
+});
+
+test("parseSubmissionPage finds the real 100 years later 500px Entries gallery and keeps external sources", () => {
+  const wikiText = readFileSync(path.join(fixturesDir, "submission-page-duo-reference-100-years-later.txt"), "utf8");
+
+  const entries = parseSubmissionPage(wikiText);
+  const external = entries.find((entry) => entry.fileName === "Not on Commons" && entry.sourceUrl);
+
+  assert.equal(entries.length, 190);
+  assert.equal(external?.sourceUrl, "http://memoire-net.org/article.php3?id_article=141");
+});

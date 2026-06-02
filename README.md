@@ -55,7 +55,9 @@ node dist/cli.js post-results-maintenance --challenge "2026 - February - Orange"
 ### 1. Prepare voting page
 
 Use this before voting starts.
-Outputs are written under `output/jobs/<job-id>/generated/`, including `*_voting.txt`, `*_files.json`, and `*_summary.txt`.
+Outputs are written under `output/jobs/<job-id>/generated/`, including `*_voting.txt`, `*_files.json`, `*_challenge-config.json`, and `*_summary.txt`.
+
+The default is a single-image, single-month challenge. For paired-image challenges, use `--entry-mode duo-coequal` or `--entry-mode duo-reference`. Only override `--submission-start` and `--submission-end` when the community has approved an exceptional duration; paired-image mode does not automatically extend the submission window.
 
 ### 2. Count votes and publish results
 

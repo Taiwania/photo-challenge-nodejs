@@ -55,7 +55,9 @@ node dist/cli.js post-results-maintenance --challenge "2026 - February - Orange"
 ### 1. Prepare voting page
 
 適用於投票開始前。
-產物會寫到 `output/jobs/<job-id>/generated/`，包含 `*_voting.txt`、`*_files.json`、`*_summary.txt`。
+產物會寫到 `output/jobs/<job-id>/generated/`，包含 `*_voting.txt`、`*_files.json`、`*_challenge-config.json`、`*_summary.txt`。
+
+預設為單圖、單月挑戰。雙圖像挑戰可使用 `--entry-mode duo-coequal` 或 `--entry-mode duo-reference`。只有社群確認採用例外時長時，才覆寫 `--submission-start` 與 `--submission-end`；雙圖像模式本身不會自動延長投稿期間。
 
 ### 2. Count votes and publish results
 

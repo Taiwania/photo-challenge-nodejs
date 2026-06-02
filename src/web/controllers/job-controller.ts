@@ -1,7 +1,8 @@
 import path from "node:path";
 import { readdir, readFile } from "node:fs/promises";
 import type { Request, Response } from "express";
-import type { JobProgress, JobRequest, PublishMode } from "../../core/models.js";
+import { DateTime } from "luxon";
+import type { EntryMode, JobProgress, JobRequest, PublishMode, SubmissionWindow } from "../../core/models.js";
 import { getCredentialPassword, rememberCredential } from "../../infra/credential-store.js";
 import { config } from "../../infra/config.js";
 import { loadPersistedJob } from "../../infra/job-history.js";
@@ -134,6 +135,23 @@ const workflowArtifactDefinitions: Record<string, Array<{
 };
 
 const VALID_PUBLISH_MODES = new Set<PublishMode>(["dry-run", "sandbox", "live"]);
+const VALID_ENTRY_MODES = new Set<EntryMode>(["single", "duo-coequal", "duo-reference"]);
+
+function parseSubmissionWindow(body: Record<string, unknown>): SubmissionWindow | undefined {
+  const startsAt = String(body.submissionStart ?? "").trim();
+  const endsAt = String(body.submissionEnd ?? "").trim();
+  if (!startsAt && !endsAt) return undefined;
+  if (!startsAt || !endsAt) {
+    throw new Error("Submission start and submission end must be provided together.");
+  }
+
+  const start = DateTime.fromISO(startsAt, { setZone: true });
+  const end = DateTime.fromISO(endsAt, { setZone: true });
+  if (!start.isValid || !end.isValid || start >= end) {
+    throw new Error("Submission window must use valid ISO date/times with start earlier than end.");
+  }
+  return { startsAt, endsAt };
+}
 
 function buildJobRequest(body: Record<string, unknown>): JobRequest {
   const rawPublishMode = String(body.publishMode ?? "dry-run");
@@ -141,10 +159,18 @@ function buildJobRequest(body: Record<string, unknown>): JobRequest {
     ? (rawPublishMode as PublishMode)
     : "dry-run";
 
+  const rawEntryMode = String(body.entryMode ?? "single");
+  if (!VALID_ENTRY_MODES.has(rawEntryMode as EntryMode)) {
+    throw new Error("Entry mode must be single, duo-coequal, or duo-reference.");
+  }
+  const entryMode = rawEntryMode as EntryMode;
+
   return {
     action: String(body.action ?? "process-challenge"),
     challenge: String(body.challenge ?? "").trim(),
     pairedChallenge: String(body.pairedChallenge ?? "").trim() || undefined,
+    entryMode,
+    submissionWindow: parseSubmissionWindow(body),
     credentials: {
       name: String(body.name ?? "").trim(),
       botPassword: String(body.botPassword ?? "")
@@ -215,7 +241,28 @@ async function getJobSnapshot(jobId: string): Promise<JobProgress | null> {
 
 export async function createJob(request: Request, response: Response) {
   const body = request.body as Record<string, unknown>;
-  const jobRequest = buildJobRequest(body);
+  let jobRequest: JobRequest;
+  try {
+    jobRequest = buildJobRequest(body);
+  } catch (error) {
+    response.status(400).render(
+      "home",
+      await buildHomePageViewModel({
+        error: error instanceof Error ? error.message : "Invalid voting page settings.",
+        defaults: {
+          name: String(body.name ?? "").trim(),
+          challenge: String(body.challenge ?? "").trim(),
+          pairedChallenge: String(body.pairedChallenge ?? "").trim(),
+          entryMode: String(body.entryMode ?? "single"),
+          submissionStart: String(body.submissionStart ?? "").trim(),
+          submissionEnd: String(body.submissionEnd ?? "").trim(),
+          action: String(body.action ?? "process-challenge"),
+          publishMode: String(body.publishMode ?? "dry-run")
+        }
+      })
+    );
+    return;
+  }
   const rememberRequested = shouldRememberCredential(body);
 
   if (!jobRequest.credentials.botPassword && jobRequest.credentials.name) {
@@ -231,6 +278,9 @@ export async function createJob(request: Request, response: Response) {
           name: jobRequest.credentials.name,
           challenge: jobRequest.challenge,
           pairedChallenge: jobRequest.pairedChallenge,
+          entryMode: jobRequest.entryMode,
+          submissionStart: jobRequest.submissionWindow?.startsAt,
+          submissionEnd: jobRequest.submissionWindow?.endsAt,
           action: jobRequest.action,
           publishMode: jobRequest.publishMode
         }

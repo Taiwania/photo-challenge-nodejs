@@ -1,7 +1,8 @@
 import path from "node:path";
 import { writeFile } from "node:fs/promises";
 import { DateTime } from "luxon";
-import type { JobRequest, PublishMode, VotingEntry } from "../core/models.js";
+import type { JobRequest, PublishMode, VotingEntry, VotingEntryMember } from "../core/models.js";
+import { assembleVotingEntries } from "../core/submission-entries.js";
 import { formatVoteDeadlineUtc, getVoteDeadlineUtc, getVoteDeadlineZoneLabel } from "../core/challenge-date.js";
 import { countVotes, type ScoredVotingFile } from "../core/scoring.js";
 import { listErrors, validateVotes, type VoteWithError, type VoterValidation } from "../core/validation.js";
@@ -9,13 +10,12 @@ import { validateVoters } from "../core/voters.js";
 import {
   extractPrefixIndexPrefix,
   parseSubmittedChallenges,
-  parseSubmissionPage,
-  type SubmissionEntry
+  parseSubmissionPage
 } from "../parsers/submitting-parser.js";
 import { parseVotingChallenges, parseVotingPage } from "../parsers/voting-parser.js";
 import { renderResultPage } from "../renderers/result-page.js";
 import { reviseVotingPage } from "../renderers/revised-voting-page.js";
-import { renderVotingPage, type VotingSubmissionEntry } from "../renderers/voting-page.js";
+import { renderVotingPage, resolveSubmissionWindow } from "../renderers/voting-page.js";
 import { renderWinnersPage } from "../renderers/winners-page.js";
 import { extractChallengeCode, renderVotingIndexSection, type VotingIndexEntry } from "../renderers/voting-index.js";
 import { config } from "../infra/config.js";
@@ -35,8 +35,6 @@ type SourceSpec = {
   title: string;
   fileName: string;
 };
-
-type EnrichedSubmissionEntry = SubmissionEntry & VotingSubmissionEntry;
 
 type ParsedArtifacts = {
   summaryLines: string[];
@@ -153,10 +151,14 @@ export async function runJob(jobId: string, request: JobRequest): Promise<void> 
 
     if (request.action === "create-voting") {
       await enrichCreateVotingSources(bot, request, sources, paths.inputDir, jobId);
-      const submissionEntries = await handleCreateVoting(bot, request, sources, paths.inputDir, jobId);
-      const parsed = parseCreateVotingArtifacts(request, sources, submissionEntries);
+      const submissionAssembly = await handleCreateVoting(bot, request, sources, paths.inputDir, jobId);
+      const parsed = parseCreateVotingArtifacts(request, sources, submissionAssembly.entries);
       await persistCommonArtifacts(paths.generatedDir, challengeSlug, sources, parsed);
-      const renderedVotingPage = renderVotingPage(request.challenge, submissionEntries);
+      await persistChallengeConfig(paths.generatedDir, challengeSlug, request);
+      const renderedVotingPage = renderVotingPage(request.challenge, submissionAssembly.entries, {
+        submissionWindow: request.submissionWindow,
+        issues: submissionAssembly.issues
+      });
       await writeFile(path.join(paths.generatedDir, `${challengeSlug}_voting.txt`), renderedVotingPage.text, "utf8");
       jobStore.appendMessage(jobId, `Rendered voting page with ${renderedVotingPage.includedCount} entries and ${renderedVotingPage.issueCount} issues.`);
 
@@ -220,7 +222,7 @@ async function handleCreateVoting(
   sources: ReadPageResult[],
   inputDir: string,
   jobId: string
-): Promise<EnrichedSubmissionEntry[]> {
+): Promise<{ entries: VotingEntry[]; issues: string[] }> {
   updateProgress(jobId, {
     percent: 50,
     step: "Loading file metadata",
@@ -324,6 +326,21 @@ async function persistCommonArtifacts(
   await writeFile(path.join(generatedDir, `${challengeSlug}_votes.json`), JSON.stringify(parsed.votes, null, 2), "utf8");
 }
 
+async function persistChallengeConfig(generatedDir: string, challengeSlug: string, request: JobRequest): Promise<void> {
+  const window = resolveSubmissionWindow(request.challenge, request.submissionWindow);
+  await writeFile(
+    path.join(generatedDir, `${challengeSlug}_challenge-config.json`),
+    JSON.stringify({
+      entryMode: request.entryMode ?? "single",
+      submissionWindow: {
+        startsAt: window.startsAt.toISO(),
+        endsAt: window.endsAt.toISO()
+      }
+    }, null, 2),
+    "utf8"
+  );
+}
+
 async function finalizeJob(
   logsDir: string,
   jobId: string,
@@ -341,6 +358,7 @@ async function finalizeJob(
     message: "Persisting run metadata to the fixed output directory."
   });
 
+  const timingLines = getJobTimingLogLines(request);
   await writeFile(
     path.join(logsDir, "job.log"),
     [
@@ -349,6 +367,7 @@ async function finalizeJob(
       `action=${request.action}`,
       `challenge=${request.challenge}`,
       `publishMode=${request.publishMode}`,
+      ...timingLines,
       `name=${request.credentials.name}`,
       `loggedInAs=${currentUser ?? "unknown"}`,
       `sourceCount=${sourceCount}`,
@@ -363,6 +382,7 @@ async function finalizeJob(
 
 async function persistFailedJob(logsDir: string, jobId: string, request: JobRequest, errorMessage: string): Promise<void> {
   const timestamp = DateTime.now().toUTC().toISO();
+  const timingLines = getJobTimingLogLines(request);
   await writeFile(
     path.join(logsDir, "job.log"),
     [
@@ -371,12 +391,35 @@ async function persistFailedJob(logsDir: string, jobId: string, request: JobRequ
       `action=${request.action}`,
       `challenge=${request.challenge}`,
       `publishMode=${request.publishMode}`,
+      ...timingLines,
       `name=${request.credentials.name}`,
       `errorMessage=${errorMessage.replace(/\r?\n/g, " ")}`,
       `completedAt=${timestamp}`
     ].join("\n"),
     "utf8"
   );
+}
+
+function getJobTimingLogLines(request: JobRequest): string[] {
+  if (request.action !== "create-voting") {
+    return [`entryMode=${request.entryMode ?? "single"}`];
+  }
+
+  let window;
+  try {
+    window = resolveSubmissionWindow(request.challenge, request.submissionWindow);
+  } catch {
+    return [
+      `entryMode=${request.entryMode ?? "single"}`,
+      `submissionStart=${request.submissionWindow?.startsAt ?? ""}`,
+      `submissionEnd=${request.submissionWindow?.endsAt ?? ""}`
+    ];
+  }
+  return [
+    `entryMode=${request.entryMode ?? "single"}`,
+    `submissionStart=${window.startsAt.toISO()}`,
+    `submissionEnd=${window.endsAt.toISO()}`
+  ];
 }
 
 function getSourceSpecs(request: JobRequest): SourceSpec[] {
@@ -423,69 +466,97 @@ async function enrichCreateVotingSources(bot: CommonsBot, request: JobRequest, s
   }
 }
 
-async function loadSubmissionEntries(bot: CommonsBot, request: JobRequest, sources: ReadPageResult[], jobId: string): Promise<EnrichedSubmissionEntry[]> {
+async function loadSubmissionEntries(
+  bot: CommonsBot,
+  request: JobRequest,
+  sources: ReadPageResult[],
+  jobId: string
+): Promise<{ entries: VotingEntry[]; issues: string[] }> {
   const submissionSources = sources.filter((source) => source.title.startsWith(`Commons:Photo challenge/${request.challenge}`));
-  const dedupedFiles = dedupeSubmissionFiles(submissionSources.flatMap((source) => parseSubmissionPage(source.content)));
-  if (dedupedFiles.length === 0) return [];
+  const assembly = assembleVotingEntries(
+    submissionSources.flatMap((source) => parseSubmissionPage(source.content)),
+    request.entryMode ?? "single"
+  );
+  const fileNames = assembly.entries.flatMap((entry) => entry.members)
+    .filter((member) => member.displayKind === "commons-file" && member.fileName)
+    .map((member) => member.fileName as string);
+  if (assembly.entries.length === 0) return assembly;
 
-  const infoByName = new Map<string, FileInfoLookup>((await bot.listFileInfo(dedupedFiles.map((file) => file.fileName))).map((info) => [info.fileName, info]));
+  const infoByName = new Map<string, FileInfoLookup>((await bot.listFileInfo(fileNames)).map((info) => [info.fileName, info]));
+  const enrichedEntries = assembly.entries.map((entry) => ({
+    ...entry,
+    members: entry.members.map((member) => enrichSubmissionMember(member, infoByName))
+  }));
   const counters = new Map<string, number>();
-  const enriched = dedupedFiles.map((file) => {
-    const info = infoByName.get(file.fileName);
-    const userKey = info?.user ?? "";
+  for (const entry of enrichedEntries) {
+    const userKey = entry.members.find((member) => member.role === "submission")?.user ?? "";
     const seenCount = counters.get(userKey) ?? 0;
     const active = Boolean(userKey) && seenCount < 4;
     counters.set(userKey, seenCount + 1);
+    for (const member of entry.members.filter((member) => member.role === "submission")) {
+      member.active = active;
+    }
+  }
 
-    return {
-      ...file,
-      user: info?.user ?? null,
-      uploaded: info?.uploaded ?? null,
-      width: info?.width ?? null,
-      height: info?.height ?? null,
-      comment: info?.comment ?? null,
-      ownWork: info?.ownWork ?? false,
-      exists: info?.exists ?? false,
-      active
-    };
-  });
-
-  const missingCount = enriched.filter((entry) => !entry.exists).length;
-  const inactiveCount = enriched.filter((entry) => !entry.active).length;
-  const nonOwnWorkCount = enriched.filter((entry) => entry.exists && !entry.ownWork).length;
-  jobStore.appendMessage(jobId, `Loaded metadata for ${enriched.length} files (${missingCount} missing, ${inactiveCount} over-limit, ${nonOwnWorkCount} not marked own-work).`);
-  return enriched;
+  const members = enrichedEntries.flatMap((entry) => entry.members);
+  const missingCount = members.filter((member) => !member.exists).length;
+  const inactiveCount = enrichedEntries.filter((entry) => entry.members.some((member) => member.role === "submission" && !member.active)).length;
+  const nonOwnWorkCount = members.filter((member) => member.role === "submission" && member.exists && !member.ownWork).length;
+  jobStore.appendMessage(jobId, `Loaded metadata for ${enrichedEntries.length} entries (${members.length} members, ${missingCount} missing, ${inactiveCount} over-limit entries, ${nonOwnWorkCount} submissions not marked own-work).`);
+  return { entries: enrichedEntries, issues: assembly.issues };
 }
 
-function parseCreateVotingArtifacts(request: JobRequest, sources: ReadPageResult[], submissionEntries: EnrichedSubmissionEntry[]): ParsedArtifacts {
+function enrichSubmissionMember(member: VotingEntryMember, infoByName: Map<string, FileInfoLookup>): VotingEntryMember {
+  if (member.displayKind === "placeholder") {
+    return { ...member, exists: true, active: true };
+  }
+  const info = member.fileName ? infoByName.get(member.fileName) : undefined;
+  return {
+    ...member,
+    user: info?.user ?? null,
+    uploaded: info?.uploaded ?? null,
+    width: info?.width ?? null,
+    height: info?.height ?? null,
+    comment: info?.comment ?? null,
+    ownWork: info?.ownWork ?? false,
+    exists: info?.exists ?? false
+  };
+}
+
+function parseCreateVotingArtifacts(request: JobRequest, sources: ReadPageResult[], entries: VotingEntry[]): ParsedArtifacts {
   const submissionPage = sources.find((source) => source.title === `Commons:Photo challenge/${request.challenge}`);
   const submittingIndex = sources.find((source) => source.title === "Commons:Photo challenge/Submitting");
   const challenges = submittingIndex ? parseSubmittedChallenges(submittingIndex.content) : [];
   const submissionSources = sources.filter((source) => source.title.startsWith(`Commons:Photo challenge/${request.challenge}`));
-  const files = submissionEntries;
+  const members = entries.flatMap((entry) => entry.members);
+  const window = resolveSubmissionWindow(request.challenge, request.submissionWindow);
 
   return {
     summaryLines: [
       `Action: ${request.action}`,
       `Challenge: ${request.challenge}`,
       `Configured login name: ${request.credentials.name}`,
+      `Entry mode: ${request.entryMode ?? "single"}`,
+      `Submission start: ${window.startsAt.toISO()}`,
+      `Submission end: ${window.endsAt.toISO()}`,
       "",
       `Submitting index challenges found: ${challenges.length}`,
       `Submission sources crawled: ${submissionSources.length}`,
-      `Submission gallery files found: ${files.length}`,
+      `Submission entries assembled: ${entries.length}`,
+      `Submission gallery members found: ${members.length}`,
       `Uses PrefixIndex: ${submissionPage ? String(Boolean(extractPrefixIndexPrefix(submissionPage.content))) : "false"}`,
-      `Missing files: ${files.filter((file) => !file.exists).length}`,
-      `Over-limit files: ${files.filter((file) => !file.active).length}`,
-      `Files not marked own-work: ${files.filter((file) => file.exists && !file.ownWork).length}`,
+      `Missing files: ${members.filter((member) => !member.exists).length}`,
+      `Over-limit entries: ${entries.filter((entry) => entry.members.some((member) => member.role === "submission" && !member.active)).length}`,
+      `Submission files not marked own-work: ${members.filter((member) => member.role === "submission" && member.exists && !member.ownWork).length}`,
       "",
       "Recent challenges from Submitting index:",
       ...challenges.slice(0, 10).map((challenge) => `- ${challenge.raw}`),
       "",
-      "First enriched submission files:",
-      ...files.slice(0, 10).map((file) => `- ${file.fileName} :: ${file.title} :: ${file.user ?? "unknown"} :: ${file.uploaded ?? "n/a"}`)
+      "First enriched submission entries:",
+      ...entries.slice(0, 10).map((entry) => `- ${entry.mode} :: ${entry.members.map((member) => `${member.role}:${member.fileName ?? "empty"}:${member.user ?? "unknown"}`).join(" || ")}`)
     ],
     challenges,
-    files,
+    files: entries,
     votes: []
   };
 }
@@ -522,18 +593,6 @@ function parseProcessChallengeArtifacts(
     files: scoredFiles,
     votes
   };
-}
-
-function dedupeSubmissionFiles(files: SubmissionEntry[]): SubmissionEntry[] {
-  const seen = new Set<string>();
-  const result: SubmissionEntry[] = [];
-  for (const file of files) {
-    const key = `${file.fileName}|||${file.title}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    result.push(file);
-  }
-  return result;
 }
 
 type PublishPageType = "voting" | "result" | "winners";

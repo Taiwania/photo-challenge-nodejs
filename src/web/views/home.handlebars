@@ -116,6 +116,32 @@
     </label>
 
     <fieldset class="action-picker">
+      <legend>Prepare voting page settings</legend>
+      <p class="action-picker-copy">These settings apply only when preparing a voting page. The normal workflow is a single-month challenge inferred from the challenge name. Override the dates only when the community has approved an exceptional duration.</p>
+
+      <label>
+        <span>Entry mode</span>
+        <select name="entryMode">
+          <option value="single" {{#if (eq defaults.entryMode "single")}}selected{{/if}}>Single image</option>
+          <option value="duo-coequal" {{#if (eq defaults.entryMode "duo-coequal")}}selected{{/if}}>Two coequal submission images</option>
+          <option value="duo-reference" {{#if (eq defaults.entryMode "duo-reference")}}selected{{/if}}>Reference image and submission image</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Submission start</span>
+        <input name="submissionStart" type="text" value="{{defaults.submissionStart}}" placeholder="2026-06-01T00:00:00Z" />
+        <small>Optional ISO date/time, inclusive.</small>
+      </label>
+
+      <label>
+        <span>Submission end</span>
+        <input name="submissionEnd" type="text" value="{{defaults.submissionEnd}}" placeholder="2026-07-01T00:00:00Z" />
+        <small>Optional ISO date/time, exclusive. Provide both dates or leave both blank.</small>
+      </label>
+    </fieldset>
+
+    <fieldset class="action-picker">
       <legend>What do you want to do?</legend>
       <p class="action-picker-copy">Pick the workflow that matches where the challenge is right now.</p>
 

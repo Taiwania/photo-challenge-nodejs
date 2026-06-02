@@ -32,6 +32,8 @@ test("parseCliArgs reads command line values directly", () => {
     action: "create-voting",
     challenge: "2026 - March - Three-wheelers",
     pairedChallenge: undefined,
+    entryMode: "single",
+    submissionWindow: undefined,
     source: "old",
     credentials: {
       name: "Example@Bot",
@@ -82,6 +84,57 @@ test("parseCliArgs accepts --publish-mode sandbox and live", () => {
   assert.equal(live.kind, "run");
   if (live.kind !== "run") throw new Error("Expected run");
   assert.equal(live.request.publishMode, "live");
+});
+
+test("parseCliArgs accepts duo entry mode and a configured submission window", () => {
+  const parsed = parseCliArgs([
+    "create-voting",
+    "--challenge", "2016 - December - Home appliances",
+    "--entry-mode", "duo-coequal",
+    "--submission-start", "2016-12-01T00:00:00Z",
+    "--submission-end", "2017-02-01T00:00:00Z",
+    "--name", "Example@Bot",
+    "--bot-password", "secret"
+  ]);
+
+  assert.equal(parsed.kind, "run");
+  if (parsed.kind !== "run") throw new Error("Expected run");
+  assert.equal(parsed.request.entryMode, "duo-coequal");
+  assert.deepEqual(parsed.request.submissionWindow, {
+    startsAt: "2016-12-01T00:00:00Z",
+    endsAt: "2017-02-01T00:00:00Z"
+  });
+});
+
+test("parseCliArgs rejects an invalid --entry-mode value", () => {
+  assert.throws(
+    () => parseCliArgs([
+      "create-voting", "--challenge", "2026 - March - Three-wheelers",
+      "--entry-mode", "trio",
+      "--name", "Example@Bot", "--bot-password", "secret"
+    ]),
+    /Invalid --entry-mode/
+  );
+});
+
+test("parseCliArgs rejects partial or reversed submission windows", () => {
+  assert.throws(
+    () => parseCliArgs([
+      "create-voting", "--challenge", "2016 - December - Home appliances",
+      "--submission-start", "2016-12-01T00:00:00Z",
+      "--name", "Example@Bot", "--bot-password", "secret"
+    ]),
+    /must be provided together/
+  );
+  assert.throws(
+    () => parseCliArgs([
+      "create-voting", "--challenge", "2016 - December - Home appliances",
+      "--submission-start", "2017-02-01T00:00:00Z",
+      "--submission-end", "2016-12-01T00:00:00Z",
+      "--name", "Example@Bot", "--bot-password", "secret"
+    ]),
+    /Invalid submission window/
+  );
 });
 
 test("parseCliArgs rejects an invalid --publish-mode value", () => {

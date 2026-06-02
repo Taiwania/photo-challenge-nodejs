@@ -1,0 +1,274 @@
+=== 2015 – {{ucfirst:{{I18n month|9}}}}-{{I18n month|10}} – {{Photo challenge theme|100 years later}} ===
+{{LangSwitch
+|af=
+Die nuwe uitdaging vertoon '''100 jaar later'''.
+
+|cs=
+Nová soutěž na téma ''' Po 100 letech''' dokumentuje změny provedené během dlouhého času ''znovuvyfotografováním'' starých obrázků (stejná perspektiva, úhel, atd.). K porovnání změn by měl soutěžící do galerie připojit také originální dobový obrázek (nezáleží na tom, zda ''originál'' je již nahrán; pokud není možné originál nahrát do Commons, měl by být uveden alespoň odkaz). Jelikož se pohybujeme v časovém rozdílu přibližně sta let, ''originál'' by měl být až z roku 1935 nebo dřívější, ale nemusí se jednat striktně o fotografii.
+
+|de=
+Im neuen Wettbewerb '''100 Jahre später''' werden Veränderungen im Lauf der Zeit dokumentiert, indem alte Bilder ''wiederholt'' werden (gleiche Perspektive, gleicher Blickwinkel, usw.). Um die Nachstellung zu illustrieren sollen die alten Bilder mit eingereicht werden (dabei ist das Hochladedatums des ''Originals'' irrelevant; wenn es nicht auf commons hochgeladen werden darf, muss es per Link zu erreichen sein). Das ''Original'' sollte spätestens 1935 entstanden sein, muss aber nicht unbedingt ein Photo sein.
+
+|en=
+The new challenge '''100 years later''' documents changes over time by ''retaking'' old pictures (same perspective, same angle, etc.). To illustrate the retake, the old picture should also be included into the submission gallery (it doesn't matter when the ''original'' was uploaded; if it's not possible to host it on commons, a link has to be provided). As we are aiming for a time difference of roughly one hundred years, the ''original'' should be from 1935 or earlier, but doesn't necessarily have to be a photo.
+
+|es=
+El nuevo desafío '''100 años después''' documenta los cambios con el paso del tiempo al recrear viejas imágenes (misma perspectiva, mismo ángulo, etc). Para ilustrar la recreación, se debe incluir también la imagen original en la galería al ser enviada (no importa cuando se subió la imagen ''original''; si no es posible subirla a Commons, es necesario proveer un enlace a la misma). Como apuntamos a una diferencia de aproximadamente cien años, el ''original'' debe ser de 1935 o antes, pero no necesariamente tiene que ser una fotografía.
+
+|fr=
+Le nouveau défi se nomme '''100 ans après''' et propose de montrer les changements créés par le temps qui passe en images (avec la même perspective, le même angle), etc. Pour illustrer le changement, il faut aussi inclure l'image originale avec la photo récente (peu importe quand cette image "originale" a été téléversée; s'il n'est pas possible de la téléverser, il est nécessaire de faire figurer un lien où se trouve l'image). Le défi se nomme « 100 ans après » mais ceci reste apporoximatif, l'original peut être de 1935 ou avant, il n'est pas nécessaire, non plus, que ce soit une photographie.
+
+
+|hu=
+Az új kihívás — '''100 évvel később''' — lényege az idő múlásával járó változások dokumentálása régi képek '''újrafotózásával''' (azonos perspektívával, azonos szögből stb.). A „felújítás” illusztrálásához fel kell tüntetni a régi képet is a kihívás galériájában (nem számít, hogy mikor volt feltöltve az ''eredeti'' kép; ha nem lehetséges a Commonsra való feltöltése, akkor szükséges egy rá mutató linket csatolni). Mivel a cél, hogy az időbeli különbség körülbelül száz év legyen, az ''eredeti'' képnek 1935-ből vagy régebbről kell származnia, de nem szükséges, hogy fénykép legyen.
+
+<!-- |it=
+=== 2015 – – ===
+La Challenge tratta degli ''''''.
+-->
+
+|pt=
+O desafio '''100 anos depois''' pretende documentar mudanças ao longo do tempo, ao recriar fotos antigas (usando a mesma perspectiva, o mesmo ângulo, etc.) Para ilustrar a recriação, a imagem original deve ser incluída na galeria (não importa quando a foto "original" foi enviada. E, se não for possível enviar a imagem original para o Commons, deve-se incluir um link para ela). Como queremos uma diferença de cerca de 100 anos, a imagem original deve ser de 1935 ou antes, mas não necessariamente precisa ser uma foto (pode ser um quadro, por exemplo).
+
+
+|ru=
+Тема нового конкурса — '''100 лет спустя''', при помощи ''переснятых'' фотографий (с того же места, под тем же углом) показывающая изменения, произошедшие за долгое время. Для того, чтоб показать изменения, старые изображения также должны быть включены в галерею работ (не имеет значения, когда ''оригинальное'' изображение было загружено; если невозможно загрузить его на Викисклад, можно указать ссылку на него). Так как мы стремимся продемонстрировать разницу во времени примерно в сто лет, ''оригинал'' должен быть сделан в 1935 году или раньше, хотя не обязательно, чтоб это была именно фотография.
+
+|sv=
+Den nya utmaningen '''100 år senare''' dokumenterar förändringar med tiden genom att ''ta om'' gamla bilder (från samma perspektiv, samma vinkel, etc). För att illustrera omtagningen, bör den gamla bilden också inkluderas i inlämningsgalleriet (det spelar ingen roll när ''originalet'' laddades upp; om det inte är möjligt att lagra den på Commons måste en länk bifogas). Då vi siktar mot en tidsskillnad på cirka hundra år bör ''originalet'' vara från 1935 eller tidigare, men behöver nödvändigtvis inte vara ett fotografi.
+
+|uk=
+Тема цього конкурсу '''Через 100 років'''. Його метою є задокументувати зміни, сфотографувавши ті самі об'єкти з того самого місця і кута зору з проміжком приблизно у 100 років. Щоб унаочнити зміни, старий знімок має бути також представлений на конкурс. (Щодо останнього нема обмежень у часі завантаження на Сховище, а також, якщо чомусь завантажити його на Сховище неможливо, прохання подати лінк на оригінальне історичне зображення). Стараючись зберегти проміжок приблизно у сто років, ми хочемо, щоб "оригінал" був зроблений у 1935 або раніше, до речі, це може бути й інше зображення, не обов'язково саме фото.
+
+|vi=
+Thách thức mới, tư liệu về '''100 năm sau''', miêu tả sự thay đổi theo thời gian bằng cách ''chụp lại'' dựa theo những bức ảnh cũ (cùng bối cảnh, cùng một góc độ, vv). Để minh họa cho việc chụp lại, các ảnh cũ cũng cần được đưa vào nơi trưng bày tác phẩm dự thi (''nguồn chụp ảnh'' đã được đăng tải cũng không sao; còn nếu không thể lưu trữ nó trên commons, phải có liên kết đến hình). Theo như chủ đề chúng ta đang hướng tới, sự khác biệt trong khoảng thời gian một trăm năm, ''nguồn chụp ảnh'' nên xuất phát từ năm 1935 hoặc sớm hơn nữa, nhưng không nhất thiết phải là một hình ảnh.
+}}
+
+{{trim|
+{{Photo challenge rules|September|2015|October}}
+}}
+
+{{countdown
+|year= 2015 |month= 11 |day= 01 |hour= 00 |minute= 00
+|event= {{LangSwitch |af=hierdie uitdaging eindig |cs=tato soutěž končí |de=dieser Wettbewerb endet|en=this challenge ends |es=este reto termine |hu=kihívás vége |it=della fine della sfida |fr=de ce défi |sv=denna utmaning slutar |ru=окончания этого конкурса|vi=thách thức này kết thúc}}
+|eventend= {{LangSwitch |af=Hierdie uitdaging het alreeds geëindig. |cs=Tato soutěž již skončila. |de=Dieser Wettbewerb ist beendet|en=This challenge has already ended. |es=Este reto ya ha terminado.|hu=Ez a kihívás már befejeződött. |it=Questa sfida è già terminata. |sv=Denna utmatning har redan slutat. |ru=Этот конкурс уже закончился.|vi=Thách thức này đã kết thúc.}}
+}}
+
+<gallery mode="packed" heights="100px" caption="Examples">
+W1144-Landreau3 Eglise DeRueTrittau.jpg|~1910
+W1145-Landreau3 Eglise DeRueTrittau 58407.JPG|2013
+Stadtbahn-Wien-vor-Elektrifizierung.jpg|around 1910
+2013-06-07 0176 Wien Guertel LinieU6 Station JosefstaedterStrasse Bruecken ueber die JosefstaedterStrasse.JPG|2013
+Naschmarkt2.jpg|< 1910
+Linke Wienzeile 4, 1060 Wien.JPG|2012
+S 356 Abb 356 Volksgarten mit dem Theseus-Tempel.jpg|<1905
+Theseustempel, Volksgarten 2014.jpg |2014
+W1154-Landreau11 Eglise DeRueMoulins.jpg|~1910
+W1155-Landreau11 Eglise DeRueMoulins 8529.JPG|2013
+</gallery>
+===Entries===
+<!--
+ATTENTION! NEW ORDER! Please paste the File names of your entries at the top of the gallery. /
+ATENCIÓN! ¡NUEVO ORDEN! Por favor pega los nombres de los archivos de tus entradas en la parte superior de la galería. /
+Bitte neue Bilder am Anfang der Gallerie einfügen. /
+Copiez le nom de fichier de votre image en haut de la liste, sous la balise "gallery". /
+ATTENZIONE! NUOVO ORDINE! Aggiungi il nome del file della tua candidata in cima alla lista della galleria. Grazie. /
+برای اضافه کردن تصویر ، پیوند [ویرایش] را در بالای بخش فشار دهید و عکستان را در بالای فهرست وارد کنید. /
+Внимание! Новый порядок добавления фотографий: пожалуйста, помещайте ваши новые фотографии в начале (в верху) галереи! Спасибо. /
+Увага! Новий порядок додавання фотографій: прохання вставляти ваші файли згори (на початку галереї). Дякуємо. /
+LƯU Ý! HÌNH ĐĂNG MỚI! Hãy dán tên các tập tin tham dự của bạn lên đầu nơi trưng bày.!
+-->
+<gallery mode="nolines" widths=500px heights=250px perrow=2>
+ND 80 - LILLE - L'Hotel des Postes.JPG|1914 Carte postale ancienne éditée par ND, n°80: ND 80 - LILLE - L'Hôtel des Postes
+Lille zombiewalk 2012.jpg|2012 L'Hôtel des Postes,Lille.- France
+AT 28 - LILLE - La Gare.jpg| 1907 Carte postale ancienne éditée par AT, n°28, LILLE : La Gare
+Lille la gare Lille-Flandres en 2014.jpg|2014 Gare de Lille-Flandres.- France
+Parroquia Nuestra Señora de Regla. 1918.jpg|Parroquia Nuestra Señora de Regla. 1918 La Habana, Cuba
+Parroquia Nuestra Señora de Regla. 2015.jpg|Parroquia Nuestra Señora de Regla. 2015 La Habana, Cuba
+EC 1 - LILLE - La Grand'Place (Coté gauche).jpg| av. 1914 LILLE - La Grand'Place (Coté gauche)
+Lille grand Place 2012.jpg|2012 La Grand-Place de Lille Nord.- France
+Baksovet011.JPG|~1918 'Bakı Şurası' Binası (Hal hazırda Bakı Şəhəri İcra hakimiyyəti)
+Bakı Şəhəri İcra Hakimiyyəti Binası.JPG|2013 Bakı Şəhəri İcra Hakimiyyəti Binası, Azərbaycan
+Debur's house.jpg|~1920 Hal hazırda İncəsənət Muzeyinin binası
+Azərbaycan Milli İncəsənət Muzeyinin Binası.jpg|2013 Azərbaycan Milli İncəsənət Muzeyinin Binası
+Müasir Kukla Teatrının binası, Bakı, XX əsrin əvvəli.jpg|~1910 Müasir Kukla Teatrının binası, Bakı
+Kukla Teatrı, Bakı.JPG|2013 Kukla teatrının binası, Bakı, Azərbaycan
+Bamberg 1900.jpg | The old townhall in Bamberg 1900
+The old townhall of Bamberg 089.jpg | The old townhall in Bamberg 2006
+Embarcadero de la Lancha de Regla 1930.jpg| Embarcadero de las Lanchas de Regla, La Habana. 1930
+Embarcadero de la Lancha de Regla 2015.jpg| Embarcadero de las Lanchas de Regla, La Habana. 2015
+Saint-Rambert (1900).jpg|Rue de Saint-Rambert-en-Bugey vers 1900 
+Saint-Rambert (2015).jpg|Rue de Saint-Rambert-en-Bugey en 2015
+2012-10-07 16-31-50-musee-histoire-belfort-tour-miotte.jpg|Tour de la Miotte, à Belfort, en 1871.
+2015-09-05 11-01-51 tour-miotte.jpg|Tour de la Miotte, à Belfort, en 2015.
+Not on Commons|Lieu où a été pris en photo le fusillé souriant, à Belfort. La photo du fusillé souriant étant, à ce jour, encore protégée par les droits d'auteur, voici quelques sites web où l'on peut la trouver : [http://memoire-net.org/article.php3?id_article=141 ici] et [http://se-rememorer.e-monsite.com/pages/partie-ii-les-temoignages-historiques-permettent-a-la-memoire-collective-de-subsiter/le-fusille-de-belfort.html ici].
+2015-09-05 11-30-22 fusille-souriant.jpg|Lieu où a été pris en photo le fusillé souriant, à Belfort.
+Tramway Belfort Bd Carnot 1907.jpg|Pont Carnot, à Belfort, en 1907.
+2015-09-05 12-22-28 boulevard-carnot.jpg|Pont Carnot, à Belfort, en 2015.
+Lyon 5 - Groupe scolaire et postes du Point-du-Jour 19xx.jpg|Groupe scolaire et postes du Point-du-Jour, Lyon 5, début XXe.
+Lyon 5 - Groupe scolaire et postes du Point-du-Jour 2015.jpg|Groupe scolaire et postes du Point-du-Jour, Lyon 5, 5 août 2015.
+St Louis City Hall 1900.jpg|St. Louis City Hall, 1900
+St Louis MO City Hall 20150905-100.jpg|St. Louis City Hall, 2015
+Old Courthouse 1862.jpg|Old St. Louis County courthouse, 1865
+Old St Louis County Courthouse 20150905 046-047.jpg|Old St. Louis County courthouse, 2015
+St Louis Sixth Street looking south from Lucas Ave 1906.jpg|6th Street in St. Louis in 1906
+St Louis Sixth Street looking south from Lucas Ave 20150905-068-071.jpg|6th Street in St. Louis, 2015
+Bombay - Gateway of India - Then.jpg|Bombay - Gateway of India - Then
+Mumbai(Bombay) - Gateway of India - Now.jpg|Mumbai(Bombay) - Gateway of India - Now
+Göllheim 1911.jpg|Panorama von Göllheim ca. 1911 - Germany
+Göllheim 2015.jpg|Panorama Blick auf Göllheim (2015) - Germany
+Villeurbanne - Boulevard de la Côte.jpg|Postcard from early 20th century. Villeurbanne (France)
+Villeurbanne - Boulevard de la Côte (actuel boulevard Eugène Réguillon).jpg|Same street, different name, in 2015.
+Montchat. Place Louise 3.jpg|Postcard from early 20th century, of "Place Louise", Lyon (France)
+Montchat Place Louise.jpg|Same square, with new buildings. Some old houses are still there, hidden by the tree. 
+33, avenue du Château, Lyon 3e - 2.jpg|Before 1936, a school in Lyon (France)
+33, avenue du Château, Lyon 3e.jpg|Now, the same school.
+Lyon 3e - Salle de conférence.jpg|Taken early 20th century, conference room in Lyon (France)
+Salle de conférence, avenue du Château.jpg|Same conference room, near a school.
+De Waal park circa 1900.jpg|Entrance to De Waal Park, Cape Town, circa 1900.
+De Waal park circa 2015.jpg|Entrance to De Waal Park, Cape Town, 2015.
+Villeurbanne - Mairie et trams.jpg|Villeurbanne's city hall and tramway, early 20th century.
+Villeurbanne - Mairie et trams 2015.jpg|Villeurbanne's post office and bus, in 2015.
+Villeurbanne - La grande place.jpg|Villeurbanne's grande place, early 20th century (postcard).
+Villeurbanne - La grande place 2015.jpg|Villeurbanne's place Jules-Grandclément in 2015.
+La Rue de la Gare, à Villeurbanne, vers 1934.jpg|[[:fr:Villeurbanne|Villeurbanne]]'s rue de la Gare, circa 1934.
+Avenue Général-Leclerc (ex Rue de la Gare), à Villeurbanne, 2015.jpg|Villeurbanne's rue de la Gare, in 2015.
+La Place Henri à Montchat, au début du XXe siècle.jpg|Place Henri, in Lyon, France, taken before 1936.
+La Place Henri à Montchat, 2015.jpg|Place Henri in 2015.
+Hôpital Villeurbanne - Lycée Frédéric-Faÿs.jpg|[[:fr:Villeurbanne|Villeurbanne]]'s hospital in early 20th century.
+Hôpital Villeurbanne (Lycée Faÿs) 2015.jpg|Villeurbanne's Frédéric-Faÿs school in 2015.
+Gare de Villeurbanne.jpg|[[:fr:Villeurbanne|Villeurbanne]]'s station in early 20th century (postcard).
+Gare de Villeurbanne 2015.jpg|Villeurbanne's station in 2015.
+Constantin Uhde (1888) Fachada de la Universidad de Alcalá.png|Facade of the [[University of Alcalá]]. Photography [[Constantin Uhde]] in [[1888]].
+Alcalá de Henares (RPS 08-08-2015) Colegio Mayor de San Ildefonso, fachada.png|Facade of the [[University of Alcalá]] ([[Community of Madrid]] - [[Spain]]) in 2015.
+Not on Commons|Casemate de Bourges, au fort de Roppe en 1940 [http://www.fortiffsere.fr/belfort/index_fichiers/Page19234.htm ici]
+2015-09-19 14-20-44 fort-roppe.jpg|Casemate de Bourges, au fort de Roppe.
+Bevo Mill Restaurant in St. Louis, Missouri, in 1907.jpg|Bevo Mill restaurant in 1907
+Bevo Mill Restaurant 20150905-190.jpg|Bevo Mill restaurant in 2015
+Lyon - Rue Octavio Mey et Gare Saint-Paul (flamme de 1904).jpg|Lyon - Rue Octavio Mey et Gare Saint-Paul (flamme de 1904)
+Lyon - Rue Octavio Mey et Gare Saint-Paul 2015.jpg|Lyon - Rue Octavio Mey et Gare Saint-Paul en 2015
+Grands travaux d'urbanisme du Second Empire ; ouverture de la rue de l'Impératrice et rectification de la place de la Fromagerie.jpg|Grands travaux d'urbanisme du Second Empire ; ouverture de la rue de l'Impératrice et rectification de la place de la Fromagerie - Vers 1860
+Eglise Saint-Nizier angle rue du president Edouard Herriot rue de la Fromagerie - 2015.jpg|Eglise Saint-Nizier angle rue du president Edouard Herriot rue de la Fromagerie - 2015
+1920 Via Nomentana Roma.JPG|Postcard of Via Nomentana in Rome, Italy, about 1920
+2015 Via Nomentana Roma.JPG|Photo of Via Nomentana in Rome, Italy, 2015
+1920 VillaCalderai Roma.JPG|Postcard of Villa Calderai in Rome Italy from about 1920
+2015 VillaCalderai.JPG|Photo of Villa Calderai in Roma from 2015
+Bahnhof Messel Empfangsgebaeude.jpg|Station Building Messel, 1st half of 20th century
+Bahnhof Messel Empfangsgebaeude 2015.jpg|Building at Messel Train Station (Hesse, Germany), 2015
+Lion of Chaeronea (c. 1918).jpg|Lion of Chaeronea, Greece, about 1918
+Lion of Chaeronea 3.JPG|Lion of Chaeronea, Greece, 2015
+Carl Wilhelm von Heideck - Palikaren vor dem Tempel von Korinth.jpg|Partisans at the temple of Apollo at Corinth, 1829.
+Temple of Apollo in Corinth 1.jpg|Tourists at the temple of Apollo at Corinth, 2013.
+Luxembourg, Conrotseck (vers 1900).jpg|Luxembourg: Building «Conrotseck», about 1900
+Luxembourg, Conrotseck (vers 2015).JPG|Luxembourg: Building «Conrotseck», 2015
+Luxembourg, Huelen Zant (vers 1905).png|Luxembourg: Montée de Clausen and «Huelen Zant», about 1905
+Luxembourg, Huelen Zant (2015).JPG|Luxembourg: Montée de Clausen and «Huelen Zant», 2015
+Luxembourg, Hotel Staar (vers 1920).jpeg|Luxembourg: Hotel Staar, about 1920
+Luxembourg, Hotel Staar (2015).JPG|Luxembourg: Building on the grounds of former Hotel Staar, 2015
+Luxembourg, Villa Werling (vers 1900).jpg|Luxembourg: Montée de Clausen, about 1900
+Luxembourg, montée de Clausen.JPG|Luxembourg: Montée de Clausen, 2015
+Strassenbahn-vor-dem-Alten-Rathaus-Bamberg .jpg|Tram in front of the old town hall in Bamberg about 1912
+Torbogen-Altes-Rathaus-Bamberg.jpg|Old townhall in Bamberg with tourist 2015.
+Carl Hagenbecks Tierpark Grosser Vogelteich1913.jpg|Carl Hagenbecks Tierpark in Hamburg - Grosser Vogelteich vor 100 Jahren (1913)
+Carl Hagenbecks Tierpark Grosser Vogelteich 2015.JPG|Carl Hagenbecks Tierpark in Hamburg - Grosser Vogelteich 2015
+Theater bergen.jpg|The New Theater in Bergen, Norway, beginning of the 20th Century
+Bergen teatr.JPG|The New Theater in Bergen, Norway, 2015 (sorry for the lamp...)
+Not on Commons|Hohndorf. Erzgebirgskreis-Sachsen (deleted)
+Hohndorf. Erzgebirgskreis-Sachsen... IMG 7619H.jpg|Hohndorf. Erzgebirgskreis-Sachsen.
+BriarcliffOutlook4.jpg|The [[:en:Briarcliff Manor, New York|Briarcliff Manor]] train station in 1907
+BriarcliffOutlook4 (2014).png|The Briarcliff Manor train station as part of the newer [[:en:Briarcliff Manor Public Library|Briarcliff Manor Public Library]], 2014
+Briarcliff International Road Race.jpg|The [[:en:Briarcliff Manor, New York#Sports|First American International Road Race]] in Briarcliff Manor, 1908
+BriarcliffOutlook4 (2014).jpg|The same location in 2014
+Not on Commons|[https://en.wikipedia.org/wiki/File:Eilean_Donan_Castle,_pre_1911.jpg Eilean Donan Castle, pre 1911<br/>(on en:wp)]
+Eilean Donan Panorama 2015-08-15.jpg|Eilean Donan Castle, 2015
+Grands travaux d'urbanisme du Second Empire ; place des Cordeliers et la colonne du Méridien (2).jpg|Grands travaux d'urbanisme du Second Empire ; place des Cordeliers et la colonne du Méridien - Juin 1854
+Place des Cordeliers rue grenette 2015.jpg|Vue de la place des Cordeliers vers l'ouest et la rue Grenette.Tentative de coller a la photo File:Grands travaux d'urbanisme du Second Empire ; place des Cordeliers et la colonne du Méridien (2).jpg en se basant sur la position supposée de la colonne du Méridien et l’alignement de la rue Grenette.
+LH Cape Florida 1923.jpg|Cape Florida Light, 1923
+Cape Florida Light Oct. 2015.jpg|Cape Florida Light, 2015
+Rudolstadt Marktstraße 54 Amtsgericht 1906 .jpg|Rudolstadt Amtsgericht um 1906
+Rudolstadt Marktstraße 54 Amtsgericht 10.2015.jpg|Rudolstadt Amtsgericht 2015
+Jedlova nádraží.jpg|Jedlová 1920
+Jedlovské nádraží 2015.JPG|Jedlová nádraží 2015
+Old Post Office Pavilion, 1911.jpg|Old Post Office Pavilion, 1911
+Old post office pavilion 20151016 ECG.jpg|Old Post Office Pavilion in Washington, D.C. as it appears in 2015
+Pohled z Tolštejna na Vdf.jpg|Pohled z vyhlídky Tolštejna na Varnsdorf 1923
+Pohled z Tolštejna na Vdf 1.jpg|Pohled z vyhlídky Tolštejna na Varnsdorf
+Not on Commons|Blick auf die Ruine Kauzenburg, Links die Pauluskirche und die Nahe mit der "Alten" Brücke.
+Neue Ansicht von Bad Kreuznach.JPG|Kauzenburg , "Neue" Nahebrücke wird derzeit saniert - links die Provisorische Zufahrt für Baufahrzeuge , Die Pauluskirche am linken Bildrand ist von Bäumen verdeckt.
+Christchurch Cathedral Nov 1918.jpg|Christchurch Cathedral (Christchurch, New Zealand), November 1918
+Christchurch Cathedral Nov 2008.jpg|Christchurch Cathedral (Christchurch, New Zealand), November 2008
+Bamberg-Stadt-054282-PS2.jpg|Bamberg-Stadt-054282-PS2
+Bamberg-Stadt-054282-PS.jpg|Bamberg-Stadt-054282-PS
+BambergerSynagoge01-PS.jpg|BambergerSynagoge01-PS
+Bamberg-Stadt-084541-PS-PS.jpg|Bamberg-Stadt-084541-PS-PS
+Viru Square circa 1835.jpg|Viru Square area of Tallinn (Estonia), about 1835
+Viru Square 2015.jpg|Viru Square in Tallinn (Estonia), 2015
+Dunkri-Rataskaevu St circa 1835.jpg|Corner of Dunkri and Rataskaevu Streets in Tallinn (Estonia), about 1835
+Dunkri-Rataskaevu St 2015.jpg|Corner of Dunkri and Rataskaevu Streets in Tallinn (Estonia), 2015
+Šnelli Pond with Toompea Hill circa 1931.jpg|Šnelli Pond and Toompea Hill in Tallinn (Estonia), about 1931
+Šnelli Pond with Toompea Hill 2015.jpg|Šnelli Pond and Toompea Hill in Tallinn (Estonia), 2015
+Humayun's Tomb, Delhi. 1860.jpg|Humayun's Tomb, Delhi. 1860
+Humayun's Tomb in 2015.jpg|Humayun's Tomb, Delhi. 2015
+Kuttull Minor, Delhi. The Qutb Minar, an aquatint by Thomas Daniell, 1805.jpg|Qutb Minar in 1805
+Qutb Minar in 2015.jpg|Qutb Minar in 2015
+Beaufort Island - 1911.jpg| Beaufort Island, Antarctica (Watercolour by Edward A. Wilson, January 1911)
+Beaufort Island - 2014.jpg| Beaufort Island, Antarctica (February 2014)
+Universidade Federal de Viçosa - Prédio principal, 1926.png|Main building of Federal University of Viçosa, Brazil. 1926.[http://www.siaapm.cultura.mg.gov.br/modules/fotografico_docs/photo.php?lid=26874 Original file.]
+Universidade Federal de Viçosa - Prédio principal, 2015.jpg|Main building of Federal University of Viçosa, Brazil. 2015.
+City gate 1890-1891.jpg|Азербайджан, Баку, Главные городские ворота (Шемахинские) фотография 1890-1891г.г.
+City gate 2014.jpg|Азербайджан, Баку, Главные городские ворота (Шемахинские) фотография 2014г.
+COLLECTIE TROPENMUSEUM Het kantoor van de Chartered Bank aan de Kali Besar West Batavia TMnr 10015461.jpg|Office of Chartered Bank of India, Australia, and China ,1915-1940
+Former office of the Chartered Bank of India, Australia, and China.jpg|The same corner,as of 2015
+Old Pottinger Street.jpg|Pottinger Street,hong Kong,early 20th century
+Pottinger Street, Hong Kong.jpg|The same location in 2015
+Tcitp d161 wyndham street also known as flower street.jpg|Wyndham Street,Hong Kong in 1908
+Viewing up Wyndham Street.jpg|Wyndham Street in 2015
+William Henry Jackson, Street scene, Peking, 1895.jpg|Cochrane Street, Hong Kong in 1895
+Cochrane Street, Central, Hong Kong.jpg|Cochrane Street viewed from similar location in 2015,though hardly recognisable
+Album of Hongkong Canton Macao Amoy Foochow 017.jpg|Northwest Corner of Pedder Street in 1870
+Intersection of Des Voeux Road,Chater Road and Pedder Street as of April 2015.jpg|the same location 2015,now one of the busiest intersections in Hong Kong
+COLLECTIE TROPENMUSEUM Het buitenverblijf van de gouverneur-generaal in Tjipanas TMnr 60016713.jpg|Cipanas Palace,Indonesia in the 1920s
+Istana Tjipanas.jpg|Cipanas Palace in 2015
+Salisbury Road in 1930s.jpg|Salisbury Road, Tsim Sha Tsui, Hong Kong in year 1930
+Salisbury Road from Hong Kong Cultural Centre.jpg|Salisbury Road in 2015,shot from a similar location
+Rudolstadt Postamt Augustastraße 1905.jpg|Rudolstadt Postamt Augustastraße 1905
+Rudolstadt Postamt und August-Bebel-Straße.jpg|Rudolstadt Postamt und August-Bebel-Straße
+Peter I monument in Voronezh (begining of the XX century).jpg|Peter I monument in Voronezh (begining of the XX century)
+Peter I monument in Voronezh (2015).jpg|Peter I monument in Voronezh (2015)
+Grand Hotel in Voronezh (begining of the XX century).jpg|Grand Hotel in Voronezh (begining of the XX century)
+Srednemoskovskaya street, 12, Voronezh (ex. Grand Hotel) 2015.jpg|Srednemoskovskaya street, 12, Voronezh (ex. Garand Hotel)
+Voskresenskaya church in Voronezh (view from Stone Bridge, begining of the XX century).jpg|Voskresenskaya church in Voronezh (view from Stone Bridge, begining of the XX century)
+Voskresenskaya church in Voronezh (view from Stone Bridge, 2015).jpg|Voskresenskaya church in Voronezh (view from Stone Bridge, 2015)
+Nikitin monument in Voronezh (begining of the XX century).jpg|Nikitin monument in Voronezh (begining of the XX century)
+Nikitin monument in Voronezh (2015).jpg|Nikitin monument in Voronezh (2015)
+Theatre square in Voronezh (begining of the XX century).jpg|Theatre square in Voronezh (begining of the XX century)
+Square near Proletariy cinema, Voronezh (2015).jpg|Square near Proletariy cinema, Voronezh (2015)
+Entréede Saint-Rambert-en Bugey (2).jpg|Entrée de Saint-Rambert-en-Bugey au début du XXème siècle
+Entréede Saint-Rambert-en Bugey (3).JPG|Entrée de Saint-Rambert-en-Bugey en 2015.
+Nikolskaya church in Voronezh (begining of the XX century).jpg|Nikolskaya church in Voronezh (begining of the XX century)
+Nikolskaya church in Voronezh (2015).jpg|Nikolskaya church in Voronezh (2015)
+Old Central Market of 1895.jpg|Central Market, Hong Kong as of 1895, the second generation Building
+Central Market,Central,Hong Kong.jpg|The defunct third generation Central Market in 2015
+Quincaillerie 1915.jpg|Quincaillerie-épicerie vers 1915
+Pharmacie 2015.JPG|Pharmacie en 2015
+Wine warehouse in Voronezh (begining of the XX century).jpg|Wine warehouse in Voronezh (begining of the XX century)
+Voronezh distillery (2015).jpg|Voronezh distillery (2015)
+Spadina Road - Dupont Street subway looking north, in 1915.jpg|Casa Loma shot from Dupont Street, March 1915
+Spadina Road from Dupont 2015.JPG|Casa Loma shot from Dupont Street, April 2015
+Plauen, Johanniskirche um 1900.jpg|Plauen, die Johanniskirche um 1900
+Plauen, Johanniskirche 2015.JPG|Plauen, die Johanniskirche 2015
+Plauen, Neundorfer Straße - Feuerwache-Sparkasse-Rathaus um 1920.jpg|Plauen, die Feuerwache, die Sparkasse und das Neue Rathaus um 1920
+Plauen, Neundorfer Straße - Feuerwache-Sparkasse-Rathaus 2015.JPG|Plauen, die Feuerwache, die Sparkasse und das Neue Rathaus 2015
+Plauen, Blick vom Bärenstein um 1920.jpg|Plauen, Blick vom Bärenstein um 1920
+Plauen, Blick vom Bärenstein 2014.JPG|Plauen, Blick vom Bärenstein um 2014
+Plauen, Hauptpost um 1900.jpg|Plauen, Hauptpost um 1900
+Plauen, Hauptpost 2015.JPG|Plauen, Hauptpost 2015
+Plauen, Theaterplatz - Theater-Theatercafé-Konservatorium um 1900.jpg|Plauen, Blick auf den Theaterplatz um 1900
+Plauen, Theaterplatz - Theater-Theatercafé-Konservatorium 2015.JPG|Plauen, Blick auf den Theaterplatz 2015
+Historia grosslingova gamca.jpg|Királyi katolikus gimnázium Pozsony (Austria-Hungary) ~1910
+Groszling utca Pozsony Grosslingova Bratislava.png|Gymnázium Grösslingova 18, Bratislava (Slovakia) 2015
+Pozsony k.u.k. InfKas.jpg|Gyalogsági kaszárnya, Esterházy tér (Hunyady János utca), Pozsony (Austria-Hungary) ~1910
+Kaszarnya1.png|Úrad pre normalizáciu, metrológiu a skúšobníctvo SR, Štefanovičova 3, Bratislava (Slovakia) 2015
+</gallery>
+
+[[Category:Photo challenge/2015 - September-October - 100 years later]]

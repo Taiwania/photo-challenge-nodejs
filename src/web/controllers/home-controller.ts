@@ -7,6 +7,9 @@ type HomeDefaults = {
   name: string;
   challenge: string;
   pairedChallenge: string;
+  entryMode: string;
+  submissionStart: string;
+  submissionEnd: string;
   action: string;
   publishMode: string;
 };
@@ -54,6 +57,9 @@ export async function buildHomePageViewModel(options: HomePageOptions = {}) {
       name: options.defaults?.name ?? savedName ?? process.env.NAME ?? "",
       challenge: options.defaults?.challenge ?? "",
       pairedChallenge: options.defaults?.pairedChallenge ?? "",
+      entryMode: options.defaults?.entryMode ?? "single",
+      submissionStart: options.defaults?.submissionStart ?? "",
+      submissionEnd: options.defaults?.submissionEnd ?? "",
       action: options.defaults?.action ?? "process-challenge",
       publishMode: options.defaults?.publishMode ?? "dry-run"
     },
