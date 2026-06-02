@@ -61,7 +61,7 @@ test("offline process-challenge pipeline matches expected Orange snippet outputs
   ];
 
   const validated = validateVotes(parsed.votes, voters, "2026 - February - Orange");
-  const scored = countVotes(parsed.files, validated);
+  const scored = countVotes(parsed.entries, validated);
   const errors = listErrors(validated, voters, "2026 - February - Orange");
 
   assert.equal(renderResultPage(scored, 4, errors), readFixture("orange-snippet-result-expected.txt"));

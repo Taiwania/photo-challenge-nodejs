@@ -1,0 +1,310 @@
+{{Discussion top}}
+__NOTOC__
+
+'''Voting ended at midnight UTC on 28 February 2017'''. The theme was '''Home appliances'''.
+
+{{Commons:Photo challenge/Voting header/{{SuperFallback|Commons:Photo challenge/Voting header}}}}
+
+===Sample===
+[[File:Sample-image.svg|none|thumb|300x300px|Sample caption. [{{filepath:Sample-image.svg}}<br>''(Full size image)'']]]
+*{{3/3*}} Great font! -- [[User:Colin|Colin]] ([[User talk:Colin|<span class="signature-talk">talk</span>]]) 18:22, 2 January 2014 (UTC)
+*{{2/3*}} -- '''Another person''' 18:20, 2 January 2014 (UTC)
+*{{1/3*}} Cool. Love it. -- '''Yet another person''' 18:32, 2 January 2014 (UTC)
+*{{0/3*}} Beautiful -- '''Someone else''' 13:30 3 January 2014 (UTC)
+
+===1. radio Gnomo interno===
+{|
+|- valign="top"
+|width="100pt" |[[File:Radio Gnomo esterno.jpg|none|thumb|x299px|Radio Gnomo exterior [{{filepath:Radio Gnomo esterno.jpg}}<br>''(Full size image)'']]]
+|width="100pt" |[[File:radio Gnomo interno.jpg|none|thumb|x299px|Radio Gnomo interior [{{filepath:radio Gnomo interno.jpg}}<br>''(Full size image)'']]]
+|}
+'''Creator:''' [[User:Rosapicci|Rosapicci]]'''Taken:''' 07 January 2000 '''Uploaded:''' 17 December 2016 '''Size''': 4147 × 3091 (12.8 MP)
+'''Creator:''' [[User:Rosapicci|Rosapicci]]'''Taken:''' 07 January 2000 '''Uploaded:''' 17 December 2016 '''Size''': 4213 × 3190 (13.4 MP)
+<!-- Vote below this line -->
+*{{2/3*}} -- [[User:Gozitano|Gozitano]] ([[User talk:Gozitano|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 10:25, 3 February 2017 (UTC)
+*{{3/3*}}--[[User:Alexmar983|Alexmar983]] ([[User talk:Alexmar983|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 09:20, 4 February 2017 (UTC)
+*{{0/3*}} -- [[User:Tequask|Tequask]] ([[User talk:Tequask|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 20:13, 5 February 2017 (UTC)
+*{{1/3*}} -- [[User:Ermell|Ermell]] ([[User talk:Ermell|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 09:48, 10 February 2017 (UTC)
+<!-- Vote above this line -->
+
+===2. Macchina caffè elettrica smontata===
+{|
+|- valign="top"
+|width="100pt" |[[File:Macchina caffè elettrica esterno.jpg|none|thumb|x342px|Old electric coffee machine exterior    [{{filepath:Macchina caffè elettrica esterno.jpg}}<br>''(Full size image)'']]]
+|width="100pt" |[[File:Macchina caffè elettrica smontata.jpg|none|thumb|x342px|Old electric coffee machine disassembled [{{filepath:Macchina caffè elettrica smontata.jpg}}<br>''(Full size image)'']]]
+|}
+'''Creator:''' [[User:Rosapicci|Rosapicci]]'''Taken:''' 02 December 2016 '''Uploaded:''' 17 December 2016 '''Size''': 4288 × 3216 (13.7 MP)
+'''Creator:''' [[User:Rosapicci|Rosapicci]]'''Taken:''' 05 January 2000 '''Uploaded:''' 17 December 2016 '''Size''': 2840 × 4016 (11.4 MP)
+<!-- Vote below this line -->
+*{{1/3*}} -- [[User:Nxr-at|Nxr-at]] ([[User talk:Nxr-at|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 11:13, 3 February 2017 (UTC)
+*{{0/3*}}--[[User:Alexmar983|Alexmar983]] ([[User talk:Alexmar983|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 09:22, 4 February 2017 (UTC)
+*{{2/3*}} -- [[User:Levin Holtkamp|Levin Holtkamp]] ([[User talk:Levin Holtkamp|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 12:34, 23 February 2017 (UTC)
+<!-- Vote above this line -->
+
+===3. Silicon Graphics 02 - back===
+{|
+|- valign="top"
+|width="100pt" |[[File:Silicon Graphics 02 - front.jpg|none|thumb|x364px|[[:en:SGI O2|Silicon Graphics 02]] front [{{filepath:Silicon Graphics 02 - front.jpg}}<br>''(Full size image)'']]]
+|width="100pt" |[[File:Silicon Graphics 02 - back.jpg|none|thumb|x364px|[[:en:SGI O2|Silicon Graphics 02]] inside [{{filepath:Silicon Graphics 02 - back.jpg}}<br>''(Full size image)'']]]
+|}
+'''Creator:''' [[User:Jarekt|Jarekt]]'''Taken:''' 17 December 2016 '''Uploaded:''' 20 December 2016 '''Size''': 2848 × 4288 (12.2 MP)
+'''Creator:''' [[User:Jarekt|Jarekt]]'''Taken:''' 17 December 2016 '''Uploaded:''' 20 December 2016 '''Size''': 3013 × 2638 (7.9 MP)
+<!-- Vote below this line -->
+<!-- Vote above this line -->
+
+===4. Zeitschaltuhr - Innenansicht===
+{|
+|- valign="top"
+|width="100pt" |[[File:Zeitschaltuhr - Außenansicht.jpg|none|thumb|x423px|Switch clock - Exterior view [{{filepath:Zeitschaltuhr - Außenansicht.jpg}}<br>''(Full size image)'']]]
+|width="100pt" |[[File:Zeitschaltuhr - Innenansicht.jpg|none|thumb|x423px|Switch clock - Interior view [{{filepath:Zeitschaltuhr - Innenansicht.jpg}}<br>''(Full size image)'']]]
+|}
+'''Creator:''' [[User:CatalpaSpirit|CatalpaSpirit]]'''Taken:''' 20 December 2016 '''Uploaded:''' 20 December 2016 '''Size''': 2304 × 3456 (7.9 MP)
+'''Creator:''' [[User:CatalpaSpirit|CatalpaSpirit]]'''Taken:''' 20 December 2016 '''Uploaded:''' 20 December 2016 '''Size''': 2304 × 3456 (7.9 MP)
+<!-- Vote below this line -->
+*{{0/3*}} -- [[User:Palamède|Palamède]] ([[User talk:Palamède|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 10:28, 24 February 2017 (UTC)
+*{{0/3*}}--[[User:Alexmar983|Alexmar983]] ([[User talk:Alexmar983|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 09:22, 4 February 2017 (UTC)
+*{{0/3*}} -- [[User:Tequask|Tequask]] ([[User talk:Tequask|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 20:14, 5 February 2017 (UTC)
+*{{2/3*}} -- [[User:Suisant7|Suisant7]] ([[User talk:Suisant7|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 18:12, 6 February 2017 (UTC)
+*{{1/3*}} -- [[User:Maasaak|Maasaak]] ([[User talk:Maasaak|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 00:18, 27 February 2017 (UTC)
+<!-- Vote above this line -->
+
+===5. Samsung Galaxy S3 ( Interior view)===
+{|
+|- valign="top"
+|width="100pt" |[[File:Samsung Galaxy S3 ( Exterior view).jpg|none|thumb|x433px|Mobile phone - Exterior view [{{filepath:Samsung Galaxy S3 ( Exterior view).jpg}}<br>''(Full size image)'']]]
+|width="100pt" |[[File:Samsung Galaxy S3 ( Interior view).jpg|none|thumb|x433px|Mobile phone - Interior view [{{filepath:Samsung Galaxy S3 ( Interior view).jpg}}<br>''(Full size image)'']]]
+|}
+'''Creator:''' [[User:PIERRE ANDRE LECLERCQ|PIERRE ANDRE LECLERCQ]]'''Taken:''' 24 December 2016 '''Uploaded:''' 24 December 2016 '''Size''': 2198 × 3309 (7.2 MP)
+'''Creator:''' [[User:PIERRE ANDRE LECLERCQ|PIERRE ANDRE LECLERCQ]]'''Taken:''' 24 December 2016 '''Uploaded:''' 24 December 2016 '''Size''': 2388 × 3909 (9.3 MP)
+<!-- Vote below this line -->
+*{{0/3*}} -- [[User:Palamède|Palamède]] ([[User talk:Palamède|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 10:29, 24 February 2017 (UTC)
+*{{0/3*}} -- [[User:Tequask|Tequask]] ([[User talk:Tequask|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 20:14, 5 February 2017 (UTC)
+<!-- Vote above this line -->
+
+===6. Philips 12 V Plug-in AC Adapter opened===
+{|
+|- valign="top"
+|width="100pt" |[[File:Philips 12 V Plug-in AC Adapter.JPG|none|thumb|x449px|Old AC power adapter - closed [{{filepath:Philips 12 V Plug-in AC Adapter.JPG}}<br>''(Full size image)'']]]
+|width="100pt" |[[File:Philips 12 V Plug-in AC Adapter opened.JPG|none|thumb|x449px|Old AC power adapter - opened [{{filepath:Philips 12 V Plug-in AC Adapter opened.JPG}}<br>''(Full size image)'']]]
+|}
+'''Creator:''' [[User:Jacek79|Jacek79]]'''Taken:''' 25 December 2016 '''Uploaded:''' 25 December 2016 '''Size''': 2630 × 4086 (10.7 MP)
+'''Creator:''' [[User:Jacek79|Jacek79]]'''Taken:''' 25 December 2016 '''Uploaded:''' 25 December 2016 '''Size''': 1966 × 3634 (7.1 MP)
+<!-- Vote below this line -->
+<!-- Vote above this line -->
+
+===7. Wires in AC power socket2===
+{|
+|- valign="top"
+|width="100pt" |[[File:Wires in AC power socket1.jpg|none|thumb|x398px|Euro AC power sockets [{{filepath:Wires in AC power socket1.jpg}}<br>''(Full size image)'']]]
+|width="100pt" |[[File:Wires in AC power socket2.jpg|none|thumb|x398px|Euro AC power sockets - interior [{{filepath:Wires in AC power socket2.jpg}}<br>''(Full size image)'']]]
+|}
+'''Creator:''' [[User:Maasaak|Maasaak]]'''Taken:''' 27 May 2016 '''Uploaded:''' 27 December 2016 '''Size''': 1100 × 1450 (1.5 MP)
+'''Creator:''' [[User:Maasaak|Maasaak]]'''Taken:''' 01 June 2016 '''Uploaded:''' 27 December 2016 '''Size''': 1200 × 1600 (1.9 MP)
+<!-- Vote below this line -->
+*{{0/3*}} -- [[User:Palamède|Palamède]] ([[User talk:Palamède|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 10:29, 24 February 2017 (UTC)
+*{{0/3*}} -- [[User:Tequask|Tequask]] ([[User talk:Tequask|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 20:15, 5 February 2017 (UTC)
+<!-- Vote above this line -->
+
+===8. Electric heater control panel 2===
+{|
+|- valign="top"
+|width="100pt" |[[File:Electric heater control panel 1.jpg|none|thumb|x423px|electric heater control panel  Exterior view [{{filepath:Electric heater control panel 1.jpg}}<br>''(Full size image)'']]]
+|width="100pt" |[[File:Electric heater control panel 2.jpg|none|thumb|x423px|electric heater control panel  Interior view [{{filepath:Electric heater control panel 2.jpg}}<br>''(Full size image)'']]]
+|}
+'''Creator:''' [[User:AlixSaz|AlixSaz]]'''Taken:''' 21 December 2016 '''Uploaded:''' 27 December 2016 '''Size''': 2000 × 3000 (6.0 MP)
+'''Creator:''' [[User:AlixSaz|AlixSaz]]'''Taken:''' 21 December 2016 '''Uploaded:''' 27 December 2016 '''Size''': 2000 × 3000 (6.0 MP)
+<!-- Vote below this line -->
+*{{0/3*}}--[[User:PIERRE ANDRE LECLERCQ|Pierre André]] ([[User talk:PIERRE ANDRE LECLERCQ|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 16:18, 3 February 2017 (UTC)
+*{{1/3*}} -- [[User:Tequask|Tequask]] ([[User talk:Tequask|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 21:21, 3 February 2017 (UTC)
+*{{0/3*}}--[[User:Alexmar983|Alexmar983]] ([[User talk:Alexmar983|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 09:22, 4 February 2017 (UTC)
+<!-- Vote above this line -->
+
+===9. Telefon W48 Grundplatte===
+{|
+|- valign="top"
+|width="100pt" |[[File:Telefon W48 Schwarz.jpg|none|thumb|x300px|Telephone W48 from West Germany 1948 [{{filepath:Telefon W48 Schwarz.jpg}}<br>''(Full size image)'']]]
+|width="100pt" |[[File:Telefon W48 Grundplatte.jpg|none|thumb|x300px|Telephone W48 Interior view [{{filepath:Telefon W48 Grundplatte.jpg}}<br>''(Full size image)'']]]
+|}
+'''Creator:''' [[User:CatalpaSpirit|CatalpaSpirit]]'''Taken:''' 28 December 2016 '''Uploaded:''' 29 December 2016 '''Size''': 4896 × 3672 (17.9 MP)
+'''Creator:''' [[User:CatalpaSpirit|CatalpaSpirit]]'''Taken:''' 28 December 2016 '''Uploaded:''' 29 December 2016 '''Size''': 4896 × 3672 (17.9 MP)
+<!-- Vote below this line -->
+*{{3/3*}} -- [[User:Palamède|Palamède]] ([[User talk:Palamède|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 10:25, 24 February 2017 (UTC)
+*{{2/3*}} -- [[User:Zoolooshka|Zoolooshka]] ([[User talk:Zoolooshka|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 18:17, 5 February 2017 (UTC)
+*{{2/3*}} -- [[User:York12321|York12321]] ([[User talk:York12321|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 17:43, 12 February 2017 (UTC)
+*{{3/3*}} -- [[User:Ibex73|Ibex73]] ([[User talk:Ibex73|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 20:54, 2 February 2017 (UTC)
+*{{1/3*}} -- [[User:Gozitano|Gozitano]] ([[User talk:Gozitano|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 10:24, 3 February 2017 (UTC)
+*{{0/3*}}--[[User:Alexmar983|Alexmar983]] ([[User talk:Alexmar983|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 09:21, 4 February 2017 (UTC)
+*{{3/3*}} -- [[User:Suisant7|Suisant7]] ([[User talk:Suisant7|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 18:10, 6 February 2017 (UTC)
+*{{2/3*}} -- [[User:Ermell|Ermell]] ([[User talk:Ermell|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 09:47, 10 February 2017 (UTC)
+*{{3/3*}} -- [[User:Ryanx7|Ryanx7]] ([[User talk:Ryanx7|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 07:37, 11 February 2017 (UTC)
+*{{0/3*}} -- [[User:Star61|Star61]] ([[User talk:Star61|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 19:08, 19 February 2017 (UTC)
+*{{1/3*}} -- [[User:Levin Holtkamp|Levin Holtkamp]] ([[User talk:Levin Holtkamp|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 12:35, 23 February 2017 (UTC)
+*{{3/3*}} -- [[User:Maasaak|Maasaak]] ([[User talk:Maasaak|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 00:19, 27 February 2017 (UTC)
+*{{3/3*}} --[[User:Jarekt|Jarekt]] ([[User talk:Jarekt|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 20:34, 28 February 2017 (UTC)
+<!-- Vote above this line -->
+
+===10. Palm Tungsten E2 disassembled, back===
+{|
+|- valign="top"
+|width="100pt" |[[File:Palm Tungsten E2 powered on, front.jpg|none|thumb|x409px|Palm Tungsten E2, a 2005 personal digital assistant [{{filepath:Palm Tungsten E2 powered on, front.jpg}}<br>''(Full size image)'']]]
+|width="100pt" |[[File:Palm Tungsten E2 disassembled, back.jpg|none|thumb|x409px|Palm Tungsten E2, a 2005 personal digital assistant [{{filepath:Palm Tungsten E2 disassembled, back.jpg}}<br>''(Full size image)'']]]
+|}
+'''Creator:''' [[User:Dllu|Dllu]]'''Taken:''' 30 December 2016 '''Uploaded:''' 31 December 2016 '''Size''': 4380 × 6290 (27.5 MP)
+'''Creator:''' [[User:Dllu|Dllu]]'''Taken:''' 30 December 2016 '''Uploaded:''' 31 December 2016 '''Size''': 4784 × 6559 (31.3 MP)
+<!-- Vote below this line -->
+*{{0/3*}} -- [[User:Tequask|Tequask]] ([[User talk:Tequask|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 20:15, 5 February 2017 (UTC)
+<!-- Vote above this line -->
+
+===11. Compact camera internal view===
+{|
+|- valign="top"
+|width="100pt" |[[File:Compact camera external view.jpg|none|thumb|x300px|Compact camera - external view [{{filepath:Compact camera external view.jpg}}<br>''(Full size image)'']]]
+|width="100pt" |[[File:Compact camera internal view.jpg|none|thumb|x300px|Compact camera - internal view [{{filepath:Compact camera internal view.jpg}}<br>''(Full size image)'']]]
+|}
+'''Creator:''' [[User:Tulumnes|Tulumnes]]'''Taken:''' 04 January 2017 '''Uploaded:''' 04 January 2017 '''Size''': 5184 × 3888 (20.1 MP)
+'''Creator:''' [[User:Tulumnes|Tulumnes]]'''Taken:''' 04 January 2017 '''Uploaded:''' 04 January 2017 '''Size''': 5184 × 3888 (20.1 MP)
+<!-- Vote below this line -->
+*{{1/3*}}--[[User:PIERRE ANDRE LECLERCQ|Pierre André]] ([[User talk:PIERRE ANDRE LECLERCQ|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 16:17, 3 February 2017 (UTC)
+*{{3/3*}} -- [[User:Tequask|Tequask]] ([[User talk:Tequask|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 21:18, 3 February 2017 (UTC)
+*{{1/3*}}--[[User:Alexmar983|Alexmar983]] ([[User talk:Alexmar983|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 09:21, 4 February 2017 (UTC)
+*{{0/3*}} -- [[User:Levin Holtkamp|Levin Holtkamp]] ([[User talk:Levin Holtkamp|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 12:35, 23 February 2017 (UTC)
+*{{0/3*}} -- [[User:Maasaak|Maasaak]] ([[User talk:Maasaak|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 00:19, 27 February 2017 (UTC)
+*{{1/3*}} --[[User:Jarekt|Jarekt]] ([[User talk:Jarekt|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 20:33, 28 February 2017 (UTC)
+<!-- Vote above this line -->
+
+===12. Western Digital Hard Disk - 1===
+{|
+|- valign="top"
+|width="100pt" |[[File:Western Digital Hard Disk - 2.jpg|none|thumb|x376px|Western Digital Hard Disk outside [{{filepath:Western Digital Hard Disk - 2.jpg}}<br>''(Full size image)'']]]
+|width="100pt" |[[File:Western Digital Hard Disk - 1.jpg|none|thumb|x376px|Western Digital Hard Disk inside [{{filepath:Western Digital Hard Disk - 1.jpg}}<br>''(Full size image)'']]]
+|}
+'''Creator:''' [[User:Jarekt|Jarekt]]'''Taken:''' 07 January 2017 '''Uploaded:''' 11 January 2017 '''Size''': 2383 × 2904 (6.9 MP)
+'''Creator:''' [[User:Jarekt|Jarekt]]'''Taken:''' 07 January 2017 '''Uploaded:''' 11 January 2017 '''Size''': 2643 × 3041 (8.0 MP)
+<!-- Vote below this line -->
+*{{0/3*}} -- [[User:Gozitano|Gozitano]] ([[User talk:Gozitano|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 10:24, 3 February 2017 (UTC)
+<!-- Vote above this line -->
+
+===13. Blackberry RIM 957 - 03===
+{|
+|- valign="top"
+|width="100pt" |[[File:Blackberry RIM 957 - 01.jpg|none|thumb|x390px|Blackberry RIM 957 outside [{{filepath:Blackberry RIM 957 - 01.jpg}}<br>''(Full size image)'']]]
+|width="100pt" |[[File:Blackberry RIM 957 - 03.jpg|none|thumb|x390px|Blackberry RIM 957 inside [{{filepath:Blackberry RIM 957 - 03.jpg}}<br>''(Full size image)'']]]
+|}
+'''Creator:''' [[User:Jarekt|Jarekt]]'''Taken:''' 07 January 2017 '''Uploaded:''' 11 January 2017 '''Size''': 2611 × 3349 (8.7 MP)
+'''Creator:''' [[User:Jarekt|Jarekt]]'''Taken:''' 07 January 2017 '''Uploaded:''' 11 January 2017 '''Size''': 2573 × 3266 (8.4 MP)
+<!-- Vote below this line -->
+*{{1/3*}} -- [[User:Palamède|Palamède]] ([[User talk:Palamède|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 10:27, 24 February 2017 (UTC)
+*{{1/3*}} -- [[User:Ibex73|Ibex73]] ([[User talk:Ibex73|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 20:56, 2 February 2017 (UTC)
+*{{0/3*}} -- [[User:Tequask|Tequask]] ([[User talk:Tequask|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 20:16, 5 February 2017 (UTC)
+*{{1/3*}} -- [[User:Suisant7|Suisant7]] ([[User talk:Suisant7|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 18:13, 6 February 2017 (UTC)
+*{{0/3*}} -- [[User:Star61|Star61]] ([[User talk:Star61|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 19:07, 19 February 2017 (UTC)
+<!-- Vote above this line -->
+
+===14. Disassembled laptop===
+{|
+|- valign="top"
+|width="100pt" |[[File:Assembled laptop.jpg|none|thumb|x378px|Assembled laptop computer [{{filepath:Assembled laptop.jpg}}<br>''(Full size image)'']]]
+|width="100pt" |[[File:Disassembled laptop.jpg|none|thumb|x378px|Disassembled laptop computer [{{filepath:Disassembled laptop.jpg}}<br>''(Full size image)'']]]
+|}
+'''Creator:''' [[User:Tulumnes|Tulumnes]]'''Taken:''' 08 January 2017 '''Uploaded:''' 14 January 2017 '''Size''': 3696 × 4040 (14.9 MP)
+'''Creator:''' [[User:Tulumnes|Tulumnes]]'''Taken:''' 08 January 2017 '''Uploaded:''' 14 January 2017 '''Size''': 3888 × 5184 (20.1 MP)
+<!-- Vote below this line -->
+*{{3/3*}}--[[User:PIERRE ANDRE LECLERCQ|Pierre André]] ([[User talk:PIERRE ANDRE LECLERCQ|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 16:15, 3 February 2017 (UTC)
+*{{0/3*}} -- [[User:Ibex73|Ibex73]] ([[User talk:Ibex73|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 20:53, 2 February 2017 (UTC)
+*{{0/3*}}--[[User:Alexmar983|Alexmar983]] ([[User talk:Alexmar983|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 09:23, 4 February 2017 (UTC)
+*{{0/3*}} -- [[User:Star61|Star61]] ([[User talk:Star61|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 19:06, 19 February 2017 (UTC)
+<!-- Vote above this line -->
+
+===15. Stereo Radio Kuba Imperial Adria Chassis 669 - Interior view===
+{|
+|- valign="top"
+|width="100pt" |[[File:Stereo Radio Kuba Imperial Adria Chassis 669.jpg|none|thumb|x219px|Radio Kuba Imperial Adria - Exterior view [{{filepath:Stereo Radio Kuba Imperial Adria Chassis 669.jpg}}<br>''(Full size image)'']]]
+|width="100pt" |[[File:Stereo Radio Kuba Imperial Adria Chassis 669 - Interior view.jpg|none|thumb|x219px|Radio Kuba Imperial Adria - Interior view [{{filepath:Stereo Radio Kuba Imperial Adria Chassis 669 - Interior view.jpg}}<br>''(Full size image)'']]]
+|}
+'''Creator:''' [[User:CatalpaSpirit|CatalpaSpirit]]'''Taken:''' 29 December 2016 '''Uploaded:''' 24 January 2017 '''Size''': 4626 × 1864 (8.6 MP)
+'''Creator:''' [[User:CatalpaSpirit|CatalpaSpirit]]'''Taken:''' 22 January 2017 '''Uploaded:''' 24 January 2017 '''Size''': 4626 × 1864 (8.6 MP)
+<!-- Vote below this line -->
+*{{0/3*}} -- [[User:Palamède|Palamède]] ([[User talk:Palamède|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 10:30, 24 February 2017 (UTC)
+*{{0/3*}} -- [[User:Ermell|Ermell]] ([[User talk:Ermell|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 09:49, 10 February 2017 (UTC)
+*{{2/3*}} -- [[User:Ryanx7|Ryanx7]] ([[User talk:Ryanx7|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 07:37, 11 February 2017 (UTC)
+*{{2/3*}} -- [[User:Star61|Star61]] ([[User talk:Star61|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 19:06, 19 February 2017 (UTC)
+*{{3/3*}} &#x2013; [[User:B jonas|b_jonas]] 23:11, 20 February 2017 (UTC)
+*{{0/3*}} -- [[User:Levin Holtkamp|Levin Holtkamp]] ([[User talk:Levin Holtkamp|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 12:36, 23 February 2017 (UTC)
+*{{0/3*}} -- [[User:Maasaak|Maasaak]] ([[User talk:Maasaak|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 00:20, 27 February 2017 (UTC)
+<!-- Vote above this line -->
+
+===16. Disassembled compact camera===
+{|
+|- valign="top"
+|width="100pt" |[[File:Assembled compact camera.jpg|none|thumb|x287px|Assembled compact camera [{{filepath:Assembled compact camera.jpg}}<br>''(Full size image)'']]]
+|width="100pt" |[[File:Disassembled compact camera.jpg|none|thumb|x287px|Disassembled compact camera [{{filepath:Disassembled compact camera.jpg}}<br>''(Full size image)'']]]
+|}
+'''Creator:''' [[User:Tulumnes|Tulumnes]]'''Taken:''' 22 January 2017 '''Uploaded:''' 29 January 2017 '''Size''': 3991 × 3259 (13.0 MP)
+'''Creator:''' [[User:Tulumnes|Tulumnes]]'''Taken:''' 22 January 2017 '''Uploaded:''' 29 January 2017 '''Size''': 4747 × 2836 (13.4 MP)
+<!-- Vote below this line -->
+*{{3/3*}} -- [[User:Zoolooshka|Zoolooshka]] ([[User talk:Zoolooshka|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 18:17, 5 February 2017 (UTC)
+*{{2/3*}}--[[User:PIERRE ANDRE LECLERCQ|Pierre André]] ([[User talk:PIERRE ANDRE LECLERCQ|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 16:16, 3 February 2017 (UTC)
+*{{0/3*}} -- [[User:Ibex73|Ibex73]] ([[User talk:Ibex73|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 20:53, 2 February 2017 (UTC)
+*{{1/3*}} -- [[User:Star61|Star61]] ([[User talk:Star61|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 19:05, 19 February 2017 (UTC)
+*{{0/3*}} -- [[User:Maasaak|Maasaak]] ([[User talk:Maasaak|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 00:20, 27 February 2017 (UTC)
+<!-- Vote above this line -->
+
+===17. Toaster inside===
+{|
+|- valign="top"
+|width="100pt" |[[File:Toaster outside.jpg|none|thumb|x282px|Toaster outside [{{filepath:Toaster outside.jpg}}<br>''(Full size image)'']]]
+|width="100pt" |[[File:Toaster inside.jpg|none|thumb|x282px|Toaster inside [{{filepath:Toaster inside.jpg}}<br>''(Full size image)'']]]
+|}
+'''Creator:''' [[User:Saeidpourbabak|Saeidpourbabak]]'''Taken:''' 28 January 2017 '''Uploaded:''' 30 January 2017 '''Size''': 5472 × 3648 (19.9 MP)
+'''Creator:''' [[User:Saeidpourbabak|Saeidpourbabak]]'''Taken:''' 28 January 2017 '''Uploaded:''' 30 January 2017 '''Size''': 5472 × 3648 (19.9 MP)
+<!-- Vote below this line -->
+<!-- Vote above this line -->
+
+===18. RK 1701 1346 Zweitwecker===
+{|
+|- valign="top"
+|width="100pt" |[[File:RK 1701 1353 Zweitwecker.jpg|none|thumb|x300px|Very simple, but hundreds of thousands in use: An auxiliary ringer bell for a telephone [{{filepath:RK 1701 1353 Zweitwecker.jpg}}<br>''(Full size image)'']]]
+|width="100pt" |[[File:RK 1701 1346 Zweitwecker.jpg|none|thumb|x300px|Very simple, but hundreds of thousands in use: An auxiliary ringer bell for a telephone [{{filepath:RK 1701 1346 Zweitwecker.jpg}}<br>''(Full size image)'']]]
+|}
+'''Creator:''' [[User:Reinhard Kraasch|Reinhard Kraasch]]'''Taken:''' 26 January 2017 '''Uploaded:''' 31 January 2017 '''Size''': 1920 × 1440 (2.7 MP)
+'''Creator:''' [[User:Reinhard Kraasch|Reinhard Kraasch]]'''Taken:''' 26 January 2017 '''Uploaded:''' 31 January 2017 '''Size''': 1920 × 1440 (2.7 MP)
+<!-- Vote below this line -->
+<!-- Vote above this line -->
+
+===19. Energy-saving electric bulb 1===
+{|
+|- valign="top"
+|width="100pt" |[[File:Energy-saving electric bulb.jpg|none|thumb|x284px|Energy-saving electric bulb Exterior view [{{filepath:Energy-saving electric bulb.jpg}}<br>''(Full size image)'']]]
+|width="100pt" |[[File:Energy-saving electric bulb 1.jpg|none|thumb|x284px|Energy-saving electric bulb Interior view [{{filepath:Energy-saving electric bulb 1.jpg}}<br>''(Full size image)'']]]
+|}
+'''Creator:''' [[User:AlixSaz|AlixSaz]]'''Taken:''' 31 January 2017 '''Uploaded:''' 31 January 2017 '''Size''': 3000 × 2043 (6.1 MP)
+'''Creator:''' [[User:AlixSaz|AlixSaz]]'''Taken:''' 31 January 2017 '''Uploaded:''' 31 January 2017 '''Size''': 3000 × 2000 (6.0 MP)
+<!-- Vote below this line -->
+*{{2/3*}} -- [[User:Tequask|Tequask]] ([[User talk:Tequask|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 21:19, 3 February 2017 (UTC)
+<!-- Vote above this line -->
+
+===20. Wandtelefon mit Wählscheibe. Innenansicht===
+{|
+|- valign="top"
+|width="100pt" |[[File:Wandtelefon mit Wählscheibe.jpg|none|thumb|x332px|Wandtelefon. Automatische Wandstation Modell PTT 1950. Schweiz. [{{filepath:Wandtelefon mit Wählscheibe.jpg}}<br>''(Full size image)'']]]
+|width="100pt" |[[File:Wandtelefon mit Wählscheibe. Innenansicht.jpg|none|thumb|x332px|Wandtelefon. Automatische Wandstation Modell PTT 1950. Schweiz. Innenansicht. [{{filepath:Wandtelefon mit Wählscheibe. Innenansicht.jpg}}<br>''(Full size image)'']]]
+|}
+'''Creator:''' [[User:Photones|Photones]]'''Taken:''' 31 January 2017 '''Uploaded:''' 31 January 2017 '''Size''': 3055 × 4583 (14.0 MP)
+'''Creator:''' [[User:Photones|Photones]]'''Taken:''' 31 January 2017 '''Uploaded:''' 31 January 2017 '''Size''': 5276 × 3517 (18.5 MP)
+<!-- Vote below this line -->
+*{{2/3*}} -- [[User:Palamède|Palamède]] ([[User talk:Palamède|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 10:26, 24 February 2017 (UTC)
+*{{1/3*}} -- [[User:Zoolooshka|Zoolooshka]] ([[User talk:Zoolooshka|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 18:17, 5 February 2017 (UTC)
+*{{2/3*}} -- [[User:Ibex73|Ibex73]] ([[User talk:Ibex73|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 20:52, 2 February 2017 (UTC)
+*{{3/3*}} -- [[User:Gozitano|Gozitano]] ([[User talk:Gozitano|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 10:24, 3 February 2017 (UTC)
+*{{2/3*}}--[[User:Alexmar983|Alexmar983]] ([[User talk:Alexmar983|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 09:20, 4 February 2017 (UTC)
+*{{0/3*}} -- [[User:Tequask|Tequask]] ([[User talk:Tequask|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 20:17, 5 February 2017 (UTC)
+*{{3/3*}} -- [[User:Ermell|Ermell]] ([[User talk:Ermell|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 09:47, 10 February 2017 (UTC)
+*{{1/3*}} -- [[User:Ryanx7|Ryanx7]] ([[User talk:Ryanx7|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 07:37, 11 February 2017 (UTC)
+*{{3/3*}} -- [[User:Star61|Star61]] ([[User talk:Star61|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 19:04, 19 February 2017 (UTC)
+*{{3/3*}} -- [[User:Levin Holtkamp|Levin Holtkamp]] ([[User talk:Levin Holtkamp|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 12:33, 23 February 2017 (UTC)
+*{{2/3*}} -- [[User:Maasaak|Maasaak]] ([[User talk:Maasaak|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 00:20, 27 February 2017 (UTC)
+*{{2/3*}} --[[User:Jarekt|Jarekt]] ([[User talk:Jarekt|<span class="signature-talk">{{int:Talkpagelinktext}}</span>]]) 20:35, 28 February 2017 (UTC)
+<!-- Vote above this line -->
+{{Discussion bottom}}
+
+[[Category:Photo challenge/2016 - December - Home appliances]]

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "./harness.js";
 import { countVotes } from "../src/core/scoring.js";
+import type { VotingEntryMember } from "../src/core/models.js";
 import { listErrors, validateVotes, type VoterValidation } from "../src/core/validation.js";
 
 const challenge = "2026 - February - First aid";
@@ -99,4 +100,36 @@ test("countVotes ranks by score and then support", () => {
       { num: 3, score: 0, support: 0, rank: 3 }
     ]
   );
+});
+
+test("countVotes scores a duo entry once while preserving both members", () => {
+  const member = (fileName: string): VotingEntryMember => ({
+    role: "submission",
+    fileName,
+    title: fileName.replace(".jpg", ""),
+    user: "PairPhotographer",
+    uploaded: null,
+    width: null,
+    height: null,
+    comment: null,
+    ownWork: true,
+    exists: true,
+    active: true
+  });
+  const entries = [{
+    num: 7,
+    mode: "duo-coequal" as const,
+    members: [member("Outside.jpg"), member("Inside.jpg")]
+  }];
+
+  const ranked = countVotes(entries, [
+    { num: 7, award: 3, error: 0 },
+    { num: 7, award: 1, error: 0 }
+  ]);
+
+  assert.equal(ranked.length, 1);
+  assert.equal(ranked[0]?.score, 4);
+  assert.equal(ranked[0]?.support, 2);
+  assert.equal(ranked[0]?.fileName, "Outside.jpg");
+  assert.deepEqual(ranked[0]?.members.map((entry) => entry.fileName), ["Outside.jpg", "Inside.jpg"]);
 });

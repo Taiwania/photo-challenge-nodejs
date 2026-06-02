@@ -1,7 +1,7 @@
 import path from "node:path";
 import { writeFile } from "node:fs/promises";
 import { DateTime } from "luxon";
-import type { JobRequest, PublishMode } from "../core/models.js";
+import type { JobRequest, PublishMode, VotingEntry } from "../core/models.js";
 import { formatVoteDeadlineUtc, getVoteDeadlineUtc, getVoteDeadlineZoneLabel } from "../core/challenge-date.js";
 import { countVotes, type ScoredVotingFile } from "../core/scoring.js";
 import { listErrors, validateVotes, type VoteWithError, type VoterValidation } from "../core/validation.js";
@@ -12,7 +12,7 @@ import {
   parseSubmissionPage,
   type SubmissionEntry
 } from "../parsers/submitting-parser.js";
-import { parseVotingChallenges, parseVotingPage, type VotingFile } from "../parsers/voting-parser.js";
+import { parseVotingChallenges, parseVotingPage } from "../parsers/voting-parser.js";
 import { renderResultPage } from "../renderers/result-page.js";
 import { reviseVotingPage } from "../renderers/revised-voting-page.js";
 import { renderVotingPage, type VotingSubmissionEntry } from "../renderers/voting-page.js";
@@ -252,7 +252,9 @@ async function handleProcessChallenge(
 }> {
   const votingPage = sources.find((source) => source.title === `Commons:Photo challenge/${request.challenge}/Voting`);
   const votingIndex = sources.find((source) => source.title === "Commons:Photo challenge/Voting");
-  const parsedVoting = votingPage ? parseVotingPage(votingPage.content) : { files: [], votes: [] };
+  const parsedVoting = votingPage
+    ? parseVotingPage(votingPage.content)
+    : { entryMode: "single" as const, entries: [], files: [], votes: [], issues: [] };
   const challenges = votingIndex ? parseVotingChallenges(votingIndex.content) : [];
 
   updateProgress(jobId, {
@@ -274,7 +276,7 @@ async function handleProcessChallenge(
     step: "Scoring results",
     message: "Calculating score, support, and rank for each file."
   });
-  const scoredFiles = countVotes(parsedVoting.files, votes);
+  const scoredFiles = countVotes(parsedVoting.entries, votes);
   const errors = listErrors(votes, voters, request.challenge);
 
   updateProgress(jobId, {
@@ -287,7 +289,7 @@ async function handleProcessChallenge(
   const resultText = renderResultPage(scoredFiles, new Set(parsedVoting.votes.map((vote) => vote.voter).filter(Boolean)).size, errors);
   const winnersText = renderWinnersPage(scoredFiles, request.challenge);
 
-  const parsed = parseProcessChallengeArtifacts(request, challenges, parsedVoting.files, votes, voters, scoredFiles);
+  const parsed = parseProcessChallengeArtifacts(request, challenges, parsedVoting.entries, votes, voters, scoredFiles);
   const lateVotes = votes.filter((vote) => vote.error === 9).length;
   if (lateVotes > 0) {
     jobStore.appendMessage(jobId, `Detected ${lateVotes} late vote(s) after the deadline of ${formatVoteDeadlineUtc(request.challenge)} ${getVoteDeadlineZoneLabel()}.`);
@@ -491,7 +493,7 @@ function parseCreateVotingArtifacts(request: JobRequest, sources: ReadPageResult
 function parseProcessChallengeArtifacts(
   request: JobRequest,
   challenges: Array<{ raw: string }>,
-  files: VotingFile[],
+  entries: VotingEntry[],
   votes: VoteWithError[],
   voters: VoterValidation[],
   scoredFiles: ScoredVotingFile[]
@@ -506,7 +508,7 @@ function parseProcessChallengeArtifacts(
       `Vote deadline (UTC): ${deadlineUtc.toFormat("yyyy-MM-dd HH:mm")}`,
       "",
       `Voting index challenges found: ${challenges.length}`,
-      `Voting page files parsed: ${files.length}`,
+      `Voting page entries parsed: ${entries.length}`,
       `Votes parsed: ${votes.length}`,
       `Invalid votes: ${votes.filter((vote) => vote.error > 0).length}`,
       `Late votes: ${votes.filter((vote) => vote.error === 9).length}`,

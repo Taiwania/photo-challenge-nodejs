@@ -64,3 +64,96 @@ test("parseVotingPage handles the historical live voting-page format from Orange
   assert.equal(parsed.votes[3]?.voter, "Sindugab");
   assert.equal(parsed.votes[3]?.timestamp, "14:34, 23 March 2026 (UTC)");
 });
+
+test("parseVotingPage groups duo-coequal members and votes into one entry", () => {
+  const wikiText = [
+    '===<span class="anchor" id="1">1</span>. Appliance pair===',
+    "[[File:Appliance outside.jpg|thumb|300px|Outside view]]",
+    "'''Creator:''' [[User:PairPhotographer|PairPhotographer]] '''Uploaded:''' 2016-12-12",
+    "[[File:Appliance inside.jpg|thumb|300px|Inside view]]",
+    "'''Creator:''' [[User:PairPhotographer|PairPhotographer]] '''Uploaded:''' 2016-12-12",
+    "<!-- Vote below this line -->",
+    "*{{3/3*}} -- [[User:PairVoter|PairVoter]] 12:00, 2 February 2017 (UTC)",
+    "<!-- Vote above this line -->"
+  ].join("\n");
+
+  const parsed = parseVotingPage(wikiText);
+
+  assert.equal(parsed.entryMode, "duo-coequal");
+  assert.equal(parsed.entries.length, 1);
+  assert.equal(parsed.entries[0]?.members.length, 2);
+  assert.deepEqual(parsed.entries[0]?.members.map((member) => ({
+    role: member.role,
+    fileName: member.fileName,
+    creator: member.user
+  })), [
+    { role: "submission", fileName: "Appliance outside.jpg", creator: "PairPhotographer" },
+    { role: "submission", fileName: "Appliance inside.jpg", creator: "PairPhotographer" }
+  ]);
+  assert.equal(parsed.votes[0]?.creator, "PairPhotographer");
+  assert.equal(parsed.votes[0]?.award, 3);
+});
+
+test("parseVotingPage infers duo-reference page mode and preserves drifted archived entries", () => {
+  const wikiText = [
+    '===<span class="anchor" id="1">1</span>. Then and now===',
+    "[[File:Town hall 1900.jpg|thumb|300px|Town hall in 1900]]",
+    "[[File:Town hall today.jpg|thumb|300px|Town hall today]]",
+    "'''Creator:''' [[User:ModernPhotographer|ModernPhotographer]] '''Uploaded:''' 2015-10-12",
+    "*{{2/3*}} -- [[User:HistoryVoter|HistoryVoter]] 12:00, 2 November 2015 (UTC)",
+    '===<span class="anchor" id="2">2</span>. Archived drift===',
+    "[[File:Missing modern comparison.jpg|thumb|300px|Historical reference still present]]",
+    "*{{1/3*}} -- [[User:ArchiveVoter|ArchiveVoter]] 13:00, 2 November 2015 (UTC)"
+  ].join("\n");
+
+  const parsed = parseVotingPage(wikiText);
+
+  assert.equal(parsed.entryMode, "duo-reference");
+  assert.equal(parsed.entries.length, 2);
+  assert.equal(parsed.entries[0]?.members[0]?.role, "reference");
+  assert.equal(parsed.entries[0]?.members[1]?.role, "submission");
+  assert.equal(parsed.entries[0]?.members[1]?.user, "ModernPhotographer");
+  assert.equal(parsed.votes.length, 2);
+  assert.equal(parsed.votes[0]?.creator, "ModernPhotographer");
+  assert.equal(parsed.votes[1]?.num, 2);
+  assert.equal(parsed.entries[1]?.members[1]?.displayKind, "empty");
+  assert.match(parsed.issues[0]?.message ?? "", /empty archived member/);
+});
+
+test("parseVotingPage handles the real Home appliances duo-coequal voting page", () => {
+  const wikiText = readFileSync(path.join(fixturesDir, "voting-page-duo-coequal-home-appliances.txt"), "utf8");
+
+  const parsed = parseVotingPage(wikiText);
+
+  assert.equal(parsed.entryMode, "duo-coequal");
+  assert.equal(parsed.entries.length, 20);
+  assert.equal(parsed.files.length, 20);
+  assert.equal(parsed.votes.length, 74);
+  assert.equal(parsed.issues.length, 0);
+  assert.deepEqual(parsed.entries[0]?.members.map((member) => ({
+    role: member.role,
+    fileName: member.fileName,
+    creator: member.user
+  })), [
+    { role: "submission", fileName: "Radio Gnomo esterno.jpg", creator: "Rosapicci" },
+    { role: "submission", fileName: "radio Gnomo interno.jpg", creator: "Rosapicci" }
+  ]);
+});
+
+test("parseVotingPage handles the real 100 years later duo-reference voting page", () => {
+  const wikiText = readFileSync(path.join(fixturesDir, "voting-page-duo-reference-100-years-later.txt"), "utf8");
+
+  const parsed = parseVotingPage(wikiText);
+  const drifted = parsed.entries.find((entry) => entry.num === 1);
+  const placeholder = parsed.entries.find((entry) => entry.num === 12)?.members[0];
+
+  assert.equal(parsed.entryMode, "duo-reference");
+  assert.equal(parsed.entries.length, 95);
+  assert.equal(parsed.files.length, 94);
+  assert.equal(parsed.votes.length, 341);
+  assert.deepEqual(parsed.issues, [{ num: 1, message: "Entry #1 contains an empty archived member." }]);
+  assert.equal(drifted?.members[1]?.displayKind, "empty");
+  assert.equal(placeholder?.fileName, "Blanco portrait.svg");
+  assert.equal(placeholder?.displayKind, "placeholder");
+  assert.equal(placeholder?.sourceUrl, "http://memoire-net.org/article.php3?id_article=141");
+});
