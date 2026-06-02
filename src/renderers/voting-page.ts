@@ -24,6 +24,11 @@ export type RenderedVotingPage = {
 const SIZE_PX = 240000;
 const COLLAPSE_TEXT = "{{Collapse top|Current votes – please choose your own winners before looking}}";
 
+export function renderVotingEntryHeading(num: number, title: string): string {
+  const anchor = `<span class="anchor" id="${num}">${num}</span>`;
+  return `===${anchor}. ${title}===`;
+}
+
 export function renderVotingPage(challenge: string, files: VotingSubmissionEntry[]): RenderedVotingPage {
   const [year, monthName, ...themeParts] = challenge.split(" - ");
   const theme = themeParts.join(" - ");
@@ -86,11 +91,10 @@ export function renderVotingPage(challenge: string, files: VotingSubmissionEntry
     includedCount += 1;
     const thumbWidth = Math.max(1, Math.floor(Math.sqrt((SIZE_PX * width) / height)));
     const fileLink = `[{{filepath:${fileName}}}<br>''(Full size image)'']`;
-    const anchor = `<span class="anchor" id="${includedCount}">${includedCount}</span>`;
     const fileBaseName = path.basename(fileName);
     const megapixels = (width * height / 1e6).toFixed(2).replace(/\.00$/, "").replace(/(\.\d)0$/, "$1");
 
-    lines.push(`===${anchor}. ${fileBaseName}===`);
+    lines.push(renderVotingEntryHeading(includedCount, fileBaseName));
     lines.push(`[[File:${fileName}|none|thumb|${thumbWidth}px|${file.title} ${fileLink}]]`);
     lines.push(`<!-- '''Creator:''' ${userLink} --> '''Uploaded:''' ${dateStr} '''Size''': ${width} × ${height} (${megapixels} MP) ${COLLAPSE_TEXT}`);
     lines.push("<!-- Vote below this line -->");

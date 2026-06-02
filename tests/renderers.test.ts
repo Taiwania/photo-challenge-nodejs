@@ -4,7 +4,7 @@ import path from "node:path";
 import { test } from "./harness.js";
 import { renderResultPage } from "../src/renderers/result-page.js";
 import { reviseVotingPage } from "../src/renderers/revised-voting-page.js";
-import { renderVotingPage } from "../src/renderers/voting-page.js";
+import { renderVotingEntryHeading, renderVotingPage } from "../src/renderers/voting-page.js";
 import { renderWinnersPage } from "../src/renderers/winners-page.js";
 
 const fixturesDir = path.resolve("tests", "fixtures");
@@ -12,6 +12,13 @@ const fixturesDir = path.resolve("tests", "fixtures");
 function readFixture(name: string): string {
   return readFileSync(path.join(fixturesDir, name), "utf8").replace(/\r\n/g, "\n");
 }
+
+test("renderVotingEntryHeading uses the current span anchor format for every entry mode", () => {
+  assert.equal(
+    renderVotingEntryHeading(7, "Appliance pair"),
+    '===<span class="anchor" id="7">7</span>. Appliance pair==='
+  );
+});
 
 test("renderVotingPage produces issues for invalid entries and includes valid images", () => {
   const rendered = renderVotingPage("2026 - March - Three-wheelers", [
