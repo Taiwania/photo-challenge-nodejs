@@ -10,8 +10,8 @@ It provides a Web UI and CLI for three common workflows:
 
 ## Requirements
 
-- Node.js `24.14.1`
-- npm
+- Node.js `26.3.0`
+- npm `11` or newer
 - A Wikimedia Commons BotPassword login
 
 Setup details:
@@ -87,6 +87,8 @@ npm run check
 npm run check:test
 npm test
 ```
+
+Compatibility status: the project is verified on Node.js `26.3.0` with npm `11.16.0`.
 
 Notes:
 - keep `.env` out of version control

@@ -10,8 +10,8 @@
 
 ## 環境需求
 
-- Node.js `24.14.1`
-- npm
+- Node.js `26.3.0`
+- npm `11` 或更新版本
 - Wikimedia Commons BotPassword 帳號
 
 基本設定：
@@ -87,6 +87,8 @@ npm run check
 npm run check:test
 npm test
 ```
+
+相容性狀態：目前已在 Node.js `26.3.0` 與 npm `11.16.0` 驗證通過。
 
 補充：
 - `.env` 不應進版控
