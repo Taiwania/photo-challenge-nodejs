@@ -1,6 +1,45 @@
 import type { ScoredVotingFile } from "../core/scoring.js";
+import type { EntryMode } from "../core/models.js";
+
+function inferMode(files: ScoredVotingFile[]): EntryMode {
+  return files.find((file) => file.mode && file.mode !== "single")?.mode ?? "single";
+}
+
+function submissionMembers(file: ScoredVotingFile): Array<{ fileName: string }> {
+  return file.members?.filter((member) => member.role === "submission" && member.fileName) ?? [{ fileName: file.fileName }];
+}
+
+function renderImageCell(fileName: string): string {
+  return `[[File:${fileName}|120px]]`;
+}
+
+function renderHeader(mode: EntryMode): string[] {
+  if (mode === "duo-coequal") {
+    return [
+      "! Image1 !! Image2 !! Author !! data-sort-type=\"number\" | Rank !! data-sort-type=\"number\" | Score !! data-sort-type=\"number\" | Support"
+    ];
+  }
+
+  return [
+    '! class="unsortable"| Image',
+    "! Author",
+    '! data-sort-type="number" | Rank',
+    '! data-sort-type="number" | Score',
+    '! data-sort-type="number" | Support'
+  ];
+}
+
+function renderFileRow(file: ScoredVotingFile, mode: EntryMode, userText: string): string {
+  if (mode === "duo-coequal") {
+    const [first, second] = submissionMembers(file);
+    return `|-\n| ${renderImageCell(first?.fileName ?? file.fileName)} || ${renderImageCell(second?.fileName ?? file.fileName)} || ${userText} || ${file.rank} || ${file.score} || ${file.support}`;
+  }
+
+  return `|-\n| ${renderImageCell(file.fileName)} || ${userText} || ${file.rank} || ${file.score} || ${file.support}`;
+}
 
 export function renderResultPage(files: ScoredVotingFile[], voterCount: number, errors: string[]): string {
+  const mode = inferMode(files);
   const contributorCount = new Set(files.map((file) => file.creator)).size;
   const imageCount = new Set(files.map((file) => file.num)).size;
   const talkLink = '<span class="signature-talk">{{int:Talkpagelinktext}}</span>';
@@ -13,11 +52,7 @@ export function renderResultPage(files: ScoredVotingFile[], voterCount: number, 
     "",
     '{| class="sortable wikitable"',
     "|-",
-    '! class="unsortable"| Image',
-    "! Author",
-    '! data-sort-type="number" | Rank',
-    '! data-sort-type="number" | Score',
-    '! data-sort-type="number" | Support'
+    ...renderHeader(mode)
   ];
 
   for (const file of files) {
@@ -26,7 +61,7 @@ export function renderResultPage(files: ScoredVotingFile[], voterCount: number, 
     }
 
     const userText = `[[User:${file.creator}|${file.creator}]] ([[User talk:${file.creator}|${talkLink}]])`;
-    lines.push(`|-\n| [[File:${file.fileName}|120px]] || ${userText} || ${file.rank} || ${file.score} || ${file.support}`);
+    lines.push(renderFileRow(file, mode, userText));
   }
 
   lines.push("|}");

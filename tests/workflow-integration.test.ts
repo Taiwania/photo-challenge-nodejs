@@ -68,3 +68,30 @@ test("offline process-challenge pipeline matches expected Orange snippet outputs
   assert.equal(renderWinnersPage(scored, "2026 - February - Orange"), readFixture("orange-snippet-winners-expected.txt"));
   assert.equal(reviseVotingPage(source), readFixture("revised-orange-live-expected.txt"));
 });
+
+test("offline duo-coequal process pipeline renders paired result and winners outputs", () => {
+  const parsed = parseVotingPage(readFixture("voting-page-duo-coequal-home-appliances.txt"));
+  const scored = countVotes(parsed.entries, parsed.votes.map((vote) => ({ ...vote, error: 0 })));
+
+  const result = renderResultPage(scored, new Set(parsed.votes.map((vote) => vote.voter).filter(Boolean)).size, []);
+  const winners = renderWinnersPage(scored, "2016 - December - Home appliances");
+
+  assert.match(result, /! Image1 !! Image2 !! Author/);
+  assert.match(result, /\| \[\[File:[^\]]+\|120px\]\] \|\| \[\[File:[^\]]+\|120px\]\] \|\| \[\[User:/);
+  assert.match(winners, /\{\| class = "wikitable"/);
+  assert.match(winners, /\[\[File:[^\]]+\|x240px\]\]<br\/>\[\[File:[^\]]+\|x240px\]\]/);
+});
+
+test("offline duo-reference process pipeline renders submission-only result and two-row winners outputs", () => {
+  const parsed = parseVotingPage(readFixture("voting-page-duo-reference-100-years-later.txt"));
+  const scored = countVotes(parsed.entries, parsed.votes.map((vote) => ({ ...vote, error: 0 })));
+
+  const result = renderResultPage(scored, new Set(parsed.votes.map((vote) => vote.voter).filter(Boolean)).size, []);
+  const winners = renderWinnersPage(scored, "2015 - September-October - 100 years later");
+
+  assert.match(result, /! class="unsortable"\| Image/);
+  assert.doesNotMatch(result, /Bamberg 1900\.jpg\|120px/);
+  assert.match(result, /The old townhall of Bamberg 089\.jpg\|120px/);
+  assert.match(winners, /\| Image \|\| \[\[File:Bamberg 1900\.jpg\|x240px\]\]/);
+  assert.match(winners, /\| Image \|\| \[\[File:The old townhall of Bamberg 089\.jpg\|x240px\]\]/);
+});

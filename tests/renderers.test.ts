@@ -7,6 +7,7 @@ import { reviseVotingPage } from "../src/renderers/revised-voting-page.js";
 import { renderVotingEntryHeading, renderVotingPage, resolveSubmissionWindow } from "../src/renderers/voting-page.js";
 import { renderWinnersPage } from "../src/renderers/winners-page.js";
 import type { VotingEntryMember } from "../src/core/models.js";
+import type { ScoredVotingFile } from "../src/core/scoring.js";
 
 const fixturesDir = path.resolve("tests", "fixtures");
 
@@ -29,6 +30,25 @@ function submissionMember(fileName: string, user = "Photographer"): VotingEntryM
     ownWork: true,
     exists: true,
     active: true
+  };
+}
+
+function scoredDuoFile(
+  mode: "duo-coequal" | "duo-reference",
+  members: ScoredVotingFile["members"],
+  overrides: Partial<ScoredVotingFile> = {}
+): ScoredVotingFile {
+  const submission = members?.find((member) => member.role === "submission");
+  return {
+    num: overrides.num ?? 1,
+    fileName: overrides.fileName ?? submission?.fileName ?? "Submission.jpg",
+    title: overrides.title ?? submission?.title ?? "Submission",
+    creator: overrides.creator ?? submission?.creator ?? "Photographer",
+    score: overrides.score ?? 9,
+    support: overrides.support ?? 4,
+    rank: overrides.rank ?? 1,
+    mode,
+    members
   };
 }
 
@@ -165,6 +185,62 @@ test("renderResultPage matches the expected table output for real First aid top-
   const rendered = renderResultPage(scoredFiles, 17, ["* no issues found"]);
 
   assert.equal(rendered, expected);
+});
+
+test("renderResultPage renders duo-coequal entries with two image columns", () => {
+  const rendered = renderResultPage([
+    scoredDuoFile("duo-coequal", [
+      { role: "submission", fileName: "Outside.jpg", title: "Outside", creator: "PairMaker" },
+      { role: "submission", fileName: "Inside.jpg", title: "Inside", creator: "PairMaker" }
+    ])
+  ], 6, []);
+
+  assert.match(rendered, /! Image1 !! Image2 !! Author/);
+  assert.match(rendered, /\[\[File:Outside\.jpg\|120px\]\] \|\| \[\[File:Inside\.jpg\|120px\]\]/);
+  assert.match(rendered, /\|\| \[\[User:PairMaker\|PairMaker\]\]/);
+});
+
+test("renderResultPage renders duo-reference entries using only the formal submission image", () => {
+  const rendered = renderResultPage([
+    scoredDuoFile("duo-reference", [
+      { role: "reference", fileName: "Archive.jpg", title: "Archive", creator: "" },
+      { role: "submission", fileName: "Modern.jpg", title: "Modern", creator: "Restager" }
+    ])
+  ], 6, []);
+
+  assert.match(rendered, /! class="unsortable"\| Image/);
+  assert.match(rendered, /\[\[File:Modern\.jpg\|120px\]\]/);
+  assert.doesNotMatch(rendered, /\[\[File:Archive\.jpg\|120px\]\]/);
+});
+
+test("renderWinnersPage renders duo-coequal winners as a hand-built pair table", () => {
+  const rendered = renderWinnersPage([
+    scoredDuoFile("duo-coequal", [
+      { role: "submission", fileName: "Outside.jpg", title: "Outside view", creator: "PairMaker" },
+      { role: "submission", fileName: "Inside.jpg", title: "Inside view", creator: "PairMaker" }
+    ], { score: 26 })
+  ], "2016 - December - Home appliances");
+
+  assert.match(rendered, /\{\| class = "wikitable"/);
+  assert.match(rendered, /\[\[File:Outside\.jpg\|x240px\]\]<br\/>\[\[File:Inside\.jpg\|x240px\]\]/);
+  assert.match(rendered, /\| Title \|\| Inside view/);
+  assert.match(rendered, /\| Author \|\| \[\[User:PairMaker\|PairMaker\]\]/);
+  assert.match(rendered, /\[\[Category:Photo challenge\/2016 - December - Home appliances\]\]/);
+});
+
+test("renderWinnersPage renders duo-reference winners with reference and submission rows", () => {
+  const rendered = renderWinnersPage([
+    scoredDuoFile("duo-reference", [
+      { role: "reference", fileName: "Archive.jpg", title: "Archive view", creator: "" },
+      { role: "submission", fileName: "Modern.jpg", title: "Modern view", creator: "Restager" }
+    ], { score: 61 })
+  ], "2015 - September-October - 100 years later");
+
+  assert.match(rendered, /\| Image \|\| \[\[File:Archive\.jpg\|x240px\]\]/);
+  assert.match(rendered, /\| Title \|\| Archive view/);
+  assert.match(rendered, /\| Image \|\| \[\[File:Modern\.jpg\|x240px\]\]/);
+  assert.match(rendered, /\| Title \|\| Modern view/);
+  assert.match(rendered, /\| Author \|\| \[\[User:Restager\|Restager\]\]/);
 });
 
 test("reviseVotingPage matches the current revised output for a historical Orange voting snippet", () => {
