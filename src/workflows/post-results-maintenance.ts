@@ -47,15 +47,18 @@ export function buildWinnerNotifications(challenge: string, files: ScoredVotingF
   return files
     .slice(0, 10)
     .filter((file) => file.rank >= 1 && file.rank <= 3)
-    .map((file) => ({
-      recipient: file.creator,
-      fileName: file.fileName,
-      rank: file.rank,
-      targetTitle: `User talk:${file.creator}`,
-      sectionHeading: `[[Commons:Photo challenge/${challenge}/Winners]]`,
-      bodyText: `{{Photo Challenge ${awardColors[file.rank]}|File:${file.fileName}|${theme}|${year}|${month}}}--~~~~`,
-      editSummary: "Announcing Photo Challenge winners"
-    }));
+    .map((file) => {
+      const representativeFileName = getRepresentativeFileName(file);
+      return {
+        recipient: file.creator,
+        fileName: representativeFileName,
+        rank: file.rank,
+        targetTitle: `User talk:${file.creator}`,
+        sectionHeading: `[[Commons:Photo challenge/${challenge}/Winners]]`,
+        bodyText: `{{Photo Challenge ${awardColors[file.rank]}|File:${representativeFileName}|${theme}|${year}|${month}}}--~~~~`,
+        editSummary: "Announcing Photo Challenge winners"
+      };
+    });
 }
 
 export function buildChallengeAnnouncement(challenges: ChallengeAnnouncementInput[]): ChallengeAnnouncement {
@@ -109,11 +112,11 @@ export function buildPreviousPageUpdate(challenges: string[]): PreviousPageUpdat
 export function buildFileAssessmentPlans(challenges: ChallengeAnnouncementInput[]): FileAssessmentPlan[] {
   return challenges.flatMap(({ challenge, files }) => {
     const { year, month, theme } = parseChallenge(challenge);
-    return files.slice(0, 3).map((file, index) => ({
-      fileTitle: `File:${file.fileName}`,
+    return files.slice(0, 3).flatMap((file, index) => getAssessmentFileNames(file).map((fileName) => ({
+      fileTitle: `File:${fileName}`,
       templateText: `{{Photo challenge winner|${index + 1}|${theme}|${year}|${month}}}\n\n`,
       editSummary: "Assessment added - congratulations"
-    }));
+    })));
   });
 }
 
@@ -165,6 +168,24 @@ function uniqueBy<T>(values: T[], getKey: (value: T) => string): T[] {
   }
 
   return unique;
+}
+
+function getSubmissionFileNames(file: ScoredVotingFile): string[] {
+  const submissions = file.members
+    ?.filter((member) => member.role === "submission" && member.fileName)
+    .map((member) => member.fileName);
+  return submissions?.length ? submissions : [file.fileName];
+}
+
+function getRepresentativeFileName(file: ScoredVotingFile): string {
+  return getSubmissionFileNames(file)[0] ?? file.fileName;
+}
+
+function getAssessmentFileNames(file: ScoredVotingFile): string[] {
+  if (file.mode === "duo-coequal") {
+    return getSubmissionFileNames(file);
+  }
+  return [getRepresentativeFileName(file)];
 }
 
 function parseChallenge(challenge: string): { year: string; month: string; monthNumber: string; theme: string } {

@@ -83,6 +83,79 @@ test("runCli executes post-results-maintenance in dry-run mode from local scored
   await removeJob("seed-first-aid");
 });
 
+test("runCli creates duo maintenance plans from local scored entry artifacts", async () => {
+  await seedProcessChallengeJob("seed-duo-home", "2016 - December - Home appliances", [
+    {
+      num: 1,
+      fileName: "Outside.jpg",
+      title: "Outside",
+      creator: "PairMaker",
+      score: 26,
+      support: 13,
+      rank: 1,
+      mode: "duo-coequal",
+      members: [
+        { role: "submission", fileName: "Outside.jpg", title: "Outside", creator: "PairMaker" },
+        { role: "submission", fileName: "Inside.jpg", title: "Inside", creator: "PairMaker" }
+      ]
+    },
+    {
+      num: 2,
+      fileName: "Second outside.jpg",
+      title: "Second outside",
+      creator: "SecondPair",
+      score: 20,
+      support: 8,
+      rank: 2,
+      mode: "duo-coequal",
+      members: [
+        { role: "submission", fileName: "Second outside.jpg", title: "Second outside", creator: "SecondPair" },
+        { role: "submission", fileName: "Second inside.jpg", title: "Second inside", creator: "SecondPair" }
+      ]
+    }
+  ]);
+
+  const logs: string[] = [];
+  const errors: string[] = [];
+  const exitCode = await runCli(
+    [
+      "post-results-maintenance",
+      "--challenge", "2016 - December - Home appliances",
+      "--name", "Example@Bot",
+      "--bot-password", "secret",
+      "--publish-mode", "dry-run"
+    ],
+    {
+      log: (message: string) => logs.push(message),
+      error: (message: string) => errors.push(message)
+    }
+  );
+
+  assert.equal(exitCode, 0);
+  assert.equal(errors.length, 0);
+
+  const jobId = logs.join("\n").match(/Started job ([0-9a-f-]+)/)?.[1];
+  assert.ok(jobId);
+  const jobPaths = getJobOutputPaths(jobId!);
+  const notifications = await readFile(path.join(jobPaths.generatedDir, "2016_-_December_-_Home_appliances_winner_notifications.json"), "utf8");
+  const assessments = JSON.parse(await readFile(path.join(jobPaths.generatedDir, "2016_-_December_-_Home_appliances_file_assessments.json"), "utf8")) as Array<{ fileTitle: string }>;
+  const summary = await readFile(path.join(jobPaths.generatedDir, "2016_-_December_-_Home_appliances_summary.txt"), "utf8");
+
+  assert.match(notifications, /File:Outside\.jpg/);
+  assert.doesNotMatch(notifications, /File:Inside\.jpg/);
+  assert.deepEqual(assessments.map((plan) => plan.fileTitle), [
+    "File:Outside.jpg",
+    "File:Inside.jpg",
+    "File:Second outside.jpg",
+    "File:Second inside.jpg"
+  ]);
+  assert.match(summary, /Winner notifications: 2/);
+  assert.match(summary, /File assessments: 4/);
+
+  await rm(jobPaths.jobRoot, { recursive: true, force: true });
+  await removeJob("seed-duo-home");
+});
+
 test("runPostResultsMaintenance can recover scored winners from a published Winners page", async () => {
   const paths = getJobOutputPaths("maintenance-published-winners");
   await rm(paths.jobRoot, { recursive: true, force: true });
@@ -136,6 +209,59 @@ test("runPostResultsMaintenance can recover scored winners from a published Winn
   assert.match(messages.join("\n"), /Loaded scored files for 2026 - February - First aid from (job|published page)/);
 
   await removeJob("maintenance-published-winners");
+});
+
+test("runPostResultsMaintenance rejects duo winners fallback without a local scored artifact", async () => {
+  const paths = getJobOutputPaths("maintenance-duo-no-local");
+  await rm(paths.jobRoot, { recursive: true, force: true });
+  await mkdir(paths.inputDir, { recursive: true });
+  await mkdir(paths.generatedDir, { recursive: true });
+  await mkdir(paths.logsDir, { recursive: true });
+
+  const fakeBot: CommonsBot = {
+    async readPage(title: string): Promise<ReadPageResult> {
+      assert.equal(title, "Commons:Photo challenge/2016 - December - Home appliances/Winners");
+      return {
+        title,
+        content: [
+          '{| class = "wikitable"',
+          "|-",
+          "! Rank !! 1 !! 2 !! 3",
+          "|-",
+          "| Image || [[File:Outside.jpg|x240px]]<br/>[[File:Inside.jpg|x240px]] || ||",
+          "|}"
+        ].join("\n"),
+        revisionTimestamp: "2017-03-01T00:00:00Z",
+        revisionId: 234
+      };
+    },
+    async savePage(): Promise<SavePageResult> {
+      throw new Error("duo fallback should not publish");
+    },
+    async getCurrentUser() { return "Example"; },
+    async listPagesByPrefix() { return []; },
+    async listFileInfo() { return []; },
+    async getUserInfo() { return null; },
+    async userHasPhotoChallengeParticipation() { return false; }
+  };
+
+  await assert.rejects(
+    () => runPostResultsMaintenance(
+      paths,
+      {
+        action: "post-results-maintenance",
+        challenge: "2016 - December - Home appliances",
+        credentials: { name: "Example@Bot", botPassword: "secret" },
+        publishMode: "dry-run"
+      },
+      () => {},
+      () => {},
+      { bot: fakeBot, jobId: "maintenance-duo-no-local", loginName: "Example@Bot" }
+    ),
+    /Duo winners page .*Run process-challenge/
+  );
+
+  await removeJob("maintenance-duo-no-local");
 });
 
 test("runPostResultsMaintenance live mode auto-publishes notifications, announcement, previous page, and file assessments", async () => {

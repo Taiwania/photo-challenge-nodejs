@@ -256,6 +256,9 @@ async function loadPublishedWinnerFiles(challenge: string, bot: CommonsBot): Pro
   const files = parsePublishedWinnersPage(page);
 
   if (files.length === 0) {
+    if (looksLikeDuoWinnersPage(page.content)) {
+      throw new Error(`Duo winners page ${pageTitle} cannot be used as a maintenance source yet. Run process-challenge for ${challenge} first so post-results-maintenance can use the local scored artifact with entry member data.`);
+    }
     throw new Error(`No local process-challenge outputs were found for ${challenge}, and ${pageTitle} does not contain parseable winner data.`);
   }
 
@@ -265,6 +268,12 @@ async function loadPublishedWinnerFiles(challenge: string, bot: CommonsBot): Pro
     files,
     rawContent: JSON.stringify(files, null, 2)
   };
+}
+
+function looksLikeDuoWinnersPage(content: string): boolean {
+  return /\{\|\s*class\s*=\s*"wikitable"/i.test(content)
+    && !/\{\{\s*Photo challenge winners table\b/i.test(content)
+    && /\[\[File:[^\]]+\|x240px\]\]/i.test(content);
 }
 
 function parsePublishedWinnersPage(page: ReadPageResult): ScoredVotingFile[] {

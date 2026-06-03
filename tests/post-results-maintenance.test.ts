@@ -81,6 +81,87 @@ test("buildFileAssessmentPlans creates top-three file templates for both challen
   assert.equal(plans[5]?.templateText, "{{Photo challenge winner|3|First aid|2026|February}}\n\n");
 });
 
+test("buildWinnerNotifications uses the first formal submission as the duo representative image", () => {
+  const notifications = buildWinnerNotifications("2016 - December - Home appliances", [{
+    num: 1,
+    fileName: "Outside.jpg",
+    title: "Outside",
+    creator: "PairMaker",
+    score: 26,
+    support: 13,
+    rank: 1,
+    mode: "duo-coequal",
+    members: [
+      { role: "submission", fileName: "Outside.jpg", title: "Outside", creator: "PairMaker" },
+      { role: "submission", fileName: "Inside.jpg", title: "Inside", creator: "PairMaker" }
+    ]
+  }]);
+
+  assert.equal(notifications[0]?.fileName, "Outside.jpg");
+  assert.match(notifications[0]?.bodyText ?? "", /\|File:Outside\.jpg\|/);
+});
+
+test("buildWinnerNotifications uses the formal submission image for duo-reference winners", () => {
+  const notifications = buildWinnerNotifications("2015 - September-October - 100 years later", [{
+    num: 1,
+    fileName: "Modern.jpg",
+    title: "Modern",
+    creator: "Restager",
+    score: 61,
+    support: 26,
+    rank: 1,
+    mode: "duo-reference",
+    members: [
+      { role: "reference", fileName: "Archive.jpg", title: "Archive", creator: "" },
+      { role: "submission", fileName: "Modern.jpg", title: "Modern", creator: "Restager" }
+    ]
+  }]);
+
+  assert.equal(notifications[0]?.fileName, "Modern.jpg");
+  assert.doesNotMatch(notifications[0]?.bodyText ?? "", /Archive\.jpg/);
+});
+
+test("buildFileAssessmentPlans applies duo templates to the formal submission members only", () => {
+  const plans = buildFileAssessmentPlans([{
+    challenge: "2016 - December - Home appliances",
+    files: [{
+      num: 1,
+      fileName: "Outside.jpg",
+      title: "Outside",
+      creator: "PairMaker",
+      score: 26,
+      support: 13,
+      rank: 1,
+      mode: "duo-coequal",
+      members: [
+        { role: "submission", fileName: "Outside.jpg", title: "Outside", creator: "PairMaker" },
+        { role: "submission", fileName: "Inside.jpg", title: "Inside", creator: "PairMaker" }
+      ]
+    }, {
+      num: 2,
+      fileName: "Modern.jpg",
+      title: "Modern",
+      creator: "Restager",
+      score: 24,
+      support: 10,
+      rank: 2,
+      mode: "duo-reference",
+      members: [
+        { role: "reference", fileName: "Archive.jpg", title: "Archive", creator: "" },
+        { role: "submission", fileName: "Modern.jpg", title: "Modern", creator: "Restager" }
+      ]
+    }]
+  }]);
+
+  assert.deepEqual(plans.map((plan) => plan.fileTitle), [
+    "File:Outside.jpg",
+    "File:Inside.jpg",
+    "File:Modern.jpg"
+  ]);
+  assert.equal(plans[0]?.templateText, "{{Photo challenge winner|1|Home appliances|2016|December}}\n\n");
+  assert.equal(plans[2]?.templateText, "{{Photo challenge winner|2|Home appliances|2016|December}}\n\n");
+});
+
 test("insertAssessmentTemplate follows the upstream insertion markers", () => {
   const viaLicense = insertAssessmentTemplate(
     "Lead\n=={{int:license-header}}==\nLicense text",
