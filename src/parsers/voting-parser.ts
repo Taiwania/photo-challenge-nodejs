@@ -96,17 +96,149 @@ function createEmptyMember(role: "submission" | "reference"): VotingEntryMember 
   };
 }
 
-function extractTitle(fileText: string, fileName: string): string {
-  const parts = fileText.split("|").map((part) => part.trim());
+function splitTopLevelPipes(text: string): string[] {
+  const parts: string[] = [];
+  let start = 0;
+  let templateDepth = 0;
+  let linkDepth = 0;
+
+  for (let index = 0; index < text.length; index += 1) {
+    const pair = text.slice(index, index + 2);
+    if (pair === "{{") {
+      templateDepth += 1;
+      index += 1;
+      continue;
+    }
+    if (pair === "}}" && templateDepth > 0) {
+      templateDepth -= 1;
+      index += 1;
+      continue;
+    }
+    if (pair === "[[") {
+      linkDepth += 1;
+      index += 1;
+      continue;
+    }
+    if (pair === "]]" && linkDepth > 0) {
+      linkDepth -= 1;
+      index += 1;
+      continue;
+    }
+    if (text[index] === "|" && templateDepth === 0 && linkDepth === 0) {
+      parts.push(text.slice(start, index));
+      start = index + 1;
+    }
+  }
+
+  parts.push(text.slice(start));
+  return parts;
+}
+
+function findBalancedEnd(text: string, start: number, open: string, close: string): number {
+  let depth = 0;
+  for (let index = start; index < text.length; index += 1) {
+    const pair = text.slice(index, index + 2);
+    if (pair === open) {
+      depth += 1;
+      index += 1;
+      continue;
+    }
+    if (pair === close && depth > 0) {
+      depth -= 1;
+      index += 1;
+      if (depth === 0) {
+        return index + 1;
+      }
+    }
+  }
+  return text.length;
+}
+
+function findEnclosingTemplateText(line: string, position: number): string | null {
+  const stack: number[] = [];
+  let candidate: string | null = null;
+
+  for (let index = 0; index < line.length - 1; index += 1) {
+    const pair = line.slice(index, index + 2);
+    if (pair === "{{") {
+      stack.push(index);
+      index += 1;
+      continue;
+    }
+    if (pair === "}}" && stack.length > 0) {
+      const start = stack.pop() ?? 0;
+      const end = index + 2;
+      if (start <= position && position < end) {
+        candidate = line.slice(start, end);
+      }
+      index += 1;
+    }
+  }
+
+  return candidate;
+}
+
+function cleanCaption(caption: string, fileName: string): string {
+  let cleaned = caption
+    .split(/\s*\[\{\{filepath:/i)[0]
+    .replace(/\]\]+$/, "")
+    .trim();
+
+  const langSwitch = cleaned.match(/^\{\{\s*LangSwitch\s*\|([\s\S]*)\}\}$/i);
+  if (langSwitch?.[1]) {
+    const langParts = splitTopLevelPipes(langSwitch[1]);
+    cleaned = langParts.find((part) => /^\s*en\s*=/.test(part)) ?? langParts[0] ?? cleaned;
+  }
+
+  cleaned = cleaned
+    .replace(/^\s*[a-z][a-z0-9-]{1,11}\s*=\s*/i, "")
+    .trim();
+
+  return cleaned || fileName.replace(/\.[^.]+$/, "");
+}
+
+function pickCaptionPart(parts: string[], fileName: string): string {
+  const options = /^(?:none|left|right|center|thumb|thumbnail|frame|frameless|border|upright(?:=[\d.]+)?|alt=.*|class=.*|link=.*|page=\d+|\d+x?\d*px|x\d+px)$/i;
   const caption = parts
     .slice(1)
-    .filter((part) => part && !/^(?:none|left|right|center|thumb|frameless|\d+px)$/i.test(part))
-    .at(-1)
-    ?.split(/\[\{\{filepath:/i)[0]
-    ?.replace(/\]\]+$/, "")
-    ?.trim();
+    .map((part) => part.trim())
+    .filter((part) => part && !options.test(part))
+    .at(-1);
 
-  return caption || fileName.replace(/\.[^.]+$/, "");
+  return caption ? cleanCaption(caption, fileName) : fileName.replace(/\.[^.]+$/, "");
+}
+
+function extractTitleFromTemplate(templateText: string, fileName: string): string | null {
+  const inner = templateText.replace(/^\{\{/, "").replace(/\}\}$/, "");
+  const parts = splitTopLevelPipes(inner);
+  const languageCaption = parts
+    .map((part) => part.trim())
+    .find((part) => /^\s*en\s*=/.test(part));
+
+  if (languageCaption) {
+    return cleanCaption(languageCaption, fileName);
+  }
+
+  const caption = parts
+    .slice(1)
+    .map((part) => part.trim())
+    .filter((part) => part && !part.includes(`[[File:${fileName}`) && !/^(?:file|image|width|height|size|align|alt)\s*=/i.test(part))
+    .at(-1);
+
+  return caption ? cleanCaption(caption, fileName) : null;
+}
+
+function extractTitle(line: string, fileName: string, fileStart: number): string {
+  const fileEnd = findBalancedEnd(line, fileStart, "[[", "]]");
+  const fileText = line.slice(fileStart, fileEnd);
+  const fileParts = splitTopLevelPipes(fileText.replace(/^\[\[/, "").replace(/\]\]$/, ""));
+  const caption = pickCaptionPart(fileParts, fileName);
+  if (caption !== fileName.replace(/\.[^.]+$/, "")) {
+    return caption;
+  }
+
+  const templateText = findEnclosingTemplateText(line, fileStart);
+  return templateText ? extractTitleFromTemplate(templateText, fileName) ?? caption : caption;
 }
 
 function appendFileMembers(section: VotingSectionBuilder, line: string): void {
@@ -116,9 +248,10 @@ function appendFileMembers(section: VotingSectionBuilder, line: string): void {
     if (!fileName || fileName === "Sample-image.svg") {
       continue;
     }
-    const fileText = line.slice(match.index);
+    const fileStart = match.index ?? 0;
+    const fileText = line.slice(fileStart);
     const sourceUrl = fileText.match(/\[(https?:\/\/[^\s\]]+)/)?.[1] ?? null;
-    section.members.push(createMember(fileName, extractTitle(fileText, fileName), sourceUrl));
+    section.members.push(createMember(fileName, extractTitle(line, fileName, fileStart), sourceUrl));
   }
 }
 

@@ -65,6 +65,24 @@ test("parseVotingPage handles the historical live voting-page format from Orange
   assert.equal(parsed.votes[3]?.timestamp, "14:34, 23 March 2026 (UTC)");
 });
 
+test("parseVotingPage strips language prefixes and template braces from wrapped file captions", () => {
+  const wikiText = [
+    '===<span class="anchor" id="48">48</span>. Swing ride at the Wurstmarkt Dürkheim===',
+    "{{Photo challenge image|[[File:Swing ride at the Wurstmarkt Dürkheim.jpg|thumb|300px]]|en=Swing ride at the Wurstmarkt Dürkheim}}",
+    "'''Creator:''' [[User:F. Riedelio|F. Riedelio]] '''Uploaded:''' 2026-04-12",
+    "*{{3/3*}} -- [[User:Voter|Voter]] 12:00, 2 May 2026 (UTC)"
+  ].join("\n");
+
+  const parsed = parseVotingPage(wikiText);
+
+  assert.deepEqual(parsed.files[0], {
+    num: 48,
+    fileName: "Swing ride at the Wurstmarkt Dürkheim.jpg",
+    title: "Swing ride at the Wurstmarkt Dürkheim",
+    creator: "F. Riedelio"
+  });
+});
+
 test("parseVotingPage groups duo-coequal members and votes into one entry", () => {
   const wikiText = [
     '===<span class="anchor" id="1">1</span>. Appliance pair===',
