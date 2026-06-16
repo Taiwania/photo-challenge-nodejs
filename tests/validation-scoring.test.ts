@@ -118,6 +118,46 @@ test("validateVoters treats low-edit voters listed in submission entrants as not
   ]);
 });
 
+test("validateVoters does not waive low-edit voters from unrelated challenge contributions", async () => {
+  const fakeBot: CommonsBot = {
+    async readPage() { throw new Error("not used"); },
+    async savePage() { throw new Error("not used"); },
+    async getCurrentUser() { return "Example"; },
+    async listPagesByPrefix() { return []; },
+    async listFileInfo() { return []; },
+    async getUserInfo(userName: string) {
+      return {
+        name: userName,
+        editCount: 12,
+        registration: "2025-11-25T23:30:23Z",
+        isRegistered: true,
+        isBlocked: false
+      };
+    },
+    async userHasPhotoChallengeParticipation() { return true; }
+  };
+
+  const voters = await validateVoters(fakeBot, [
+    {
+      num: 175,
+      award: 3,
+      voter: "JimboGimmeJoe",
+      creator: "Other Creator",
+      line: "*{{3/3*}} -- [[User:JimboGimmeJoe|JimboGimmeJoe]]",
+      timestamp: null
+    }
+  ], "2026 - April - Wooden bridges", []);
+
+  assert.deepEqual(voters.map((voter) => ({
+    voter: voter.voter,
+    editCount: voter.editCount,
+    error: voter.error,
+    note: voter.note
+  })), [
+    { voter: "JimboGimmeJoe", editCount: 12, error: 4, note: 0 }
+  ]);
+});
+
 test("countVotes ranks by score and then support", () => {
   const files = [
     { num: 1, fileName: "One.jpg", title: "One", creator: "A" },

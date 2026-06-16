@@ -49,8 +49,7 @@ export async function validateVoters(
 
     const regDate = userInfo.registration ? DateTime.fromISO(userInfo.registration, { zone: "utc" }) : null;
     const daysActive = regDate ? Math.floor(startDate.diff(regDate, "days").days) : -1;
-    const hasChallengeParticipation = entrants.has(normalizeUserName(voter))
-      || await bot.userHasPhotoChallengeParticipation(voter);
+    const hasChallengeParticipation = entrants.has(normalizeUserName(voter));
 
     let error = 0;
     let note = userInfo.isBlocked ? 1 : 0;
