@@ -258,13 +258,14 @@ async function handleProcessChallenge(
     ? parseVotingPage(votingPage.content)
     : { entryMode: "single" as const, entries: [], files: [], votes: [], issues: [] };
   const challenges = votingIndex ? parseVotingChallenges(votingIndex.content) : [];
+  const entrantNames = await loadSubmissionEntrantNames(bot, request, sources);
 
   updateProgress(jobId, {
     percent: 50,
     step: "Validating voters",
     message: "Checking voter eligibility and challenge participation rules."
   });
-  const voters = await validateVoters(bot, parsedVoting.votes, request.challenge);
+  const voters = await validateVoters(bot, parsedVoting.votes, request.challenge, entrantNames);
 
   updateProgress(jobId, {
     percent: 62,
@@ -297,6 +298,22 @@ async function handleProcessChallenge(
     jobStore.appendMessage(jobId, `Detected ${lateVotes} late vote(s) after the deadline of ${formatVoteDeadlineUtc(request.challenge)} ${getVoteDeadlineZoneLabel()}.`);
   }
   return { parsed, revisedText, resultText, winnersText };
+}
+
+async function loadSubmissionEntrantNames(
+  bot: CommonsBot,
+  request: JobRequest,
+  sources: ReadPageResult[]
+): Promise<string[]> {
+  const submissionSources = sources.filter((source) => source.title === `Commons:Photo challenge/${request.challenge}`);
+  const submissionFiles = submissionSources.flatMap((source) => parseSubmissionPage(source.content));
+  const fileNames = [...new Set(submissionFiles.map((file) => file.fileName).filter(Boolean))];
+  if (fileNames.length === 0) {
+    return [];
+  }
+
+  const fileInfo = await bot.listFileInfo(fileNames);
+  return [...new Set(fileInfo.map((info) => info.user).filter((user): user is string => Boolean(user)))];
 }
 
 async function persistCommonArtifacts(
@@ -431,6 +448,7 @@ function getSourceSpecs(request: JobRequest): SourceSpec[] {
   }
 
   return [
+    { label: "submission page", title: `Commons:Photo challenge/${request.challenge}`, fileName: "submission-page.txt" },
     { label: "voting page", title: `Commons:Photo challenge/${request.challenge}/Voting`, fileName: "voting-page.txt" },
     { label: "voting index", title: "Commons:Photo challenge/Voting", fileName: "voting-index.txt" }
   ];

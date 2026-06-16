@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { test } from "./harness.js";
 import { countVotes } from "../src/core/scoring.js";
+import { validateVoters } from "../src/core/voters.js";
+import type { CommonsBot } from "../src/services/commons-bot.js";
 import type { VotingEntryMember } from "../src/core/models.js";
 import { listErrors, validateVotes, type VoterValidation } from "../src/core/validation.js";
 
@@ -74,6 +76,46 @@ test("validateVotes flags late votes and duplicate award usage while keeping val
   assert.match(errors, /after voting closed at 2026-04-01 00:00 UTC/);
   assert.match(errors, /=== Other \(potential\) Issues ===/);
   assert.match(errors, /\[\[User:BorderlineEntrant\]\] made less than required 50 edits on Commons/);
+});
+
+test("validateVoters treats low-edit voters listed in submission entrants as notes instead of errors", async () => {
+  const fakeBot: CommonsBot = {
+    async readPage() { throw new Error("not used"); },
+    async savePage() { throw new Error("not used"); },
+    async getCurrentUser() { return "Example"; },
+    async listPagesByPrefix() { return []; },
+    async listFileInfo() { return []; },
+    async getUserInfo(userName: string) {
+      return {
+        name: userName,
+        editCount: 12,
+        registration: "2025-11-25T23:30:23Z",
+        isRegistered: true,
+        isBlocked: false
+      };
+    },
+    async userHasPhotoChallengeParticipation() { return false; }
+  };
+
+  const voters = await validateVoters(fakeBot, [
+    {
+      num: 48,
+      award: 2,
+      voter: "Entrant Voter",
+      creator: "Other Creator",
+      line: "*{{2/3*}} -- [[User:Entrant Voter|Entrant Voter]]",
+      timestamp: null
+    }
+  ], "2026 - April - Fair grounds", ["Entrant_Voter"]);
+
+  assert.deepEqual(voters.map((voter) => ({
+    voter: voter.voter,
+    editCount: voter.editCount,
+    error: voter.error,
+    note: voter.note
+  })), [
+    { voter: "Entrant Voter", editCount: 12, error: 0, note: 4 }
+  ]);
 });
 
 test("countVotes ranks by score and then support", () => {

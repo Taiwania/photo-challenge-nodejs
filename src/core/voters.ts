@@ -10,11 +10,13 @@ function isNumericIp(value: string): boolean {
 export async function validateVoters(
   bot: CommonsBot,
   votes: ParsedVote[],
-  challenge: string
+  challenge: string,
+  entrantNames: Iterable<string> = []
 ): Promise<VoterValidation[]> {
   const [year, monthName] = challenge.split(" - ");
   const startDate = DateTime.fromFormat(`30 ${monthName} ${year}`, "d MMMM yyyy", { zone: "utc" });
   const uniqueVoters = [...new Set(votes.map((vote) => vote.voter).filter(Boolean))];
+  const entrants = new Set([...entrantNames].map((name) => normalizeUserName(name)).filter(Boolean));
   const results: VoterValidation[] = [];
 
   for (const voter of uniqueVoters) {
@@ -47,7 +49,8 @@ export async function validateVoters(
 
     const regDate = userInfo.registration ? DateTime.fromISO(userInfo.registration, { zone: "utc" }) : null;
     const daysActive = regDate ? Math.floor(startDate.diff(regDate, "days").days) : -1;
-    const hasChallengeParticipation = await bot.userHasPhotoChallengeParticipation(voter);
+    const hasChallengeParticipation = entrants.has(normalizeUserName(voter))
+      || await bot.userHasPhotoChallengeParticipation(voter);
 
     let error = 0;
     let note = userInfo.isBlocked ? 1 : 0;
@@ -78,4 +81,8 @@ export async function validateVoters(
   }
 
   return results;
+}
+
+function normalizeUserName(value: string): string {
+  return value.trim().replace(/_/g, " ").replace(/\s+/g, " ").toLowerCase();
 }
