@@ -2,7 +2,22 @@ export type JobStatus = "queued" | "running" | "failed" | "completed";
 
 export type PublishMode = "dry-run" | "sandbox" | "live";
 
+export type WritablePublishMode = Exclude<PublishMode, "dry-run">;
+
 export type EntryMode = "single" | "duo-coequal" | "duo-reference";
+
+export type SourcePageVariant = "main" | "old";
+
+export type JobAction =
+  | "create-voting"
+  | "count-votes-and-select-winners"
+  | "archive-pages"
+  | "build-voting-index"
+  | "post-results-maintenance";
+
+export type LegacyJobAction = "process-challenge";
+
+export type ListAction = "list-submitted-challenges" | "list-voting-challenges";
 
 export type SubmissionWindow = {
   startsAt: string;
@@ -54,13 +69,13 @@ export type BotCredentials = {
 };
 
 export type JobRequest = {
-  action: string;
+  action: JobAction;
   challenge: string;
   pairedChallenge?: string;
   entryMode?: EntryMode;
   submissionWindow?: SubmissionWindow;
   /** "main" reads the live page; "old" reads the *_old archived copy. Applies to list-* and build-voting-index. */
-  source?: "main" | "old";
+  source?: SourcePageVariant;
   credentials: BotCredentials;
   publishMode: PublishMode;
 };

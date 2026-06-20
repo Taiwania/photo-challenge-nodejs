@@ -1,15 +1,20 @@
+import type { WritablePublishMode } from "../core/models.js";
 import { getSandboxRootForName } from "./run-job.js";
 import { insertAssessmentTemplate, type ChallengeAnnouncement, type FileAssessmentPlan, type PreviousPageUpdatePlan, type WinnerNotification } from "./post-results-maintenance.js";
 
-export type MaintenancePublishMode = "sandbox" | "live";
+export type MaintenancePublishMode = WritablePublishMode;
 
-type MaintenancePlanData = {
-  primaryChallenge?: string;
+export type MaintenancePlanData = {
+  primaryChallenge: string;
   notifications?: WinnerNotification[];
   challengeAnnouncement?: ChallengeAnnouncement | null;
   previousPageUpdate?: PreviousPageUpdatePlan | null;
   assessmentPlans?: FileAssessmentPlan[];
 };
+
+export type MaintenancePlanParseResult =
+  | { ok: true; plan: MaintenancePlanData }
+  | { ok: false; error: string };
 
 type NotificationSection = {
   heading: string;
@@ -33,10 +38,24 @@ export type MaintenancePublishEntry = {
 };
 
 export function parseMaintenancePlan(content: string): MaintenancePlanData | null {
+  const result = parseMaintenancePlanResult(content);
+  return result.ok ? result.plan : null;
+}
+
+export function parseMaintenancePlanResult(content: string): MaintenancePlanParseResult {
+  let parsed: unknown;
   try {
-    return JSON.parse(content) as MaintenancePlanData;
-  } catch {
-    return null;
+    parsed = JSON.parse(content) as unknown;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "unknown JSON parse error";
+    return { ok: false, error: `Maintenance plan JSON is invalid: ${message}` };
+  }
+
+  try {
+    return { ok: true, plan: validateMaintenancePlanData(parsed) };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "unknown validation error";
+    return { ok: false, error: `Maintenance plan is invalid: ${message}` };
   }
 }
 
@@ -45,11 +64,19 @@ export function buildMaintenancePublishEntries(
   loginName: string,
   mode: MaintenancePublishMode
 ): MaintenancePublishEntry[] {
-  const plan = parseMaintenancePlan(content);
-  if (!plan || !plan.primaryChallenge) {
-    return [];
+  const result = parseMaintenancePlanResult(content);
+  if (!result.ok) {
+    throw new Error(result.error);
   }
 
+  return buildMaintenancePublishEntriesFromPlan(result.plan, loginName, mode);
+}
+
+export function buildMaintenancePublishEntriesFromPlan(
+  plan: MaintenancePlanData,
+  loginName: string,
+  mode: MaintenancePublishMode
+): MaintenancePublishEntry[] {
   const challenge = plan.primaryChallenge;
   const entries: MaintenancePublishEntry[] = [];
   const groupedNotifications = new Map<string, WinnerNotification[]>();
@@ -129,6 +156,115 @@ export function buildMaintenancePublishEntries(
   }
 
   return entries;
+}
+
+function validateMaintenancePlanData(value: unknown): MaintenancePlanData {
+  const record = requireRecord(value, "root");
+
+  return {
+    primaryChallenge: requireString(record.primaryChallenge, "primaryChallenge"),
+    notifications: validateOptionalArray(record.notifications, "notifications", validateWinnerNotification),
+    challengeAnnouncement: validateOptionalNullableRecord(record.challengeAnnouncement, "challengeAnnouncement", validateChallengeAnnouncement),
+    previousPageUpdate: validateOptionalNullableRecord(record.previousPageUpdate, "previousPageUpdate", validatePreviousPageUpdate),
+    assessmentPlans: validateOptionalArray(record.assessmentPlans, "assessmentPlans", validateFileAssessmentPlan)
+  };
+}
+
+function validateWinnerNotification(value: unknown, path: string): WinnerNotification {
+  const record = requireRecord(value, path);
+  return {
+    recipient: requireString(record.recipient, `${path}.recipient`),
+    fileName: requireString(record.fileName, `${path}.fileName`),
+    rank: requireNumber(record.rank, `${path}.rank`),
+    targetTitle: requireString(record.targetTitle, `${path}.targetTitle`),
+    sectionHeading: requireString(record.sectionHeading, `${path}.sectionHeading`),
+    bodyText: requireString(record.bodyText, `${path}.bodyText`),
+    editSummary: requireString(record.editSummary, `${path}.editSummary`)
+  };
+}
+
+function validateChallengeAnnouncement(value: unknown, path: string): ChallengeAnnouncement {
+  const record = requireRecord(value, path);
+  return {
+    targetTitle: requireString(record.targetTitle, `${path}.targetTitle`),
+    sectionHeading: requireString(record.sectionHeading, `${path}.sectionHeading`),
+    bodyText: requireString(record.bodyText, `${path}.bodyText`),
+    editSummary: requireString(record.editSummary, `${path}.editSummary`)
+  };
+}
+
+function validatePreviousPageUpdate(value: unknown, path: string): PreviousPageUpdatePlan {
+  const record = requireRecord(value, path);
+  return {
+    targetTitle: requireString(record.targetTitle, `${path}.targetTitle`),
+    prependText: requireString(record.prependText, `${path}.prependText`),
+    editSummary: requireString(record.editSummary, `${path}.editSummary`)
+  };
+}
+
+function validateFileAssessmentPlan(value: unknown, path: string): FileAssessmentPlan {
+  const record = requireRecord(value, path);
+  return {
+    fileTitle: requireString(record.fileTitle, `${path}.fileTitle`),
+    templateText: requireString(record.templateText, `${path}.templateText`),
+    editSummary: requireString(record.editSummary, `${path}.editSummary`)
+  };
+}
+
+function validateOptionalArray<T>(
+  value: unknown,
+  path: string,
+  validateItem: (item: unknown, path: string) => T
+): T[] | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  if (!Array.isArray(value)) {
+    throw new Error(`${path} must be an array.`);
+  }
+
+  return value.map((item, index) => validateItem(item, `${path}[${index}]`));
+}
+
+function validateOptionalNullableRecord<T>(
+  value: unknown,
+  path: string,
+  validateValue: (item: unknown, path: string) => T
+): T | null | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  if (value === null) {
+    return null;
+  }
+
+  return validateValue(value, path);
+}
+
+function requireRecord(value: unknown, path: string): Record<string, unknown> {
+  if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+    return value as Record<string, unknown>;
+  }
+
+  throw new Error(`${path} must be an object.`);
+}
+
+function requireString(value: unknown, path: string): string {
+  if (typeof value === "string" && value.trim().length > 0) {
+    return value;
+  }
+
+  throw new Error(`${path} must be a non-empty string.`);
+}
+
+function requireNumber(value: unknown, path: string): number {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+
+  throw new Error(`${path} must be a finite number.`);
 }
 
 export function applyMaintenancePublishEntry(currentContent: string | null, entry: MaintenancePublishEntry): string {

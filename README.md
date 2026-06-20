@@ -45,7 +45,7 @@ CLI examples:
 
 ```bash
 npm run cli -- create-voting --challenge "2026 - March - Three-wheelers"
-npm run cli -- process-challenge --challenge "2026 - February - Orange"
+npm run cli -- count-votes-and-select-winners --challenge "2026 - February - Orange"
 node dist/cli.js post-results-maintenance --challenge "2026 - February - Orange" --paired-challenge "2026 - February - First aid" --publish-mode dry-run
 node dist/cli.js post-results-maintenance --challenge "2026 - February - Orange" --publish-mode live
 ```
@@ -59,7 +59,7 @@ Outputs are written under `output/jobs/<job-id>/generated/`, including `*_voting
 
 The default is a single-image, single-month challenge. For paired-image challenges, use `--entry-mode duo-coequal` or `--entry-mode duo-reference`. Only override `--submission-start` and `--submission-end` when the community has approved an exceptional duration; paired-image mode does not automatically extend the submission window.
 
-### 2. Count votes and publish results
+### 2. Count votes and select winners
 
 Use this after voting ends.
 This workflow validates voters and votes, checks deadlines, and generates `*_revised.txt`, `*_result.txt`, and `*_winners.txt`.
@@ -72,7 +72,7 @@ It creates winner notifications, challenge announcements, Previous-page updates,
 
 ## Publish and Safety Notes
 
-- `create-voting` and `process-challenge` support `dry-run`, `sandbox`, and `live`
+- `create-voting` and `count-votes-and-select-winners` support `dry-run`, `sandbox`, and `live`
 - `post-results-maintenance` supports `dry-run`, `sandbox`, and `live` for winner notifications, central announcements, Previous-page updates, and file assessment templates
 - sandbox targets are derived from the main account part before `@` in `NAME`
 - saved credentials use the system keychain when available, with in-memory fallback for the current process
@@ -104,10 +104,13 @@ Implemented and working today:
 - formal maintenance publishing for winner notifications, central announcements, Previous-page updates, and file assessment templates
 - regression coverage for parsers, renderers, CLI, job history, and offline workflow fixtures
 
+Maintainer docs:
+- Architecture and responsibility boundaries: [docs/architecture.md](docs/architecture.md)
+
 Recommended next steps:
 - add deployment and operations documentation for non-local usage
 - expand fixtures for older Commons page variants and unusual signatures
-- add end-to-end Web flow coverage for create-voting, process-challenge, and maintenance publish
+- add end-to-end Web flow coverage for create-voting, count-votes-and-select-winners, and maintenance publish
 - consider finer-grained inline word diff inside changed lines
 
 ## Useful Resources

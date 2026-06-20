@@ -7,7 +7,7 @@ test("buildCliUsage documents both supported commands", () => {
   const usage = buildCliUsage();
 
   assert.match(usage, /create-voting/);
-  assert.match(usage, /process-challenge/);
+  assert.match(usage, /count-votes-and-select-winners/);
   assert.match(usage, /post-results-maintenance/);
   assert.match(usage, /--challenge/);
 });
@@ -45,7 +45,7 @@ test("parseCliArgs reads command line values directly", () => {
 
 test("parseCliArgs falls back to environment variables for credentials", () => {
   const parsed = parseCliArgs(
-    ["process-challenge", "--challenge", "2026 - February - Orange"],
+    ["count-votes-and-select-winners", "--challenge", "2026 - February - Orange"],
     {
       NAME: "Env@Bot",
       BOT_PASSWORD: "env-secret"
@@ -77,7 +77,7 @@ test("parseCliArgs accepts --publish-mode sandbox and live", () => {
   assert.equal(sandbox.request.publishMode, "sandbox");
 
   const live = parseCliArgs([
-    "process-challenge", "--challenge", "2026 - February - Orange",
+    "count-votes-and-select-winners", "--challenge", "2026 - February - Orange",
     "--name", "Example@Bot", "--bot-password", "secret",
     "--publish-mode", "live"
   ]);
@@ -152,6 +152,18 @@ test("parseCliArgs rejects missing required challenge values", () => {
   assert.throws(
     () => parseCliArgs(["create-voting", "--name", "Example@Bot", "--bot-password", "secret"]),
     /Missing required --challenge value/
+  );
+});
+
+test("parseCliArgs rejects the legacy process-challenge command name", () => {
+  assert.throws(
+    () => parseCliArgs([
+      "process-challenge",
+      "--challenge", "2026 - February - Orange",
+      "--name", "Example@Bot",
+      "--bot-password", "secret"
+    ]),
+    /Unknown command: process-challenge/
   );
 });
 

@@ -1,12 +1,13 @@
 import path from "node:path";
 import { readdir, readFile, writeFile } from "node:fs/promises";
+import { isVoteCountingAction } from "../core/job-actions.js";
 import type { JobRequest } from "../core/models.js";
 import type { ScoredVotingFile } from "../core/scoring.js";
 import { config } from "../infra/config.js";
-import { recordMaintenancePublish } from "../infra/maintenance-publish-history.js";
 import type { JobOutputPaths } from "../infra/output-paths.js";
 import type { CommonsBot, ReadPageResult } from "../services/commons-bot.js";
-import { applyMaintenancePublishEntry, buildMaintenancePublishEntries, type MaintenancePublishMode } from "./maintenance-publish.js";
+import { buildMaintenancePublishEntries, type MaintenancePublishMode } from "./maintenance-publish.js";
+import { publishMaintenanceEditPlans } from "./publish-service.js";
 import {
   buildChallengeAnnouncement,
   buildFileAssessmentPlans,
@@ -49,7 +50,7 @@ export async function runPostResultsMaintenance(
     throw new Error("post-results-maintenance requires at least one challenge.");
   }
 
-  reportProgress(18, "Loading scored results", "Looking up the latest processed challenge outputs from output/jobs.");
+  reportProgress(18, "Loading scored results", "Looking up the latest vote-counting outputs from output/jobs.");
 
   const sources: MaintenanceSource[] = [];
   for (let index = 0; index < challenges.length; index += 1) {
@@ -118,7 +119,7 @@ export async function runPostResultsMaintenance(
     }
 
     reportProgress(86, "Publishing maintenance outputs", `Writing planned maintenance edits to ${request.publishMode}.`);
-    automaticPublish = await publishMaintenanceEntries(
+    automaticPublish = await publishMaintenancePlanEntries(
       maintenancePlanContent,
       request.publishMode,
       publishRuntime,
@@ -194,7 +195,7 @@ async function loadLatestScoredFiles(challenge: string, bot: CommonsBot | null):
     return loadPublishedWinnerFiles(challenge, bot);
   }
 
-  throw new Error(`No completed process-challenge outputs were found for ${challenge}. Run process-challenge first, or run post-results-maintenance in sandbox/live mode after the Winners page has been published.`);
+  throw new Error(`No completed count-votes-and-select-winners outputs were found for ${challenge}. Run count-votes-and-select-winners first, or run post-results-maintenance in sandbox/live mode after the Winners page has been published.`);
 }
 
 async function loadLatestLocalScoredFiles(challenge: string): Promise<MaintenanceSource | null> {
@@ -216,7 +217,7 @@ async function loadLatestLocalScoredFiles(challenge: string): Promise<Maintenanc
 
     const values = parseLogFile(logContent);
     if (values.status !== "completed") continue;
-    if (values.action !== "process-challenge") continue;
+    if (!isVoteCountingAction(values.action)) continue;
     if (values.challenge !== challenge) continue;
 
     const filePath = path.join(config.outputRoot, jobId, "generated", `${challengeSlug}_files.json`);
@@ -257,9 +258,9 @@ async function loadPublishedWinnerFiles(challenge: string, bot: CommonsBot): Pro
 
   if (files.length === 0) {
     if (looksLikeDuoWinnersPage(page.content)) {
-      throw new Error(`Duo winners page ${pageTitle} cannot be used as a maintenance source yet. Run process-challenge for ${challenge} first so post-results-maintenance can use the local scored artifact with entry member data.`);
+      throw new Error(`Duo winners page ${pageTitle} cannot be used as a maintenance source yet. Run count-votes-and-select-winners for ${challenge} first so post-results-maintenance can use the local scored artifact with entry member data.`);
     }
-    throw new Error(`No local process-challenge outputs were found for ${challenge}, and ${pageTitle} does not contain parseable winner data.`);
+    throw new Error(`No local count-votes-and-select-winners outputs were found for ${challenge}, and ${pageTitle} does not contain parseable winner data.`);
   }
 
   return {
@@ -357,58 +358,12 @@ function slugify(value: string): string {
     .slice(0, 80) || "challenge";
 }
 
-async function publishMaintenanceEntries(
+async function publishMaintenancePlanEntries(
   maintenancePlanContent: string,
   mode: MaintenancePublishMode,
   runtime: PublishRuntime,
   reportMessage: MessageReporter
 ): Promise<{ notifications: number; fileAssessments: number; announcements: number; previousPages: number }> {
   const entries = buildMaintenancePublishEntries(maintenancePlanContent, runtime.loginName, mode);
-
-  let notifications = 0;
-  let fileAssessments = 0;
-  let announcements = 0;
-  let previousPages = 0;
-
-  for (const entry of entries) {
-    let currentContent: string | null = null;
-    try {
-      const page = await runtime.bot.readPage(entry.liveTargetTitle);
-      currentContent = page.content;
-    } catch (error) {
-      if (!(error instanceof Error) || !error.message.startsWith("Page does not exist:")) {
-        throw error;
-      }
-    }
-
-    const nextContent = applyMaintenancePublishEntry(currentContent, entry);
-    if (mode === "live" && currentContent !== null && nextContent === currentContent) {
-      reportMessage(`Skipped ${entry.label} for ${entry.liveTargetTitle} because the live page already matches the generated content.`);
-      continue;
-    }
-
-    const saveResult = await runtime.bot.savePage(entry.targetTitle, nextContent, entry.editSummary);
-    await recordMaintenancePublish(runtime.jobId, {
-      id: entry.id,
-      type: entry.type,
-      label: entry.label,
-      mode,
-      targetTitle: entry.targetTitle,
-      liveTargetTitle: entry.liveTargetTitle,
-      editSummary: entry.editSummary,
-      publishedAt: new Date().toISOString(),
-      revisionId: saveResult.newRevisionId,
-      result: saveResult.result
-    });
-
-    if (entry.type === "notifications") notifications += 1;
-    if (entry.type === "file-assessment") fileAssessments += 1;
-    if (entry.type === "announcement") announcements += 1;
-    if (entry.type === "previous-page") previousPages += 1;
-
-    const revNote = saveResult.newRevisionId ? ` (revision ${saveResult.newRevisionId})` : "";
-    reportMessage(`Published ${entry.label} to ${entry.targetTitle}${revNote}`);
-  }
-
-  return { notifications, fileAssessments, announcements, previousPages };
+  return publishMaintenanceEditPlans(runtime.bot, runtime.jobId, entries, mode, reportMessage);
 }
