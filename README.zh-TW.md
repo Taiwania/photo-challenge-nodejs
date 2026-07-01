@@ -63,7 +63,7 @@ node dist/cli.js post-results-maintenance --challenge "2026 - February - Orange"
 
 適用於投票結束後。
 此流程會驗證投票者與投票內容、檢查截止時間，並產生 `*_revised.txt`、`*_result.txt`、`*_winners.txt`。
-Late vote 的判定已回到 Photo Challenge 預設的 `UTC` 截止時間，生成結果也會反映相同的 cutoff。
+Late vote 的判定使用每月月初 00:00 AoE 的 Photo Challenge 截止時間，生成結果也會反映相同的 cutoff。
 
 ### 3. Post-results maintenance
 

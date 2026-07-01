@@ -15,7 +15,6 @@ export function reviseVotingPage(wikiText: string): string {
       continue;
     } else if (line.startsWith("'''Voting will end") || line.startsWith("'''Voting ended")) {
       line = line.replace("Voting will end", "Voting ended");
-      line = line.replace("midnight UTC-12 on", "midnight UTC on");
     }
     lines.push(line);
   }

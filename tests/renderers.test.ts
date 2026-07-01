@@ -59,11 +59,11 @@ test("renderVotingEntryHeading uses the current span anchor format for every ent
   );
 });
 
-test("resolveSubmissionWindow defaults to one calendar month ending at midnight UTC", () => {
+test("resolveSubmissionWindow defaults to one calendar month ending at midnight AoE", () => {
   const window = resolveSubmissionWindow("2026 - December - Home appliances");
 
   assert.equal(window.startsAt.toISO(), "2026-12-01T00:00:00.000Z");
-  assert.equal(window.endsAt.toISO(), "2027-01-01T00:00:00.000Z");
+  assert.equal(window.endsAt.toISO(), "2027-01-01T12:00:00.000Z");
 });
 
 test("renderVotingPage produces issues for invalid entries and includes valid images", () => {

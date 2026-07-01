@@ -29,6 +29,15 @@ test("validateVotes flags late votes and duplicate award usage while keeping val
       isBlocked: false
     },
     {
+      voter: "BoundaryVoter",
+      editCount: 200,
+      regDate: "2020-01-01",
+      error: 0,
+      note: 0,
+      isRegistered: true,
+      isBlocked: false
+    },
+    {
       voter: "BorderlineEntrant",
       editCount: 12,
       regDate: "2026-02-27",
@@ -59,10 +68,18 @@ test("validateVotes flags late votes and duplicate award usage while keeping val
     {
       num: 1,
       award: 2 as const,
+      voter: "BoundaryVoter",
+      creator: "CreatorOne",
+      line: "*{{2/3*}} -- [[User:BoundaryVoter|BoundaryVoter]] 11:59, 1 April 2026 (UTC)",
+      timestamp: "11:59, 1 April 2026 (UTC)"
+    },
+    {
+      num: 1,
+      award: 2 as const,
       voter: "LateVoter",
       creator: "CreatorOne",
-      line: "*{{2/3*}} -- [[User:LateVoter|LateVoter]] 00:05, 1 April 2026 (UTC)",
-      timestamp: "00:05, 1 April 2026 (UTC)"
+      line: "*{{2/3*}} -- [[User:LateVoter|LateVoter]] 12:00, 1 April 2026 (UTC)",
+      timestamp: "12:00, 1 April 2026 (UTC)"
     }
   ];
 
@@ -70,10 +87,11 @@ test("validateVotes flags late votes and duplicate award usage while keeping val
 
   assert.equal(validated[0]?.error, 8);
   assert.equal(validated[1]?.error, 8);
-  assert.equal(validated[2]?.error, 9);
+  assert.equal(validated[2]?.error, 0);
+  assert.equal(validated[3]?.error, 9);
 
   const errors = listErrors(validated, voters, challenge).join("\n");
-  assert.match(errors, /after voting closed at 2026-04-01 00:00 UTC/);
+  assert.match(errors, /after voting closed at 2026-04-01 00:00 AoE/);
   assert.match(errors, /=== Other \(potential\) Issues ===/);
   assert.match(errors, /\[\[User:BorderlineEntrant\]\] made less than required 50 edits on Commons/);
 });

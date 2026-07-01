@@ -63,7 +63,7 @@ The default is a single-image, single-month challenge. For paired-image challeng
 
 Use this after voting ends.
 This workflow validates voters and votes, checks deadlines, and generates `*_revised.txt`, `*_result.txt`, and `*_winners.txt`.
-Late-vote checks use the default Photo Challenge closing time in `UTC`, and the generated outputs reflect that same cutoff.
+Late-vote checks use the Photo Challenge closing time of 00:00 AoE at the start of the next month, and generated outputs reflect that same cutoff.
 
 ### 3. Post-results maintenance
 

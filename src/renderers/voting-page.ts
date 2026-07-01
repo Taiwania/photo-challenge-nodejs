@@ -34,6 +34,7 @@ type ResolvedSubmissionWindow = {
 
 const SIZE_PX = 240000;
 const DUO_HEIGHT_PX = 300;
+const AOE_UTC_OFFSET_HOURS = 12;
 const COLLAPSE_TEXT = "{{Collapse top|Current votes – please choose your own winners before looking}}";
 
 export function renderVotingEntryHeading(num: number, title: string): string {
@@ -56,7 +57,7 @@ export function resolveSubmissionWindow(challenge: string, configured?: Submissi
   if (!startsAt.isValid) {
     throw new Error(`Unable to infer submission window from challenge name: ${challenge}`);
   }
-  return { startsAt, endsAt: startsAt.plus({ months: 1 }).startOf("month") };
+  return { startsAt, endsAt: startsAt.plus({ months: 1 }).startOf("month").plus({ hours: AOE_UTC_OFFSET_HOURS }) };
 }
 
 function isVotingEntry(entry: VotingEntry | VotingSubmissionEntry): entry is VotingEntry {
