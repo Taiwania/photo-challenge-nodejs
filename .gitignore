@@ -1,6 +1,8 @@
 # Original python assets and plans
 /upstreams
-/docs
+/docs/*
+!/docs/architecture.md
+!/docs/architecture.zh-TW.md
 
 # Environment and local secrets
 .env

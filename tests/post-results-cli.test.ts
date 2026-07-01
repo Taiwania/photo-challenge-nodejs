@@ -7,7 +7,7 @@ import { getJobOutputPaths } from "../src/infra/output-paths.js";
 import { runPostResultsMaintenance } from "../src/workflows/run-post-results-maintenance.js";
 import type { CommonsBot, ReadPageResult, SavePageResult } from "../src/services/commons-bot.js";
 
-async function seedProcessChallengeJob(jobId: string, challenge: string, files: Array<Record<string, unknown>>): Promise<void> {
+async function seedVoteCountingJob(jobId: string, challenge: string, files: Array<Record<string, unknown>>, action = "count-votes-and-select-winners"): Promise<void> {
   const paths = getJobOutputPaths(jobId);
   const slug = challenge.replace(/[^\w\- ]+/g, "").replace(/\s+/g, "_").slice(0, 80) || "challenge";
 
@@ -20,7 +20,7 @@ async function seedProcessChallengeJob(jobId: string, challenge: string, files: 
     [
       `jobId=${jobId}`,
       "status=completed",
-      "action=process-challenge",
+      `action=${action}`,
       `challenge=${challenge}`,
       "publishMode=dry-run",
       "name=Example@Bot",
@@ -35,12 +35,12 @@ async function removeJob(jobId: string): Promise<void> {
 }
 
 test("runCli executes post-results-maintenance in dry-run mode from local scored outputs", async () => {
-  await seedProcessChallengeJob("seed-orange", "2026 - February - Orange", [
+  await seedVoteCountingJob("seed-orange", "2026 - February - Orange", [
     { num: 1, fileName: "Orange winner 1.jpg", title: "Orange winner 1", creator: "Amitash", score: 10, support: 4, rank: 1 },
     { num: 2, fileName: "Orange winner 2.jpg", title: "Orange winner 2", creator: "Poco a poco", score: 8, support: 3, rank: 2 },
     { num: 3, fileName: "Orange winner 3.jpg", title: "Orange winner 3", creator: "VulpesVulpes42", score: 6, support: 2, rank: 3 }
   ]);
-  await seedProcessChallengeJob("seed-first-aid", "2026 - February - First aid", [
+  await seedVoteCountingJob("seed-first-aid", "2026 - February - First aid", [
     { num: 1, fileName: "First aid winner 1.jpg", title: "First aid winner 1", creator: "MedicOne", score: 10, support: 4, rank: 1 },
     { num: 2, fileName: "First aid winner 2.jpg", title: "First aid winner 2", creator: "BlueSunrise", score: 8, support: 3, rank: 2 },
     { num: 3, fileName: "First aid winner 3.jpg", title: "First aid winner 3", creator: "Quickresponse", score: 6, support: 2, rank: 3 }
@@ -84,7 +84,7 @@ test("runCli executes post-results-maintenance in dry-run mode from local scored
 });
 
 test("runCli creates duo maintenance plans from local scored entry artifacts", async () => {
-  await seedProcessChallengeJob("seed-duo-home", "2016 - December - Home appliances", [
+  await seedVoteCountingJob("seed-duo-home", "2016 - December - Home appliances", [
     {
       num: 1,
       fileName: "Outside.jpg",
@@ -258,19 +258,19 @@ test("runPostResultsMaintenance rejects duo winners fallback without a local sco
       () => {},
       { bot: fakeBot, jobId: "maintenance-duo-no-local", loginName: "Example@Bot" }
     ),
-    /Duo winners page .*Run process-challenge/
+    /Duo winners page .*Run count-votes-and-select-winners/
   );
 
   await removeJob("maintenance-duo-no-local");
 });
 
 test("runPostResultsMaintenance live mode auto-publishes notifications, announcement, previous page, and file assessments", async () => {
-  await seedProcessChallengeJob("seed-orange", "2026 - February - Orange", [
+  await seedVoteCountingJob("seed-orange", "2026 - February - Orange", [
     { num: 1, fileName: "Orange winner 1.jpg", title: "Orange winner 1", creator: "Amitash", score: 10, support: 4, rank: 1 },
     { num: 2, fileName: "Orange winner 2.jpg", title: "Orange winner 2", creator: "Poco a poco", score: 8, support: 3, rank: 2 },
     { num: 3, fileName: "Orange winner 3.jpg", title: "Orange winner 3", creator: "VulpesVulpes42", score: 6, support: 2, rank: 3 }
   ]);
-  await seedProcessChallengeJob("seed-first-aid", "2026 - February - First aid", [
+  await seedVoteCountingJob("seed-first-aid", "2026 - February - First aid", [
     { num: 1, fileName: "First aid winner 1.jpg", title: "First aid winner 1", creator: "MedicOne", score: 10, support: 4, rank: 1 },
     { num: 2, fileName: "First aid winner 2.jpg", title: "First aid winner 2", creator: "BlueSunrise", score: 8, support: 3, rank: 2 },
     { num: 3, fileName: "First aid winner 3.jpg", title: "First aid winner 3", creator: "Quickresponse", score: 6, support: 2, rank: 3 }
@@ -359,12 +359,12 @@ test("runPostResultsMaintenance live mode auto-publishes notifications, announce
 });
 
 test("runPostResultsMaintenance skips central announcement when a winners page is missing", async () => {
-  await seedProcessChallengeJob("seed-orange", "2026 - February - Orange", [
+  await seedVoteCountingJob("seed-orange", "2026 - February - Orange", [
     { num: 1, fileName: "Orange winner 1.jpg", title: "Orange winner 1", creator: "Amitash", score: 10, support: 4, rank: 1 },
     { num: 2, fileName: "Orange winner 2.jpg", title: "Orange winner 2", creator: "Poco a poco", score: 8, support: 3, rank: 2 },
     { num: 3, fileName: "Orange winner 3.jpg", title: "Orange winner 3", creator: "VulpesVulpes42", score: 6, support: 2, rank: 3 }
   ]);
-  await seedProcessChallengeJob("seed-first-aid", "2026 - February - First aid", [
+  await seedVoteCountingJob("seed-first-aid", "2026 - February - First aid", [
     { num: 1, fileName: "First aid winner 1.jpg", title: "First aid winner 1", creator: "MedicOne", score: 10, support: 4, rank: 1 },
     { num: 2, fileName: "First aid winner 2.jpg", title: "First aid winner 2", creator: "BlueSunrise", score: 8, support: 3, rank: 2 },
     { num: 3, fileName: "First aid winner 3.jpg", title: "First aid winner 3", creator: "Quickresponse", score: 6, support: 2, rank: 3 }

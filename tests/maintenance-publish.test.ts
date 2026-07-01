@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "./harness.js";
-import { applyMaintenancePublishEntry, buildMaintenancePublishEntries } from "../src/web/maintenance-publish.js";
+import { applyMaintenancePublishEntry, buildMaintenancePublishEntries, parseMaintenancePlanResult } from "../src/workflows/maintenance-publish.js";
 
 const maintenancePlanJson = JSON.stringify({
   primaryChallenge: "2026 - February - Orange",
@@ -76,4 +76,40 @@ test("applyMaintenancePublishEntry inserts assessment templates before the licen
 
   assert.match(next, /Photo challenge winner/);
   assert.match(next, /==\{\{Assessment\}\}==/);
+});
+
+test("parseMaintenancePlanResult rejects invalid JSON", () => {
+  const result = parseMaintenancePlanResult("{ nope");
+
+  assert.equal(result.ok, false);
+  assert.match(result.error, /JSON is invalid/);
+});
+
+test("parseMaintenancePlanResult rejects missing primary challenge", () => {
+  const result = parseMaintenancePlanResult(JSON.stringify({ notifications: [] }));
+
+  assert.equal(result.ok, false);
+  assert.match(result.error, /primaryChallenge/);
+});
+
+test("parseMaintenancePlanResult rejects malformed notifications", () => {
+  const result = parseMaintenancePlanResult(JSON.stringify({
+    primaryChallenge: "2026 - February - Orange",
+    notifications: [{ targetTitle: "User talk:Example" }]
+  }));
+
+  assert.equal(result.ok, false);
+  assert.match(result.error, /notifications\[0\]\.recipient/);
+});
+
+test("buildMaintenancePublishEntries rejects malformed assessment plans", () => {
+  const malformedPlan = JSON.stringify({
+    primaryChallenge: "2026 - February - Orange",
+    assessmentPlans: [{ fileTitle: "File:Orange One.jpg" }]
+  });
+
+  assert.throws(
+    () => buildMaintenancePublishEntries(malformedPlan, "Example User@BotApp", "live"),
+    /assessmentPlans\[0\]\.templateText/
+  );
 });

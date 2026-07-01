@@ -1,15 +1,17 @@
 import { config } from "../infra/config.js";
 import { jobStore } from "../infra/job-store.js";
-import { DateTime } from "luxon";
-import type { EntryMode, JobRequest, PublishMode, SubmissionWindow } from "../core/models.js";
+import type { JobRequest, ListAction, SourcePageVariant } from "../core/models.js";
+import {
+  buildValidatedJobRequest,
+  isJobAction,
+  isListAction,
+  parseSourcePageVariant,
+  parseSubmissionWindowValues
+} from "../core/job-actions.js";
 import { runJob } from "../workflows/run-job.js";
 import { createCommonsBot } from "../services/commons-bot.js";
 import { parseSubmittedChallenges } from "../parsers/submitting-parser.js";
 import { parseVotingChallenges } from "../parsers/voting-parser.js";
-
-type JobCommand = "create-voting" | "process-challenge" | "archive-pages" | "build-voting-index" | "post-results-maintenance";
-type ListCommand = "list-submitted-challenges" | "list-voting-challenges";
-type CliCommand = JobCommand | ListCommand;
 
 type CliLogger = {
   log: (message: string) => void;
@@ -18,15 +20,8 @@ type CliLogger = {
 
 type ParsedCliArgs =
   | { kind: "help" }
-  | { kind: "list"; action: ListCommand; credentials: { name: string; botPassword: string }; source: "main" | "old" }
+  | { kind: "list"; action: ListAction; credentials: { name: string; botPassword: string }; source: SourcePageVariant }
   | { kind: "run"; request: JobRequest };
-
-const jobCommands = new Set<JobCommand>(["create-voting", "process-challenge", "archive-pages", "build-voting-index", "post-results-maintenance"]);
-const listCommands = new Set<ListCommand>(["list-submitted-challenges", "list-voting-challenges"]);
-const challengeRequiredCommands = new Set<CliCommand>(["create-voting", "process-challenge", "post-results-maintenance"]);
-const VALID_PUBLISH_MODES = new Set<PublishMode>(["dry-run", "sandbox", "live"]);
-const VALID_SOURCES = new Set<string>(["main", "old"]);
-const VALID_ENTRY_MODES = new Set<EntryMode>(["single", "duo-coequal", "duo-reference"]);
 
 export function buildCliUsage(): string {
   return [
@@ -38,11 +33,11 @@ export function buildCliUsage(): string {
     "  archive-pages                      Copy Submitting→Submitting_old and Voting→Voting_old",
     "  build-voting-index                 Generate the new voting index section from Submitting[_old]",
     "  create-voting                      Build the voting page for a challenge",
-    "  process-challenge                  Validate votes and generate result/winners pages",
+    "  count-votes-and-select-winners     Count votes, score entries, and generate result/winners pages",
     "  post-results-maintenance           Plan maintenance and optionally publish winner notifications/file assessments",
     "",
     "Options:",
-    "  --challenge         Challenge title (required for create-voting / process-challenge / post-results-maintenance)",
+    "  --challenge         Challenge title (required for create-voting / count-votes-and-select-winners / post-results-maintenance)",
     "  --paired-challenge  Second challenge used for shared winner announcements and Previous-page updates",
     "  --entry-mode        single (default) | duo-coequal | duo-reference",
     "  --submission-start  Exceptional duration override: ISO date/time, inclusive. Use with --submission-end",
@@ -59,7 +54,7 @@ export function buildCliUsage(): string {
     "  npm run cli -- archive-pages --publish-mode live",
     "  npm run cli -- build-voting-index --publish-mode dry-run",
     "  npm run cli -- create-voting --challenge \"2026 - March - Three-wheelers\" --publish-mode sandbox",
-    "  npm run cli -- process-challenge --challenge \"2026 - February - Orange\" --publish-mode sandbox",
+    "  npm run cli -- count-votes-and-select-winners --challenge \"2026 - February - Orange\" --publish-mode sandbox",
     "  npm run cli -- post-results-maintenance --challenge \"2026 - February - Orange\" --paired-challenge \"2026 - February - First aid\" --publish-mode dry-run",
     "  npm run cli -- post-results-maintenance --challenge \"2026 - February - Orange\" --publish-mode live"
   ].join("\n");
@@ -85,20 +80,13 @@ function parseOptions(rest: string[]): Map<string, string> {
   return options;
 }
 
-function parseSubmissionWindow(options: Map<string, string>): SubmissionWindow | undefined {
+function parseSubmissionWindow(options: Map<string, string>) {
   const startsAt = options.get("submission-start")?.trim() ?? "";
   const endsAt = options.get("submission-end")?.trim() ?? "";
-  if (!startsAt && !endsAt) return undefined;
-  if (!startsAt || !endsAt) {
-    throw new Error("--submission-start and --submission-end must be provided together.");
-  }
-
-  const start = DateTime.fromISO(startsAt, { setZone: true });
-  const end = DateTime.fromISO(endsAt, { setZone: true });
-  if (!start.isValid || !end.isValid || start >= end) {
-    throw new Error("Invalid submission window. Use ISO date/times with --submission-start earlier than --submission-end.");
-  }
-  return { startsAt, endsAt };
+  return parseSubmissionWindowValues(startsAt, endsAt, {
+    partial: "--submission-start and --submission-end must be provided together.",
+    invalid: "Invalid submission window. Use ISO date/times with --submission-start earlier than --submission-end."
+  });
 }
 
 export function parseCliArgs(args: string[], env: NodeJS.ProcessEnv = process.env): ParsedCliArgs {
@@ -107,8 +95,8 @@ export function parseCliArgs(args: string[], env: NodeJS.ProcessEnv = process.en
   }
 
   const [command, ...rest] = args;
-  const isJobCmd = jobCommands.has(command as JobCommand);
-  const isListCmd = listCommands.has(command as ListCommand);
+  const isJobCmd = isJobAction(command);
+  const isListCmd = isListAction(command);
 
   if (!isJobCmd && !isListCmd) {
     throw new Error(`Unknown command: ${command}`);
@@ -122,50 +110,28 @@ export function parseCliArgs(args: string[], env: NodeJS.ProcessEnv = process.en
   if (!botPassword) throw new Error("Missing bot password. Use --bot-password or set BOT_PASSWORD in .env.");
 
   if (isListCmd) {
-    const rawSource = options.get("source")?.trim() ?? "main";
-    if (!VALID_SOURCES.has(rawSource)) {
-      throw new Error(`Invalid --source \"${rawSource}\". Must be main or old.`);
-    }
     return {
       kind: "list",
-      action: command as ListCommand,
+      action: command,
       credentials: { name, botPassword },
-      source: rawSource as "main" | "old"
+      source: parseSourcePageVariant(options.get("source")?.trim() ?? "main")
     };
   }
 
-  const challenge = options.get("challenge")?.trim() ?? "";
-  const pairedChallenge = options.get("paired-challenge")?.trim() ?? "";
-  const rawPublishMode = options.get("publish-mode")?.trim() ?? "dry-run";
-  const rawSource = options.get("source")?.trim() ?? "old";
-  const rawEntryMode = options.get("entry-mode")?.trim() ?? "single";
   const submissionWindow = parseSubmissionWindow(options);
-
-  if (challengeRequiredCommands.has(command as CliCommand) && !challenge) {
-    throw new Error("Missing required --challenge value.");
-  }
-  if (!VALID_PUBLISH_MODES.has(rawPublishMode as PublishMode)) {
-    throw new Error(`Invalid --publish-mode \"${rawPublishMode}\". Must be dry-run, sandbox, or live.`);
-  }
-  if (!VALID_SOURCES.has(rawSource)) {
-    throw new Error(`Invalid --source \"${rawSource}\". Must be main or old.`);
-  }
-  if (!VALID_ENTRY_MODES.has(rawEntryMode as EntryMode)) {
-    throw new Error(`Invalid --entry-mode \"${rawEntryMode}\". Must be single, duo-coequal, or duo-reference.`);
-  }
 
   return {
     kind: "run",
-    request: {
+    request: buildValidatedJobRequest({
       action: command,
-      challenge,
-      pairedChallenge: pairedChallenge || undefined,
-      entryMode: rawEntryMode as EntryMode,
+      challenge: options.get("challenge") ?? "",
+      pairedChallenge: options.get("paired-challenge"),
+      entryMode: options.get("entry-mode"),
       submissionWindow,
-      source: rawSource as "main" | "old",
+      source: options.get("source"),
       credentials: { name, botPassword },
-      publishMode: rawPublishMode as PublishMode
-    }
+      publishMode: options.get("publish-mode")
+    })
   };
 }
 

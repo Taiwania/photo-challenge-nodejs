@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "./harness.js";
 import { buildPublishableArtifacts, summarizePublishDiff } from "../src/web/publish-review.js";
+import { buildStandardPublishReview, toStandardPublishPlan } from "../src/web/standard-publish-review.js";
 import type { JobProgress } from "../src/core/models.js";
 
 const baseJob: JobProgress = {
@@ -12,14 +13,14 @@ const baseJob: JobProgress = {
   finishedAt: null,
   messages: [],
   outputDir: "output/jobs/job-1",
-  action: "process-challenge",
+  action: "count-votes-and-select-winners",
   challenge: "2026 - February - Orange",
   publishMode: "dry-run",
   loginName: "Example@BotApp",
   errorMessage: null
 };
 
-test("buildPublishableArtifacts prefers revised voting output for process-challenge publishes", () => {
+test("buildPublishableArtifacts prefers revised voting output for vote-counting publishes", () => {
   const artifacts = buildPublishableArtifacts(baseJob, [
     { name: "2026_-_February_-_Orange_voting.txt", content: "draft voting" },
     { name: "2026_-_February_-_Orange_revised.txt", content: "revised voting" },
@@ -33,6 +34,30 @@ test("buildPublishableArtifacts prefers revised voting output for process-challe
     "2026_-_February_-_Orange_winners.txt"
   ]);
   assert.equal(artifacts.find((artifact) => artifact.type === "revised")?.targetTitle, "User:Example/Sandbox/2026 - February - Orange/Voting");
+});
+
+test("buildStandardPublishReview builds review entries without live diffs when no bot is available", async () => {
+  const review = await buildStandardPublishReview(baseJob, "sandbox", "Example@BotApp", null, [
+    { name: "2026_-_February_-_Orange_revised.txt", content: "revised voting" },
+    { name: "2026_-_February_-_Orange_result.txt", content: "result" },
+    { name: "2026_-_February_-_Orange_winners.txt", content: "winners" }
+  ]);
+
+  assert.equal(review.entries.length, 3);
+  assert.equal(review.entries.every((entry) => entry.status === "new"), true);
+  assert.match(review.warning ?? "", /saved BotPassword/);
+});
+
+test("toStandardPublishPlan chooses vote-counting publish summaries", () => {
+  const artifact = buildPublishableArtifacts(baseJob, [
+    { name: "2026_-_February_-_Orange_revised.txt", content: "revised voting" }
+  ], "sandbox")[0];
+  assert(artifact);
+
+  const plan = toStandardPublishPlan(baseJob, artifact);
+
+  assert.equal(plan.targetTitle, "User:Example/Sandbox/2026 - February - Orange/Voting");
+  assert.equal(plan.editSummary, "Photo Challenge bot: revise voting page after validation");
 });
 
 test("summarizePublishDiff reports new pages and changed first line", () => {

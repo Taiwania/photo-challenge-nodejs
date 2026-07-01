@@ -1,6 +1,57 @@
 import assert from "node:assert/strict";
 import { test } from "./harness.js";
 import { summarizeMaintenanceArtifact } from "../src/web/maintenance-review.js";
+import { buildMaintenancePublishReview } from "../src/web/maintenance-publish-review.js";
+import type { JobProgress } from "../src/core/models.js";
+
+const baseMaintenanceJob: JobProgress = {
+  id: "maintenance-review-job",
+  status: "completed",
+  currentStep: "Completed",
+  percent: 100,
+  startedAt: null,
+  finishedAt: null,
+  messages: [],
+  outputDir: "output/jobs/maintenance-review-job",
+  action: "post-results-maintenance",
+  challenge: "2026 - February - Orange",
+  publishMode: "dry-run",
+  loginName: "Example User@BotApp",
+  errorMessage: null
+};
+
+const maintenancePlanJson = JSON.stringify({
+  primaryChallenge: "2026 - February - Orange",
+  notifications: [
+    {
+      recipient: "Example Winner",
+      fileName: "Orange One.jpg",
+      rank: 1,
+      targetTitle: "User talk:Example Winner",
+      sectionHeading: "[[Commons:Photo challenge/2026 - February - Orange/Winners]]",
+      bodyText: "{{Photo Challenge Gold|File:Orange One.jpg|Orange|2026|February}}--~~~~",
+      editSummary: "Announcing Photo Challenge winners"
+    }
+  ],
+  challengeAnnouncement: {
+    targetTitle: "Commons talk:Photo challenge",
+    sectionHeading: "[[Commons:Photo challenge|Photo challenge]] February results",
+    bodyText: "Announcement body",
+    editSummary: "Announcing Photo Challenge winners"
+  },
+  previousPageUpdate: {
+    targetTitle: "Commons:Photo challenge/Previous",
+    prependText: "=== Header ===\n{{Winners}}\n",
+    editSummary: "Add February winners"
+  },
+  assessmentPlans: [
+    {
+      fileTitle: "File:Orange One.jpg",
+      templateText: "{{Photo challenge winner|1|Orange|2026|February}}\n\n",
+      editSummary: "Assessment added - congratulations"
+    }
+  ]
+}, null, 2);
 
 test("summarizeMaintenanceArtifact reads maintenance plan counts and source jobs", () => {
   const entry = summarizeMaintenanceArtifact("2026_-_February_-_Orange_maintenance_plan.json", JSON.stringify({
@@ -21,6 +72,43 @@ test("summarizeMaintenanceArtifact reads maintenance plan counts and source jobs
   assert.equal(entry.type, "maintenance-plan");
   assert.equal(entry.summary, "2 source challenge(s), 3 winner notification(s), 2 assessment edit(s).");
   assert.equal(entry.excerpt.some((line) => line.includes("job-orange")), true);
+});
+
+test("buildMaintenancePublishReview builds disabled entries when no bot is available", async () => {
+  const review = await buildMaintenancePublishReview(
+    baseMaintenanceJob,
+    "sandbox",
+    [],
+    "Example User@BotApp",
+    null,
+    [{ name: "2026_-_February_-_Orange_maintenance_plan.json", content: maintenancePlanJson }]
+  );
+
+  assert.equal(review.canPublish, false);
+  assert.equal(review.entries.length, 4);
+  assert.equal(review.entries.every((entry) => entry.selected), true);
+  assert.match(review.warning ?? "", /saved BotPassword/);
+  assert.equal(review.overview?.type, "maintenance-plan");
+});
+
+test("buildMaintenancePublishReview reports malformed maintenance plan warnings", async () => {
+  const review = await buildMaintenancePublishReview(
+    baseMaintenanceJob,
+    "sandbox",
+    [],
+    "Example User@BotApp",
+    null,
+    [{
+      name: "2026_-_February_-_Orange_maintenance_plan.json",
+      content: JSON.stringify({
+        notifications: []
+      })
+    }]
+  );
+
+  assert.equal(review.canPublish, false);
+  assert.deepEqual(review.entries, []);
+  assert.match(review.warning ?? "", /primaryChallenge/);
 });
 
 test("summarizeMaintenanceArtifact reads notification targets and headings", () => {

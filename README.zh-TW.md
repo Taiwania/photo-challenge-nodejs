@@ -45,7 +45,7 @@ CLI 範例：
 
 ```bash
 npm run cli -- create-voting --challenge "2026 - March - Three-wheelers"
-npm run cli -- process-challenge --challenge "2026 - February - Orange"
+npm run cli -- count-votes-and-select-winners --challenge "2026 - February - Orange"
 node dist/cli.js post-results-maintenance --challenge "2026 - February - Orange" --paired-challenge "2026 - February - First aid" --publish-mode dry-run
 node dist/cli.js post-results-maintenance --challenge "2026 - February - Orange" --publish-mode live
 ```
@@ -59,7 +59,7 @@ node dist/cli.js post-results-maintenance --challenge "2026 - February - Orange"
 
 預設為單圖、單月挑戰。雙圖像挑戰可使用 `--entry-mode duo-coequal` 或 `--entry-mode duo-reference`。只有社群確認採用例外時長時，才覆寫 `--submission-start` 與 `--submission-end`；雙圖像模式本身不會自動延長投稿期間。
 
-### 2. Count votes and publish results
+### 2. Count votes and select winners
 
 適用於投票結束後。
 此流程會驗證投票者與投票內容、檢查截止時間，並產生 `*_revised.txt`、`*_result.txt`、`*_winners.txt`。
@@ -72,7 +72,7 @@ Late vote 的判定使用每月月初 00:00 AoE 的 Photo Challenge 截止時間
 
 ## 發佈與安全說明
 
-- `create-voting` 與 `process-challenge` 支援 `dry-run`、`sandbox`、`live`
+- `create-voting` 與 `count-votes-and-select-winners` 支援 `dry-run`、`sandbox`、`live`
 - `post-results-maintenance` 已支援 `dry-run`、`sandbox`、`live`，可正式發佈得獎通知、central announcement、Previous-page update 與檔案頁模板
 - `sandbox` 目標頁會依 `NAME` 中 `@` 前的主帳號名稱自動推導
 - 已保存的登入資訊優先走系統 keychain，若不可用則退回本次程式執行期間的記憶體保存
@@ -104,10 +104,13 @@ npm test
 - 後續維護：得獎通知、central announcement、Previous-page update 與檔案頁模板都可正式發佈，且 publish history 會持久化保存
 - parser、renderer、CLI、job history、offline workflow fixtures 的 regression tests
 
+維護者文件：
+- 正式架構與責任邊界：[docs/architecture.zh-TW.md](docs/architecture.zh-TW.md)
+
 建議下一步：
 - 補 deployment / operations 文件，支援非本機單人使用情境
 - 擴充更舊 Commons 頁面格式與特殊簽名 fixtures
-- 補 create-voting、process-challenge、maintenance publish 的 Web flow integration tests
+- 補 create-voting、count-votes-and-select-winners、maintenance publish 的 Web flow integration tests
 - 視需要加入 changed line 內更細的字詞級 diff
 
 ## 相關資源

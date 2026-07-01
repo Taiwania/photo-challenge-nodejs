@@ -50,7 +50,7 @@ test("offline create-voting pipeline matches the expected Three-wheelers voting 
   assert.equal(rendered.issueCount, 0);
 });
 
-test("offline process-challenge pipeline matches expected Orange snippet outputs", () => {
+test("offline vote-counting pipeline matches expected Orange snippet outputs", () => {
   const source = readFixture("voting-page-historical-live.txt");
   const parsed = parseVotingPage(source);
   const voters: VoterValidation[] = [
@@ -69,7 +69,7 @@ test("offline process-challenge pipeline matches expected Orange snippet outputs
   assert.equal(reviseVotingPage(source), readFixture("revised-orange-live-expected.txt"));
 });
 
-test("offline duo-coequal process pipeline renders paired result and winners outputs", () => {
+test("offline duo-coequal vote-counting pipeline renders paired result and winners outputs", () => {
   const parsed = parseVotingPage(readFixture("voting-page-duo-coequal-home-appliances.txt"));
   const scored = countVotes(parsed.entries, parsed.votes.map((vote) => ({ ...vote, error: 0 })));
 
@@ -82,7 +82,7 @@ test("offline duo-coequal process pipeline renders paired result and winners out
   assert.match(winners, /\[\[File:[^\]]+\|x240px\]\]<br\/>\[\[File:[^\]]+\|x240px\]\]/);
 });
 
-test("offline duo-reference process pipeline renders submission-only result and two-row winners outputs", () => {
+test("offline duo-reference vote-counting pipeline renders submission-only result and two-row winners outputs", () => {
   const parsed = parseVotingPage(readFixture("voting-page-duo-reference-100-years-later.txt"));
   const scored = countVotes(parsed.entries, parsed.votes.map((vote) => ({ ...vote, error: 0 })));
 

@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import { DEFAULT_JOB_ACTION, getJobActionLabel } from "../../core/job-actions.js";
 import { clearSavedCredential, getCredentialStoreStatus, getSavedName } from "../../infra/credential-store.js";
 import { listPersistedJobs } from "../../infra/job-history.js";
 import { jobStore } from "../../infra/job-store.js";
@@ -60,7 +61,7 @@ export async function buildHomePageViewModel(options: HomePageOptions = {}) {
       entryMode: options.defaults?.entryMode ?? "single",
       submissionStart: options.defaults?.submissionStart ?? "",
       submissionEnd: options.defaults?.submissionEnd ?? "",
-      action: options.defaults?.action ?? "process-challenge",
+      action: options.defaults?.action ?? DEFAULT_JOB_ACTION,
       publishMode: options.defaults?.publishMode ?? "dry-run"
     },
     savedCredential: savedName
@@ -115,19 +116,7 @@ async function getRecentJobs(): Promise<HomeRecentJob[]> {
 }
 
 function formatActionLabel(action: string): string {
-  if (action === "create-voting") {
-    return "Prepare voting page";
-  }
-
-  if (action === "process-challenge") {
-    return "Count votes and publish results";
-  }
-
-  if (action === "post-results-maintenance") {
-    return "Run post-results maintenance";
-  }
-
-  return action;
+  return getJobActionLabel(action);
 }
 
 function getTimestampLabel(job: { startedAt?: Date | null; finishedAt: Date | null }) {
