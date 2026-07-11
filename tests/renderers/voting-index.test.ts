@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { test } from "./harness.js";
-import { extractChallengeCode, renderVotingIndexSection } from "../src/renderers/voting-index.js";
+import { test } from "../support/harness.js";
+import { extractChallengeCode, renderVotingIndexSection } from "../../src/renderers/voting-index.js";
 
 test("extractChallengeCode finds the first === header === and adds link=-", () => {
   const wikiText = [

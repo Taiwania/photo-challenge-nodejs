@@ -1,13 +1,13 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { test } from "./harness.js";
-import { renderResultPage } from "../src/renderers/result-page.js";
-import { reviseVotingPage } from "../src/renderers/revised-voting-page.js";
-import { renderVotingEntryHeading, renderVotingPage, resolveSubmissionWindow } from "../src/renderers/voting-page.js";
-import { renderWinnersPage } from "../src/renderers/winners-page.js";
-import type { VotingEntryMember } from "../src/core/models.js";
-import type { ScoredVotingFile } from "../src/core/scoring.js";
+import { test } from "../support/harness.js";
+import { renderResultPage } from "../../src/renderers/result-page.js";
+import { reviseVotingPage } from "../../src/renderers/revised-voting-page.js";
+import { renderVotingEntryHeading, renderVotingPage, resolveSubmissionWindow } from "../../src/renderers/voting-page.js";
+import { renderWinnersPage } from "../../src/renderers/winners-page.js";
+import type { VotingEntryMember } from "../../src/core/models.js";
+import type { ScoredVotingFile } from "../../src/core/scoring.js";
 
 const fixturesDir = path.resolve("tests", "fixtures");
 

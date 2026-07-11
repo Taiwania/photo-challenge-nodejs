@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { test } from "./harness.js";
-import { applyMaintenancePublishEntry, buildMaintenancePublishEntries, parseMaintenancePlanResult } from "../src/workflows/maintenance-publish.js";
+import { test } from "../support/harness.js";
+import { applyMaintenancePublishEntry, buildMaintenancePublishEntries, parseMaintenancePlanResult } from "../../src/workflows/maintenance-publish.js";
 
 const maintenancePlanJson = JSON.stringify({
   primaryChallenge: "2026 - February - Orange",

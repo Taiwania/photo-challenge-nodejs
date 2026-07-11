@@ -1,13 +1,13 @@
 import assert from "node:assert/strict";
-import { test } from "./harness.js";
-import type { ScoredVotingFile } from "../src/core/scoring.js";
+import { test } from "../support/harness.js";
+import type { ScoredVotingFile } from "../../src/core/scoring.js";
 import {
   buildChallengeAnnouncement,
   buildFileAssessmentPlans,
   buildPreviousPageUpdate,
   buildWinnerNotifications,
   insertAssessmentTemplate
-} from "../src/workflows/post-results-maintenance.js";
+} from "../../src/workflows/post-results-maintenance.js";
 
 const orangeTopThree: ScoredVotingFile[] = [
   { num: 8, fileName: "Woman in traditional orange attire at Jaipur Literature Festival.jpg", title: "Woman in traditional orange attire at Jaipur Literature Festival", creator: "Amitash", score: 34, support: 14, rank: 1 },

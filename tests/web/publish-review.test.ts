@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
-import { test } from "./harness.js";
-import { buildPublishableArtifacts, summarizePublishDiff } from "../src/web/publish-review.js";
-import { buildStandardPublishReview, toStandardPublishPlan } from "../src/web/standard-publish-review.js";
-import type { JobProgress } from "../src/core/models.js";
+import { test } from "../support/harness.js";
+import { buildPublishableArtifacts, summarizePublishDiff } from "../../src/web/publish-review.js";
+import { buildStandardPublishReview, toStandardPublishPlan } from "../../src/web/standard-publish-review.js";
+import type { JobProgress } from "../../src/core/models.js";
 
 const baseJob: JobProgress = {
   id: "job-1",

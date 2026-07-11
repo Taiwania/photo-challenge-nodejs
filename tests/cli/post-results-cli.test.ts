@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import path from "node:path";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
-import { test } from "./harness.js";
-import { runCli } from "../src/cli/index.js";
-import { getJobOutputPaths } from "../src/infra/output-paths.js";
-import { runPostResultsMaintenance } from "../src/workflows/run-post-results-maintenance.js";
-import type { CommonsBot, ReadPageResult, SavePageResult } from "../src/services/commons-bot.js";
+import { test } from "../support/harness.js";
+import { runCli } from "../../src/cli/index.js";
+import { getJobOutputPaths } from "../../src/infra/output-paths.js";
+import { runPostResultsMaintenance } from "../../src/workflows/run-post-results-maintenance.js";
+import type { CommonsBot, ReadPageResult, SavePageResult } from "../../src/services/commons-bot.js";
 
 async function seedVoteCountingJob(jobId: string, challenge: string, files: Array<Record<string, unknown>>, action = "count-votes-and-select-winners"): Promise<void> {
   const paths = getJobOutputPaths(jobId);

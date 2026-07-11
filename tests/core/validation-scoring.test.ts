@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
-import { test } from "./harness.js";
-import { countVotes } from "../src/core/scoring.js";
-import { validateVoters } from "../src/core/voters.js";
-import type { CommonsBot } from "../src/services/commons-bot.js";
-import type { VotingEntryMember } from "../src/core/models.js";
-import { listErrors, validateVotes, type VoterValidation } from "../src/core/validation.js";
+import { test } from "../support/harness.js";
+import { countVotes } from "../../src/core/scoring.js";
+import { validateVoters } from "../../src/core/voters.js";
+import type { CommonsBot } from "../../src/services/commons-bot.js";
+import type { VotingEntryMember } from "../../src/core/models.js";
+import { listErrors, validateVotes, type VoterValidation } from "../../src/core/validation.js";
 
 const challenge = "2026 - February - First aid";
 

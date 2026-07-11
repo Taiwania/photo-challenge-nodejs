@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import { mkdir, readFile, rm } from "node:fs/promises";
 import path from "node:path";
-import { test } from "./harness.js";
-import { getJobOutputPaths } from "../src/infra/output-paths.js";
-import { buildMaintenancePublishEntries } from "../src/workflows/maintenance-publish.js";
-import { publishMaintenanceEditPlans, publishStandardPages, readExistingPageContent } from "../src/workflows/publish-service.js";
-import type { CommonsBot, ReadPageResult, SavePageResult } from "../src/services/commons-bot.js";
+import { test } from "../support/harness.js";
+import { getJobOutputPaths } from "../../src/infra/output-paths.js";
+import { buildMaintenancePublishEntries } from "../../src/workflows/maintenance-publish.js";
+import { publishMaintenanceEditPlans, publishStandardPages, readExistingPageContent } from "../../src/workflows/publish-service.js";
+import type { CommonsBot, ReadPageResult, SavePageResult } from "../../src/services/commons-bot.js";
 
 function makeFakeBot(pages: Map<string, string>) {
   const saves: Array<{ title: string; text: string; summary: string }> = [];

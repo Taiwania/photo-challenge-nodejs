@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
-import { test } from "./harness.js";
-import { buildCliUsage, parseCliArgs, runCli } from "../src/cli/index.js";
-import { getSandboxRootForName, resolvePublishTarget } from "../src/workflows/run-job.js";
+import { test } from "../support/harness.js";
+import { buildCliUsage, parseCliArgs, runCli } from "../../src/cli/index.js";
+import { getSandboxRootForName, resolvePublishTarget } from "../../src/workflows/run-job.js";
 
 test("buildCliUsage documents both supported commands", () => {
   const usage = buildCliUsage();

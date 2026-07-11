@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { test } from "./harness.js";
-import { parseVotingChallenges, parseVotingPage } from "../src/parsers/voting-parser.js";
+import { test } from "../support/harness.js";
+import { parseVotingChallenges, parseVotingPage } from "../../src/parsers/voting-parser.js";
 
 const fixturesDir = path.resolve("tests", "fixtures");
 

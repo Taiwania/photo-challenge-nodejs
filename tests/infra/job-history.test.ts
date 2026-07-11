@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import path from "node:path";
 import { mkdir, rm, writeFile } from "node:fs/promises";
-import { test } from "./harness.js";
-import { loadPersistedJob } from "../src/infra/job-history.js";
-import { getJobOutputPaths } from "../src/infra/output-paths.js";
+import { test } from "../support/harness.js";
+import { loadPersistedJob } from "../../src/infra/job-history.js";
+import { getJobOutputPaths } from "../../src/infra/output-paths.js";
 
 test("loadPersistedJob preserves publishMode for failed jobs", async () => {
   const jobId = "test-failed-publish-mode";

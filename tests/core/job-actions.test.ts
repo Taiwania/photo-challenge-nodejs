@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { test } from "./harness.js";
+import { test } from "../support/harness.js";
 import {
   DEFAULT_JOB_ACTION,
   buildValidatedJobRequest,
@@ -9,7 +9,7 @@ import {
   parsePublishMode,
   parseSourcePageVariant,
   parseSubmissionWindowValues
-} from "../src/core/job-actions.js";
+} from "../../src/core/job-actions.js";
 
 test("buildValidatedJobRequest builds typed job requests for the vote-counting workflow", () => {
   const request = buildValidatedJobRequest({

@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
-import { test } from "./harness.js";
-import { summarizeMaintenanceArtifact } from "../src/web/maintenance-review.js";
-import { buildMaintenancePublishReview } from "../src/web/maintenance-publish-review.js";
-import type { JobProgress } from "../src/core/models.js";
+import { test } from "../support/harness.js";
+import { summarizeMaintenanceArtifact } from "../../src/web/maintenance-review.js";
+import { buildMaintenancePublishReview } from "../../src/web/maintenance-publish-review.js";
+import type { JobProgress } from "../../src/core/models.js";
 
 const baseMaintenanceJob: JobProgress = {
   id: "maintenance-review-job",

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { test } from "./harness.js";
-import { assembleVotingEntries } from "../src/core/submission-entries.js";
+import { test } from "../support/harness.js";
+import { assembleVotingEntries } from "../../src/core/submission-entries.js";
 
 test("assembleVotingEntries pairs adjacent duo-coequal submissions without shifting later pairs", () => {
   const assembled = assembleVotingEntries([

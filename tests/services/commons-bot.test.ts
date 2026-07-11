@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { test } from "./harness.js";
-import { isCommonsLoginError, toUserFacingCommonsErrorMessage } from "../src/services/commons-bot.js";
+import { test } from "../support/harness.js";
+import { isCommonsLoginError, toUserFacingCommonsErrorMessage } from "../../src/services/commons-bot.js";
 
 test("isCommonsLoginError detects wrapped Wikimedia credential failures", () => {
   const error = new Error([

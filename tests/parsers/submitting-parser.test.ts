@@ -1,12 +1,12 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { test } from "./harness.js";
+import { test } from "../support/harness.js";
 import {
   extractPrefixIndexPrefix,
   parseSubmissionPage,
   parseSubmittedChallenges
-} from "../src/parsers/submitting-parser.js";
+} from "../../src/parsers/submitting-parser.js";
 
 const fixturesDir = path.resolve("tests", "fixtures");
 
