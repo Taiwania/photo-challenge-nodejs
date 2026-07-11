@@ -50,6 +50,8 @@ export type CommonsBot = {
   userHasPhotoChallengeParticipation(userName: string): Promise<boolean>;
 };
 
+type CommonsApiRequest = (params: any) => Promise<any>;
+
 export function isCommonsLoginError(error: unknown): boolean {
   return error instanceof Error
     && error.message.startsWith("Unable to log in to Wikimedia Commons with the provided credentials.");
@@ -194,25 +196,7 @@ export async function createCommonsBot(config: CommonsBotConfig): Promise<Common
     },
 
     async getUserInfo(userName: string): Promise<UserInfoLookup | null> {
-      const response = await bot.request({
-        action: "query",
-        list: "users",
-        ususers: userName,
-        usprop: "registration|editcount|blockinfo"
-      });
-
-      const user = Array.isArray(response?.query?.users) ? response.query.users[0] : null;
-      if (!user || typeof user.name !== "string") {
-        return null;
-      }
-
-      return {
-        name: user.name,
-        editCount: typeof user.editcount === "number" ? user.editcount : 0,
-        registration: typeof user.registration === "string" ? user.registration : null,
-        isRegistered: !Boolean(user.missing),
-        isBlocked: Boolean(user.blockid || user.blockedby)
-      };
+      return lookupCommonsUserInfo((params) => bot.request(params), userName);
     },
 
     async userHasPhotoChallengeParticipation(userName: string): Promise<boolean> {
@@ -228,6 +212,65 @@ export async function createCommonsBot(config: CommonsBotConfig): Promise<Common
       return contribs.some((contrib) => typeof contrib?.title === "string" && /^Commons:Photo challenge\/[^/]+$/.test(contrib.title));
     }
   };
+}
+
+export async function lookupCommonsUserInfo(
+  request: CommonsApiRequest,
+  userName: string
+): Promise<UserInfoLookup | null> {
+  const directUser = await requestUserInfo(request, userName);
+  if (!directUser || directUser.isRegistered) {
+    return directUser;
+  }
+
+  const response = await request({
+    action: "query",
+    titles: `User:${userName}`,
+    redirects: true,
+    prop: "info"
+  });
+  const redirects = Array.isArray(response?.query?.redirects) ? response.query.redirects : [];
+  const sourceTitle = normalizeTitle(`User:${userName}`);
+  const redirect = redirects.find((entry: any) => (
+    typeof entry?.from === "string"
+    && normalizeTitle(entry.from) === sourceTitle
+    && typeof entry?.to === "string"
+    && /^User:/i.test(entry.to)
+  ));
+  if (!redirect) {
+    return directUser;
+  }
+
+  const renamedUser = await requestUserInfo(request, redirect.to.replace(/^User:/i, ""));
+  return renamedUser?.isRegistered ? renamedUser : directUser;
+}
+
+async function requestUserInfo(
+  request: CommonsApiRequest,
+  userName: string
+): Promise<UserInfoLookup | null> {
+  const response = await request({
+    action: "query",
+    list: "users",
+    ususers: userName,
+    usprop: "registration|editcount|blockinfo"
+  });
+  const user = Array.isArray(response?.query?.users) ? response.query.users[0] : null;
+  if (!user || typeof user.name !== "string") {
+    return null;
+  }
+
+  return {
+    name: user.name,
+    editCount: typeof user.editcount === "number" ? user.editcount : 0,
+    registration: typeof user.registration === "string" ? user.registration : null,
+    isRegistered: !Boolean(user.missing),
+    isBlocked: Boolean(user.blockid || user.blockedby)
+  };
+}
+
+function normalizeTitle(value: string): string {
+  return value.trim().replace(/_/g, " ").replace(/\s+/g, " ").toLowerCase();
 }
 
 async function loginWithCandidates(config: CommonsBotConfig): Promise<Mwn> {

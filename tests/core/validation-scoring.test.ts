@@ -2,11 +2,62 @@ import assert from "node:assert/strict";
 import { test } from "../support/harness.js";
 import { countVotes } from "../../src/core/scoring.js";
 import { validateVoters } from "../../src/core/voters.js";
-import type { CommonsBot } from "../../src/services/commons-bot.js";
+import { lookupCommonsUserInfo, type CommonsBot } from "../../src/services/commons-bot.js";
 import type { VotingEntryMember } from "../../src/core/models.js";
 import { listErrors, validateVotes, type VoterValidation } from "../../src/core/validation.js";
 
 const challenge = "2026 - February - First aid";
+
+test("lookupCommonsUserInfo follows a renamed user's User-page redirect", async () => {
+  const requests: Record<string, unknown>[] = [];
+  const user = await lookupCommonsUserInfo(async (params) => {
+    requests.push(params);
+    if (params.list === "users" && params.ususers === "TSavitski") {
+      return { query: { users: [{ name: "TSavitski", missing: true }] } };
+    }
+    if (params.titles === "User:TSavitski") {
+      return {
+        query: {
+          redirects: [{ from: "User:TSavitski", to: "User:Tyler Savitski" }],
+          pages: [{ title: "User:Tyler Savitski" }]
+        }
+      };
+    }
+    if (params.list === "users" && params.ususers === "Tyler Savitski") {
+      return {
+        query: {
+          users: [{
+            name: "Tyler Savitski",
+            editcount: 267,
+            registration: "2025-11-19T22:56:19Z"
+          }]
+        }
+      };
+    }
+    throw new Error(`Unexpected request: ${JSON.stringify(params)}`);
+  }, "TSavitski");
+
+  assert.deepEqual(user, {
+    name: "Tyler Savitski",
+    editCount: 267,
+    registration: "2025-11-19T22:56:19Z",
+    isRegistered: true,
+    isBlocked: false
+  });
+  assert.equal(requests.length, 3);
+});
+
+test("lookupCommonsUserInfo keeps a missing user missing without a User-page redirect", async () => {
+  const user = await lookupCommonsUserInfo(async (params) => {
+    if (params.list === "users") {
+      return { query: { users: [{ name: "Missing voter", missing: true }] } };
+    }
+    return { query: { pages: [{ title: "User:Missing voter", missing: true }] } };
+  }, "Missing voter");
+
+  assert.equal(user?.name, "Missing voter");
+  assert.equal(user?.isRegistered, false);
+});
 
 test("validateVotes flags late votes and duplicate award usage while keeping valid votes countable", () => {
   const voters: VoterValidation[] = [
