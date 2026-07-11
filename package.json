@@ -21,18 +21,18 @@
     "test": "npm run build:test && node .test-dist/tests/run.js"
   },
   "dependencies": {
-    "dotenv": "^16.5.0",
-    "express": "^4.21.2",
-    "express-handlebars": "^8.0.1",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.2",
+    "express-handlebars": "^8.0.7",
     "keytar": "^7.9.0",
-    "luxon": "^3.6.1",
-    "mwn": "^3.0.1"
+    "luxon": "^3.7.2",
+    "mwn": "^3.0.3"
   },
   "devDependencies": {
-    "@types/express": "^5.0.1",
-    "@types/luxon": "^3.7.1",
-    "@types/node": "^25.9.1",
-    "tsx": "^4.19.3",
-    "typescript": "^5.8.3"
+    "@types/express": "^4.17.25",
+    "@types/luxon": "^3.7.2",
+    "@types/node": "^26.1.1",
+    "tsx": "^4.23.0",
+    "typescript": "^5.9.3"
   }
 }
