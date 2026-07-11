@@ -10,7 +10,7 @@
 
 ## 環境需求
 
-- Node.js `26.3.0`
+- Node.js `26.5.0`
 - npm `11` 或更新版本
 - Wikimedia Commons BotPassword 帳號
 
@@ -88,7 +88,7 @@ npm run check:test
 npm test
 ```
 
-相容性狀態：目前已在 Node.js `26.3.0` 與 npm `11.16.0` 驗證通過。
+相容性狀態：目前已在 Node.js `26.5.0` 與 npm `11.16.0` 驗證通過。
 
 補充：
 - `.env` 不應進版控
